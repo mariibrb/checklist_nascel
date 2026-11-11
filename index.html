@@ -171,6 +171,45 @@
       box-shadow: 0 0 0 3px rgba(252, 164, 34, 0.18);
     }
 
+    .regime-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+
+    .regime-bar-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+      margin-right: 4px;
+    }
+
+    .regime-pill {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 7px 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .regime-pill:hover {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+    }
+
+    .regime-pill.active {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: #fff;
+    }
+
     .tabs-bar {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -682,7 +721,8 @@
         font-size: 11px;
       }
       .header-actions,
-      .tabs-bar {
+      .tabs-bar,
+      .regime-bar {
         display: none !important;
       }
       .header-card {
@@ -735,6 +775,7 @@
         grid-template-columns: 1fr;
       }
     }
+
   </style>
 </head>
 <body>
@@ -775,45 +816,49 @@
     </div>
     <div class="field-group">
       <label>Revisor Técnico</label>
-      <select id="clientReviewer" onchange="saveHeaderData()">
-        <option value="Mariana / Clayton">Mariana / Clayton</option>
-        <option value="Mariana">Mariana</option>
-        <option value="Clayton">Clayton</option>
-      </select>
+      <input type="text" id="clientReviewer" placeholder="Nome do revisor" oninput="saveHeaderData()">
     </div>
   </section>
 
+  <div class="regime-bar">
+    <span class="regime-bar-label">Regime:</span>
+    <button type="button" class="regime-pill active" id="regime-simples" onclick="switchRegime('simples')">Simples Nacional</button>
+    <button type="button" class="regime-pill" id="regime-presumido" onclick="switchRegime('presumido')">Lucro Presumido</button>
+    <button type="button" class="regime-pill" id="regime-real" onclick="switchRegime('real')">Lucro Real</button>
+    <button type="button" class="regime-pill" id="regime-mei" onclick="switchRegime('mei')">MEI</button>
+  </div>
+
   <nav class="tabs-bar">
-    <button class="tab-btn active" id="tab-simples" onclick="switchRegime('simples')">
+    <button class="tab-btn active" id="tab-importacao" onclick="switchChecklistType('importacao')">
       <div class="tab-title">
-        <span>Simples Nacional</span>
-        <span class="tab-badge" id="badge-simples">24 itens</span>
+        <span>Importação</span>
+        <span class="tab-badge" id="badge-importacao">0 itens</span>
       </div>
-      <div class="tab-sub">Anexos I a V • PGDAS-D • Fator R • ST/Monofásico</div>
+      <div class="tab-sub">SIEG • XMLs • NFS-e • App Coletor • Parâmetros</div>
     </button>
 
-    <button class="tab-btn" id="tab-presumido" onclick="switchRegime('presumido')">
+    <button class="tab-btn" id="tab-analise" onclick="switchChecklistType('analise')">
       <div class="tab-title">
-        <span>Lucro Presumido</span>
-        <span class="tab-badge" id="badge-presumido">18 itens</span>
+        <span>Análise</span>
+        <span class="tab-badge" id="badge-analise">0 itens</span>
       </div>
-      <div class="tab-sub">PIS/COFINS Cumulativo • ICMS RPA • IRPJ/CSLL</div>
+      <div class="tab-sub">Sequência • Entradas • Saídas • Retenções • Segregação</div>
     </button>
 
-    <button class="tab-btn" id="tab-real" onclick="switchRegime('real')">
+    <button class="tab-btn" id="tab-obrigacoes" onclick="switchChecklistType('obrigacoes')">
       <div class="tab-title">
-        <span>Lucro Real</span>
-        <span class="tab-badge" id="badge-real">19 itens</span>
+        <span>Obrigações Acessórias</span>
+        <span class="tab-badge" id="badge-obrigacoes">0 itens</span>
       </div>
-      <div class="tab-sub">Não-Cumulativo (Créditos 9,25%) • LALUR • SPEDs</div>
+      <div class="tab-sub">PGDAS • SPEDs • Livros • DeSTDA • DCTF</div>
     </button>
 
-    <button class="tab-btn" id="tab-mei" onclick="switchRegime('mei')">
+    <button class="tab-btn" id="tab-fechamento" onclick="switchChecklistType('fechamento')">
       <div class="tab-title">
-        <span>MEI</span>
-        <span class="tab-badge" id="badge-mei">9 itens</span>
+        <span>Fechamento e Entrega</span>
+        <span class="tab-badge" id="badge-fechamento">0 itens</span>
       </div>
-      <div class="tab-sub">Teto 81k • Regra 80% Compras • PGMEI</div>
+      <div class="tab-sub">Apuração • App Fechamento • Guias • Travar período</div>
     </button>
   </nav>
 
@@ -835,7 +880,7 @@
   </section>
 
   <section class="paths-box">
-    <h3>Diretórios Padrão de Salvamento na Rede (Preenchimento Mari / Clayton)</h3>
+    <h3>Diretórios Padrão de Salvamento na Rede (Preenchimento da equipe)</h3>
     <div class="paths-grid">
       <div class="path-item">
         <span>1. Pasta para Salvar XMLs Brutos (SIEG / Prefeitura) + Relatório App Coletor:</span>
@@ -861,11 +906,11 @@
     <div>
       <strong>Status p/ App Fechamento:</strong>
       <p style="font-size: 0.8rem; color: var(--muted); margin-top: 4px;">
-        Só envie para revisão da Mariana ou do Clayton após todos os itens estarem marcados com <strong>OK</strong> ou <strong>N/A</strong> (ou com a dúvida descrita na coluna Observação se marcado <strong>PEND</strong>).
+        Só envie para revisão técnica após todos os itens estarem marcados com <strong>OK</strong> ou <strong>N/A</strong> (ou com a dúvida descrita na coluna Observação se marcado <strong>PEND</strong>).
       </p>
     </div>
     <div class="sign-box">Assinatura / Visto - Operador Fiscal</div>
-    <div class="sign-box">Aprovação Revisão Técnica (Mariana / Clayton)</div>
+    <div class="sign-box">Aprovação - Revisão Técnica</div>
   </footer>
 </div>
 
@@ -877,7 +922,7 @@
         { id: "sn_01", cat: "1. Parâmetros e Coleta (Domínio / SIEG / App Coletor)", title: "Selecionar empresa e competência correta no Domínio (F8) e checar Regime", desc: "Verificar se é Competência ou Caixa.", path: "Domínio: Controle > Parâmetros > Aba Simples Nacional" },
         { id: "sn_02", cat: "1. Parâmetros e Coleta (Domínio / SIEG / App Coletor)", title: "Baixar parcelas recebidas (Exclusivo se for Regime de Caixa)", desc: "Solicitar extrato/financeiro via WhatsApp/Nibo e baixar recebimentos antes de apurar.", path: "Domínio: Movimentos > Baixa de Parcelas" },
         { id: "sn_03", cat: "1. Parâmetros e Coleta (Domínio / SIEG / App Coletor)", title: "Baixar e importar XMLs de Mercadorias e Fretes (Ativas e Canceladas)", desc: "NF-e (55), NFC-e (65), SAT (59) e CT-e (57) capturados no SIEG Cofre XML.", path: "Domínio: Utilitários > Importação > Importador de XML" },
-        { id: "sn_04", cat: "1. Parâmetros e Coleta (Domínio / SIEG / App Coletor)", title: "Baixar NFS-e (Prefeitura/Portal Nacional), importar na Domínio e rodar App Coletor", desc: "Passar notas do Emissor Nacional no App Coletor (App da Mari) para gerar o relatório de conferência dos Serviços Tomados.", path: "App Coletor + Domínio: Utilitários > Importação > Importação de NFS-e" },
+        { id: "sn_04", cat: "1. Parâmetros e Coleta (Domínio / SIEG / App Coletor)", title: "Baixar NFS-e (Prefeitura/Portal Nacional), importar na Domínio e rodar App Coletor", desc: "Passar notas do Emissor Nacional no App Coletor para gerar o relatório de conferência dos Serviços Tomados.", path: "App Coletor + Domínio: Utilitários > Importação > Importação de NFS-e" },
         { id: "sn_05", cat: "2. Auditoria de Sequência e Entradas (SP / MG / Retenções)", title: "Auditar quebra de sequência numérica e tratar Canceladas / Inutilizadas", desc: "Garantir que não há pulo de nota e que canceladas estão R$ 0,00.", path: "Domínio: Relatórios > Acompanhamento > Verificar Numeração | Movimentos > NF-e Inutilizadas" },
         { id: "sn_06", cat: "2. Auditoria de Sequência e Entradas (SP / MG / Retenções)", title: "Analisar compras interestaduais (CFOP 2.556/2.551/2.406/2.407) p/ DIFAL Uso/Consumo e Ativo", desc: "Se alíquota interestadual (4% ou 12%) for menor que a interna, calcular DIFAL e emitir DARE-SP ou DAE-MG.", path: "Domínio: Movimentos > Entradas | Relatórios > Acompanhamento > Demonstrativo de CFOPs" },
         { id: "sn_07", cat: "2. Auditoria de Sequência e Entradas (SP / MG / Retenções)", title: "Analisar compras interestaduais de revenda (CFOP 2.101/2.102/2.403) - Regra SP vs. MG", desc: "Em SP: checar NCM p/ Antecipação ST (Art. 426-A). Em MG: calcular Antecipação de Alíquota MG. Em 2.403: checar GNRE paga.", path: "Domínio: Movimentos > Entradas" },
@@ -894,7 +939,7 @@
         { id: "sn_18", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Validar se o RBT12 do Domínio está idêntico ao RBT12 do Portal PGDAS-D", desc: "Se houver diferença nos 12 meses anteriores, ajustar em Receitas Anteriores.", path: "Domínio: Movimentos > Outros Dados > Simples Nacional > Receitas Anteriores" },
         { id: "sn_19", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Bater centavos (Valor do DAS no PGDAS-D == Valor do Domínio) e gerar Guia/Recibo/Extrato", desc: "Só transmitir o PGDAS-D após o valor bater 100% com o demonstrativo do Domínio.", path: "Portal Simples Nacional / e-CAC" },
         { id: "sn_20", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Emitir Livros Fiscais (Entradas, Saídas, ISS) e Demonstrativos em PDF na Domínio", desc: "Salvar todos os relatórios e livros na pasta de rede do cliente.", path: "Domínio: Relatórios > Livros > Entradas / Saídas / ISS" },
-        { id: "sn_21", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Montar pacote completo no App Fechamento e enviar p/ Revisão (Mariana / Clayton)", desc: "Subir no App Fechamento: DAS, Extrato/Recibo PGDAS, Relatório Domínio, Relatório App Coletor, Livros e Guias extras.", path: "App Fechamento" },
+        { id: "sn_21", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Montar pacote completo no App Fechamento e enviar p/ Revisão Técnica", desc: "Subir no App Fechamento: DAS, Extrato/Recibo PGDAS, Relatório Domínio, Relatório App Coletor, Livros e Guias extras.", path: "App Fechamento" },
         { id: "sn_22", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Transmitir DeSTDA (SEDIF-SN) e encerrar escrituração no site da Prefeitura", desc: "Gerar DeSTDA para contribuintes com IE e fechar competência municipal de ISS.", path: "Domínio: Relatórios > Informativos > Estaduais > DeSTDA" },
         { id: "sn_23", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "(Pós-Revisão) Postar guias validadas para o cliente via Nibo / WhatsApp", desc: "Liberar para o cliente somente após o OK do revisor no App Fechamento.", path: "Nibo / WhatsApp" },
         { id: "sn_24", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Fechar / Travar o Período Fiscal no Domínio Sistemas", desc: "Bloquear o mês apurado para impedir alterações acidentais.", path: "Domínio: Utilitários > Fechamento de Período" }
@@ -905,7 +950,7 @@
       items: [
         { id: "lp_01", cat: "1. Coleta, Parâmetros, SIEG e App Coletor", title: "Selecionar empresa e competência no Domínio (F8) e checar regime (Caixa ou Competência)", desc: "Conferir parametrização federal/estadual e solicitar extratos de aplicação financeira no trimestre.", path: "Domínio: Controle > Parâmetros" },
         { id: "lp_02", cat: "1. Coleta, Parâmetros, SIEG e App Coletor", title: "Baixar no SIEG e importar no Domínio XMLs de NF-e, NFC-e, SAT e CT-e (Ativas e Canceladas)", desc: "Importar lotes de entradas, saídas e conhecimentos de transporte.", path: "Domínio: Utilitários > Importação > Importador de XML" },
-        { id: "lp_03", cat: "1. Coleta, Parâmetros, SIEG e App Coletor", title: "Baixar NFS-e (Prefeitura/Portal Nacional), importar na Domínio e rodar o App Coletor", desc: "Gerar no App Coletor (App da Mari) o relatório de auditoria das retenções de Serviços Tomados.", path: "App Coletor + Domínio: Utilitários > Importação > NFS-e" },
+        { id: "lp_03", cat: "1. Coleta, Parâmetros, SIEG e App Coletor", title: "Baixar NFS-e (Prefeitura/Portal Nacional), importar na Domínio e rodar o App Coletor", desc: "Gerar no App Coletor o relatório de auditoria das retenções de Serviços Tomados.", path: "App Coletor + Domínio: Utilitários > Importação > NFS-e" },
         { id: "lp_04", cat: "1. Coleta, Parâmetros, SIEG e App Coletor", title: "Auditar sequência numérica de Saídas e tratar Canceladas / Inutilizadas", desc: "Confirmar que não há pulo de numeração em NF-e, NFC-e e NFS-e.", path: "Domínio: Relatórios > Acompanhamento > Verificar Numeração" },
         { id: "lp_05", cat: "2. Auditoria de Entradas (Crédito ICMS/IPI, Fronteira e App Coletor)", title: "Conferir crédito de ICMS/IPI nas entradas de revenda/insumos e bloqueio em ST/Uso e Consumo", desc: "CFOPs 1.101/1.102/2.102 tributados geram crédito de ICMS; 1.403 (ST) e 1.556 (Uso/Consumo) não geram crédito.", path: "Domínio: Movimentos > Entradas" },
         { id: "lp_06", cat: "2. Auditoria de Entradas (Crédito ICMS/IPI, Fronteira e App Coletor)", title: "Auditar compras interestaduais (CFOP 2.xxx) p/ DIFAL e Antecipações (SP e MG)", desc: "Verificar DIFAL Uso/Ativo em conta gráfica (SP) ou DAE (MG), Art. 426-A (SP) e Antecipação de Entrada (MG).", path: "Domínio: Movimentos > Entradas" },
@@ -919,7 +964,7 @@
         { id: "lp_14", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Processar Apuração (F6) e emitir Relatórios de Impostos em PDF na Domínio", desc: "Emitir demonstrativos de PIS, COFINS, ICMS, IPI, ISS, Retenções, IRPJ e CSLL.", path: "Domínio: Movimentos > Apuração | Relatórios > Impostos" },
         { id: "lp_15", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Emitir todos os Livros Fiscais em PDF na Domínio Sistemas", desc: "Livros de Entradas, Saídas, Apuração de ICMS, Apuração de IPI (se indústria) e ISS.", path: "Domínio: Relatórios > Livros > Entradas / Saídas / Apuração ICMS / ISS" },
         { id: "lp_16", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Gerar e validar SPED Fiscal, EFD-Contribuições, EFD-Reinf, DCTFWeb/MIT e GIA/DAPI", desc: "Validar arquivos nos PVAs, transmitir obrigações e gerar todos os DARFs, DARE/DAE e guias de ISS.", path: "Domínio: Relatórios > Informativos > Federais e Estaduais" },
-        { id: "lp_17", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Salvar na rede, montar pacote completo no App Fechamento e enviar p/ Revisão (Mariana/Clayton)", desc: "Subir no App Fechamento: Relatórios de Impostos, Relatório App Coletor, Livros Fiscais, Recibos SPED e Guias.", path: "App Fechamento" },
+        { id: "lp_17", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Salvar na rede, montar pacote completo no App Fechamento e enviar p/ Revisão Técnica", desc: "Subir no App Fechamento: Relatórios de Impostos, Relatório App Coletor, Livros Fiscais, Recibos SPED e Guias.", path: "App Fechamento" },
         { id: "lp_18", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "(Pós-Revisão) Enviar guias via Nibo/WhatsApp e travar período no Domínio", desc: "Liberar ao cliente após revisão e bloquear mês fiscal.", path: "Domínio: Utilitários > Fechamento de Período" }
       ]
     },
@@ -928,7 +973,7 @@
       items: [
         { id: "lr_01", cat: "1. Coleta Rigorosa, SIEG, App Coletor e Despesas Creditáveis", title: "Selecionar empresa e competência no Domínio (F8)", desc: "Verificar se apuração de IRPJ/CSLL é Trimestral ou Estimativa Mensal (Balanço de Suspensão/Redução).", path: "Domínio: Controle > Parâmetros" },
         { id: "lr_02", cat: "1. Coleta Rigorosa, SIEG, App Coletor e Despesas Creditáveis", title: "Baixar no SIEG e importar XMLs de NF-e, NFC-e, SAT, CT-e e NF3-e Energia", desc: "Importar 100% dos documentos fiscais estaduais de entradas e saídas.", path: "Domínio: Utilitários > Importação > Importador de XML" },
-        { id: "lr_03", cat: "1. Coleta Rigorosa, SIEG, App Coletor e Despesas Creditáveis", title: "Baixar NFS-e (Prefeitura/Portal Nacional), importar na Domínio e rodar o App Coletor", desc: "Emitir o relatório do App Coletor (App da Mari) para auditar retenções e serviços tomados.", path: "App Coletor + Domínio: Utilitários > Importação > NFS-e" },
+        { id: "lr_03", cat: "1. Coleta Rigorosa, SIEG, App Coletor e Despesas Creditáveis", title: "Baixar NFS-e (Prefeitura/Portal Nacional), importar na Domínio e rodar o App Coletor", desc: "Emitir o relatório do App Coletor para auditar retenções e serviços tomados.", path: "App Coletor + Domínio: Utilitários > Importação > NFS-e" },
         { id: "lr_04", cat: "1. Coleta Rigorosa, SIEG, App Coletor e Despesas Creditáveis", title: "Coletar e lançar faturas de Energia, Aluguéis PJ, Leasing, Fretes e Depreciação", desc: "Lançar despesas que geram crédito de 1,65% PIS e 7,6% COFINS.", path: "Domínio: Movimentos > Outros Dados > PIS/COFINS > Créditos / Ativo" },
         { id: "lr_05", cat: "1. Coleta Rigorosa, SIEG, App Coletor e Despesas Creditáveis", title: "Conferir sequência numérica de Saídas e tratar Canceladas / Inutilizadas", desc: "Garantir integridade total da numeração antes de apurar os créditos/débitos.", path: "Domínio: Relatórios > Acompanhamento > Verificar Numeração" },
         { id: "lr_06", cat: "2. Auditoria de Créditos Não-Cumulativos e Retenções nas Entradas", title: "Auditar créditos de ICMS, IPI, PIS (1,65%) e COFINS (7,6%) nas compras de revenda, insumos e fretes", desc: "Conferir CST 50 nas entradas tributadas e regras da Lei 14.592/2023.", path: "Domínio: Movimentos > Entradas" },
@@ -943,7 +988,7 @@
         { id: "lr_15", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Processar Apuração (F6) e emitir Relatórios de Impostos (com Memória de Créditos PIS/COFINS)", desc: "Salvar PDFs de PIS/COFINS Não-Cumulativo, ICMS, IPI, ISS, Retenções, IRPJ e CSLL.", path: "Domínio: Movimentos > Apuração | Relatórios > Impostos" },
         { id: "lr_16", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Emitir todos os Livros Fiscais em PDF (Entradas, Saídas, Apuração ICMS, IPI, ISS e Inventário)", desc: "Gerar livros oficiais do período para compor o fechamento.", path: "Domínio: Relatórios > Livros > Entradas / Saídas / ICMS / IPI / ISS / Inventário" },
         { id: "lr_17", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Gerar e validar SPED Fiscal, EFD-Contribuições (Blocos F e M), EFD-Reinf, DCTFWeb/MIT e GIA/DAPI", desc: "Validar no PVA, conferir créditos no Bloco M e gerar todas as guias de pagamento.", path: "Domínio: Relatórios > Informativos > Federais e Estaduais" },
-        { id: "lr_18", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Salvar na rede, montar dossiê completo no App Fechamento e enviar p/ Revisão (Mariana/Clayton)", desc: "Anexar Memória de Créditos, Relatórios Domínio, Relatório App Coletor, Livros, SPEDs e Guias.", path: "App Fechamento" },
+        { id: "lr_18", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Salvar na rede, montar dossiê completo no App Fechamento e enviar p/ Revisão Técnica", desc: "Anexar Memória de Créditos, Relatórios Domínio, Relatório App Coletor, Livros, SPEDs e Guias.", path: "App Fechamento" },
         { id: "lr_19", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "(Pós-Revisão) Liberar guias no Nibo/WhatsApp e travar período fiscal no Domínio", desc: "Enviar ao cliente após validação técnica e bloquear mês na Domínio.", path: "Domínio: Utilitários > Fechamento de Período" }
       ]
     },
@@ -953,11 +998,11 @@
         { id: "mei_01", cat: "1. Coleta de Dados (SIEG, Portal Nacional, App Coletor e Cliente)", title: "Baixar XMLs de compras (Entradas) e vendas (Saídas) do MEI no SIEG Cofre XML", desc: "Capturar todas as NF-e emitidas contra o CNPJ do MEI e emitidas por ele.", path: "SIEG Cofre XML" },
         { id: "mei_02", cat: "1. Coleta de Dados (SIEG, Portal Nacional, App Coletor e Cliente)", title: "Baixar NFS-e do Portal Nacional (Emissor Nacional) e rodar no App Coletor", desc: "Verificar pelo relatório do App Coletor se o MEI tomou serviços com retenção de ISS/INSS.", path: "Portal Nacional (gov.br/nfse) + App Coletor" },
         { id: "mei_03", cat: "1. Coleta de Dados (SIEG, Portal Nacional, App Coletor e Cliente)", title: "Receber do cliente (via WhatsApp / Nibo) o faturamento sem nota do mês", desc: "Coletar controles de vendas em dinheiro, PIX e maquininha de cartão.", path: "WhatsApp / Nibo" },
-        { id: "mei_04", cat: "2. Auditoria de Limites do MEI (Regras SE / SENÃO)", title: "Conferir Faturamento Acumulado no Ano vs. Limite de R$ 81.000,00 (ou proporcional)", desc: "Se passou de R$ 81k até R$ 97,2k (20%) ou acima de R$ 97,2k: PARAR e avisar Mariana/Clayton imediatamente!", path: "Planilha / Controle de Faturamento MEI" },
-        { id: "mei_05", cat: "2. Auditoria de Limites do MEI (Regras SE / SENÃO)", title: "Conferir Volume de Compras no SIEG vs. Limite de 80% das Receitas", desc: "Alertar Mariana/Clayton se as compras do ano estiverem próximas ou acima de 80% do que o MEI vendeu.", path: "Relatório de Entradas SIEG" },
+        { id: "mei_04", cat: "2. Auditoria de Limites do MEI (Regras SE / SENÃO)", title: "Conferir Faturamento Acumulado no Ano vs. Limite de R$ 81.000,00 (ou proporcional)", desc: "Se passou de R$ 81k até R$ 97,2k (20%) ou acima de R$ 97,2k: PARAR e avisar a coordenação/revisão técnica imediatamente!", path: "Planilha / Controle de Faturamento MEI" },
+        { id: "mei_05", cat: "2. Auditoria de Limites do MEI (Regras SE / SENÃO)", title: "Conferir Volume de Compras no SIEG vs. Limite de 80% das Receitas", desc: "Alertar a coordenação/revisão técnica se as compras do ano estiverem próximas ou acima de 80% do que o MEI vendeu.", path: "Relatório de Entradas SIEG" },
         { id: "mei_06", cat: "2. Auditoria de Limites do MEI (Regras SE / SENÃO)", title: "Verificar se houve Compra Interestadual (CFOP 2.xxx) sujeita a DIFAL/ST ou ISS Tomador", desc: "Checar se alguma compra de fora do estado exige recolhimento estadual ou guia municipal de ISS retido.", path: "XMLs de Entrada + Relatório App Coletor" },
         { id: "mei_07", cat: "3. Guia DAS-MEI, App Fechamento, Revisão e Entrega", title: "Emitir a guia DAS-MEI no portal PGMEI e preencher o Relatório Mensal de Receitas Brutas", desc: "Gerar documento de arrecadação do mês (vencimento dia 20).", path: "Portal Simples Nacional > Simei > PGMEI" },
-        { id: "mei_08", cat: "3. Guia DAS-MEI, App Fechamento, Revisão e Entrega", title: "Salvar arquivos na pasta da rede e subir no App Fechamento p/ Revisão (Mariana/Clayton)", desc: "Anexar Guia DAS-MEI, Controle de Receitas/Compras e Relatório do App Coletor.", path: "App Fechamento" },
+        { id: "mei_08", cat: "3. Guia DAS-MEI, App Fechamento, Revisão e Entrega", title: "Salvar arquivos na pasta da rede e subir no App Fechamento p/ Revisão Técnica", desc: "Anexar Guia DAS-MEI, Controle de Receitas/Compras e Relatório do App Coletor.", path: "App Fechamento" },
         { id: "mei_09", cat: "3. Guia DAS-MEI, App Fechamento, Revisão e Entrega", title: "(Pós-Revisão) Enviar guia DAS-MEI ao cliente via Nibo / WhatsApp", desc: "Disponibilizar guia validada para pagamento do cliente.", path: "Nibo / WhatsApp" }
       ]
     }
@@ -966,12 +1011,52 @@
   const STORAGE_KEY = "mari_fiscal_checklists_v2";
   const LEGACY_KEY = "mari_fiscal_checklists_v1";
 
+  const CHECKLIST_TYPES = {
+    importacao: { title: "Importação" },
+    analise: { title: "Análise" },
+    obrigacoes: { title: "Obrigações Acessórias" },
+    fechamento: { title: "Fechamento e Entrega" }
+  };
+
+  const ITEM_TYPE_MAP = {
+    sn_01: "importacao", sn_02: "importacao", sn_03: "importacao", sn_04: "importacao",
+    sn_05: "analise", sn_06: "analise", sn_07: "analise", sn_08: "analise", sn_09: "analise",
+    sn_10: "analise", sn_11: "analise", sn_12: "analise", sn_13: "analise", sn_14: "analise",
+    sn_15: "analise", sn_16: "analise",
+    sn_18: "obrigacoes", sn_19: "obrigacoes", sn_20: "obrigacoes", sn_22: "obrigacoes",
+    sn_17: "fechamento", sn_21: "fechamento", sn_23: "fechamento", sn_24: "fechamento",
+
+    lp_01: "importacao", lp_02: "importacao", lp_03: "importacao", lp_04: "importacao",
+    lp_05: "analise", lp_06: "analise", lp_07: "analise", lp_08: "analise",
+    lp_09: "analise", lp_10: "analise", lp_11: "analise", lp_12: "analise", lp_13: "analise",
+    lp_15: "obrigacoes", lp_16: "obrigacoes",
+    lp_14: "fechamento", lp_17: "fechamento", lp_18: "fechamento",
+
+    lr_01: "importacao", lr_02: "importacao", lr_03: "importacao", lr_04: "importacao", lr_05: "importacao",
+    lr_06: "analise", lr_07: "analise", lr_08: "analise", lr_09: "analise",
+    lr_10: "analise", lr_11: "analise", lr_12: "analise", lr_13: "analise", lr_14: "analise",
+    lr_16: "obrigacoes", lr_17: "obrigacoes",
+    lr_15: "fechamento", lr_18: "fechamento", lr_19: "fechamento",
+
+    mei_01: "importacao", mei_02: "importacao", mei_03: "importacao",
+    mei_04: "analise", mei_05: "analise", mei_06: "analise",
+    mei_07: "obrigacoes",
+    mei_08: "fechamento", mei_09: "fechamento"
+  };
+
   let currentRegime = "simples";
+  let currentChecklistType = "importacao";
   let savedState = loadState();
+
+  function sanitizePersonName(value) {
+    const text = String(value || "").trim();
+    if (/mariana|clayton/i.test(text)) return "";
+    return text;
+  }
 
   function defaultState() {
     return {
-      header: { name: "", cnpj: "", comp: "2026-11", operator: "", reviewer: "Mariana / Clayton" },
+      header: { name: "", cnpj: "", comp: "2026-11", operator: "", reviewer: "" },
       paths: {
         simples: { xml: "", close: "" },
         presumido: { xml: "", close: "" },
@@ -1026,6 +1111,8 @@
     const base = defaultState();
     const merged = Object.assign(base, state || {});
     merged.header = Object.assign(base.header, (state && state.header) || {});
+    merged.header.reviewer = sanitizePersonName(merged.header.reviewer);
+    merged.header.operator = sanitizePersonName(merged.header.operator);
     merged.paths = Object.assign(base.paths, (state && state.paths) || {});
     merged.flags = (state && state.flags) || {};
     merged.obsLogs = (state && state.obsLogs) || {};
@@ -1085,12 +1172,32 @@
     return savedState.obsLogs[itemId];
   }
 
+  function getRegimeItems() {
+    return (regimesData[currentRegime] && regimesData[currentRegime].items) || [];
+  }
+
+  function getItemType(itemId) {
+    return ITEM_TYPE_MAP[itemId] || "analise";
+  }
+
+  function getCurrentItems() {
+    return getRegimeItems().filter(item => getItemType(item.id) === currentChecklistType);
+  }
+
+  function updateTypeBadges() {
+    Object.keys(CHECKLIST_TYPES).forEach(typeKey => {
+      const count = getRegimeItems().filter(item => getItemType(item.id) === typeKey).length;
+      const badge = document.getElementById("badge-" + typeKey);
+      if (badge) badge.innerText = count + (count === 1 ? " item" : " itens");
+    });
+  }
+
   function initApp() {
     document.getElementById("clientName").value = savedState.header.name || "";
     document.getElementById("clientCnpj").value = savedState.header.cnpj || "";
     document.getElementById("clientComp").value = savedState.header.comp || "2026-11";
     document.getElementById("clientOperator").value = savedState.header.operator || "";
-    document.getElementById("clientReviewer").value = savedState.header.reviewer || "Mariana / Clayton";
+    document.getElementById("clientReviewer").value = savedState.header.reviewer || "";
     switchRegime("simples");
     renderClosingsList();
   }
@@ -1121,15 +1228,29 @@
   function switchRegime(regimeKey) {
     currentRegime = regimeKey;
 
-    document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
-    document.getElementById("tab-" + regimeKey).classList.add("active");
+    document.querySelectorAll(".regime-pill").forEach(btn => btn.classList.remove("active"));
+    const regimeBtn = document.getElementById("regime-" + regimeKey);
+    if (regimeBtn) regimeBtn.classList.add("active");
 
     const rPaths = (savedState.paths && savedState.paths[regimeKey]) || { xml: "", close: "" };
     document.getElementById("pathXmlInput").value = rPaths.xml || "";
     document.getElementById("pathCloseInput").value = rPaths.close || "";
 
-    document.getElementById("pageMainTitle").innerText = "Checklist Operacional - " + regimesData[regimeKey].title;
-    document.getElementById("regimeProgressLabel").innerText = "Progresso do Fechamento (" + regimesData[regimeKey].title + ")";
+    updateTypeBadges();
+    switchChecklistType(currentChecklistType);
+  }
+
+  function switchChecklistType(typeKey) {
+    currentChecklistType = typeKey;
+
+    document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+    const tabBtn = document.getElementById("tab-" + typeKey);
+    if (tabBtn) tabBtn.classList.add("active");
+
+    const regimeTitle = regimesData[currentRegime].title;
+    const typeTitle = CHECKLIST_TYPES[typeKey].title;
+    document.getElementById("pageMainTitle").innerText = "Checklist - " + typeTitle + " (" + regimeTitle + ")";
+    document.getElementById("regimeProgressLabel").innerText = "Progresso: " + typeTitle + " · " + regimeTitle;
 
     renderChecklistTable();
     updateCounters();
@@ -1166,7 +1287,12 @@
 
   function renderChecklistTable() {
     const container = document.getElementById("checklistContainer");
-    const items = regimesData[currentRegime].items;
+    const items = getCurrentItems();
+
+    if (!items.length) {
+      container.innerHTML = `<div class="category-header">Nenhum item neste checklist para o regime selecionado.</div>`;
+      return;
+    }
 
     let html = "";
     let lastCategory = "";
@@ -1301,7 +1427,7 @@
   }
 
   function updateCounters() {
-    const items = regimesData[currentRegime].items;
+    const items = getCurrentItems();
     const counts = countFlagsForItems(items, savedState.flags);
     const done = counts.okCount + counts.naCount;
     const pct = counts.total > 0 ? Math.round((done / counts.total) * 100) : 0;
@@ -1314,7 +1440,7 @@
   }
 
   function markAllOk() {
-    const items = regimesData[currentRegime].items;
+    const items = getCurrentItems();
     items.forEach(item => {
       if (!savedState.flags[item.id]) {
         savedState.flags[item.id] = "ok";
@@ -1326,8 +1452,8 @@
   }
 
   function resetCurrentRegime() {
-    if (!confirm("Deseja limpar as marcações e a observação atual desta aba? O histórico de logs e os fechamentos salvos serão mantidos.")) return;
-    const items = regimesData[currentRegime].items;
+    if (!confirm("Deseja limpar as marcações e a observação atual deste checklist? O histórico de logs e os fechamentos salvos serão mantidos.")) return;
+    const items = getCurrentItems();
     items.forEach(item => {
       delete savedState.flags[item.id];
       if (savedState.obsLogs[item.id]) {
@@ -1349,7 +1475,7 @@
       return;
     }
 
-    const items = regimesData[currentRegime].items;
+    const items = getRegimeItems();
     items.forEach(item => {
       const log = getObsLog(item.id);
       const text = String(log.current || "").trim();
@@ -1372,6 +1498,8 @@
       savedAt: new Date().toISOString(),
       regime: currentRegime,
       regimeTitle: regimesData[currentRegime].title,
+      checklistType: currentChecklistType,
+      checklistTypeTitle: CHECKLIST_TYPES[currentChecklistType].title,
       header: Object.assign({}, savedState.header),
       paths: Object.assign({}, savedState.paths[currentRegime] || {}),
       flags: Object.assign({}, savedState.flags),
@@ -1406,7 +1534,7 @@
         <div class="closing-item">
           <div>
             <strong>${escapeHtml(item.header && item.header.name ? item.header.name : "Empresa sem nome")}</strong>
-            <span>${escapeHtml(formatDateTime(item.savedAt))} · ${escapeHtml(item.regimeTitle || item.regime)} · Comp. ${escapeHtml((item.header && item.header.comp) || "-")} · ${done}/${total} OK/N/A · ${pend} PEND</span>
+            <span>${escapeHtml(formatDateTime(item.savedAt))} · ${escapeHtml(item.regimeTitle || item.regime)}${item.checklistTypeTitle ? " · " + escapeHtml(item.checklistTypeTitle) : ""} · Comp. ${escapeHtml((item.header && item.header.comp) || "-")} · ${done}/${total} OK/N/A · ${pend} PEND</span>
           </div>
           <div class="closing-actions">
             <button type="button" onclick="loadClosingSnapshot('${item.id}')">Carregar</button>
@@ -1433,9 +1561,10 @@
     document.getElementById("clientCnpj").value = savedState.header.cnpj || "";
     document.getElementById("clientComp").value = savedState.header.comp || "2026-11";
     document.getElementById("clientOperator").value = savedState.header.operator || "";
-    document.getElementById("clientReviewer").value = savedState.header.reviewer || "Mariana / Clayton";
+    document.getElementById("clientReviewer").value = sanitizePersonName(savedState.header.reviewer) || "";
 
     saveToStorage();
+    currentChecklistType = snap.checklistType || "importacao";
     switchRegime(snap.regime || "simples");
     renderClosingsList();
   }
