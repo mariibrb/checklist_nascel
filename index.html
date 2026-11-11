@@ -765,18 +765,18 @@
         border-bottom: 1px solid #999;
       }
       body.print-mode-etapa .flag-btn {
-        border: 1px solid #000 !important;
-        color: #000 !important;
-        padding: 2px 6px;
-        font-size: 9px;
+        display: none !important;
       }
       body.print-mode-etapa .flag-btn.active-ok,
-      body.print-mode-etapa .flag-btn.active-na,
       body.print-mode-etapa .flag-btn.active-pend,
       body.print-mode-etapa .flag-btn.active-nh,
       body.print-mode-etapa .flag-btn.active-sc {
+        display: inline-block !important;
+        border: 1px solid #000 !important;
         background: #000 !important;
         color: #fff !important;
+        padding: 2px 6px;
+        font-size: 9px;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
       }
@@ -889,18 +889,15 @@
         print-color-adjust: exact;
       }
       .print-capa-table .col-num { width: 28px; text-align: center; }
-      .print-capa-table .col-flags { width: 120px; white-space: nowrap; }
+      .print-capa-table .col-flags { width: 88px; white-space: nowrap; }
       .print-capa .flag-chip {
         display: inline-block;
         border: 1px solid #000;
+        background: #000;
+        color: #fff;
         padding: 1px 5px;
         font-size: 8px;
         font-weight: 700;
-        margin: 1px 0;
-      }
-      .print-capa .flag-chip.on {
-        background: #000;
-        color: #fff;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
       }
@@ -908,24 +905,17 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 18px;
-        margin-top: 16px;
+        margin-top: 14px;
         border: 1px solid #000;
         padding: 10px;
       }
       .print-sign-box {
         border-top: 1px solid #000;
         padding-top: 6px;
-        margin-top: 18px;
-        min-height: 48px;
+        margin-top: 16px;
+        min-height: 42px;
         font-size: 10px;
         text-align: center;
-      }
-      .print-obs {
-        margin-top: 10px;
-        border: 1px solid #000;
-        min-height: 48px;
-        padding: 6px 8px;
-        font-size: 10px;
       }
     }
 
@@ -2505,9 +2495,49 @@
     };
   }
 
-  function flagChipHtml(current, value, label) {
-    const on = current === value ? " on" : "";
-    return `<span class="flag-chip${on}">[ ${label} ]</span>`;
+  function printFlagLabel(flag) {
+    if (flag === "ok") return "OK";
+    if (flag === "nh") return "NÃO HOUVE";
+    if (flag === "sc") return "SALDO CREDOR";
+    if (flag === "pend") return "PEND";
+    return "";
+  }
+
+  function printActiveFlagHtml(flag) {
+    const label = printFlagLabel(flag);
+    if (!label) return "";
+    return `<span class="flag-chip">[ ${label} ]</span>`;
+  }
+
+  function capaBucketForItem(item) {
+    const blob = ((item.cat || "") + " " + (item.title || "") + " " + (item.shortPrint || "")).toLowerCase();
+    if (/encerramento|travar período|liberar guia|liberação das guias/.test(blob)) return "";
+    if (/guia|das|darf|dare|dae|gnre|retenç|coletor|pgdas|destda|recibo/.test(blob) || /demonstrativos e guias/.test(blob)) {
+      return "guias";
+    }
+    return "livros";
+  }
+
+  function buildCapaSectionTable(title, items, flags) {
+    if (!items.length) {
+      return `<div class="category-header">${escapeHtml(title)}</div>
+        <table class="print-capa-table"><tbody><tr><td colspan="4">Sem itens nesta área.</td></tr></tbody></table>`;
+    }
+    const rows = items.map((item, idx) => {
+      const current = flags[item.id] || "";
+      const obs = (getObsLog(item.id).current || "").trim();
+      return `<tr>
+        <td class="col-num">${String(idx + 1).padStart(2, "0")}</td>
+        <td>${escapeHtml(item.shortPrint || item.title)}</td>
+        <td class="col-flags">${printActiveFlagHtml(current)}</td>
+        <td>${escapeHtml(obs || "")}</td>
+      </tr>`;
+    }).join("");
+    return `<div class="category-header">${escapeHtml(title)}</div>
+      <table class="print-capa-table">
+        <thead><tr><th class="col-num">#</th><th>Item</th><th class="col-flags">Situação</th><th>Observação</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
   }
 
   function buildFechamentoCapaHtml() {
@@ -2518,11 +2548,10 @@
     const operator = document.getElementById("clientOperator").value || "-";
     const reviewer = document.getElementById("clientReviewer").value || "-";
     const ieSt = ieStLabel(document.getElementById("clientIeSt").value);
-    const ieStUfs = document.getElementById("clientIeStUfs").value || "-";
+    const ieStUfs = document.getElementById("clientIeStUfs").value || "";
     const code = document.getElementById("closingCode").value || "-";
     const semMov = readSemMovimentoFlag();
     const rec = getCurrentClientRecord();
-    const statusTxt = statusLabel((rec && rec.status) || "em_execucao");
     const regimeTitle = regimesData[currentRegime].title;
     const flags = getWorkingFlags();
     let fechamentoItems = getRegimeItems().filter(item => getItemType(item.id) === "fechamento");
@@ -2530,60 +2559,40 @@
       fechamentoItems = fechamentoItems.filter(item => /faturamento|receitas/i.test(item.title));
     }
 
-    const byCat = {};
+    const guias = [];
+    const livros = [];
     fechamentoItems.forEach(item => {
-      const cat = item.cat || "Dossiê";
-      if (!byCat[cat]) byCat[cat] = [];
-      byCat[cat].push(item);
+      const bucket = capaBucketForItem(item);
+      if (bucket === "guias") guias.push(item);
+      else if (bucket === "livros") livros.push(item);
     });
-
-    let num = 0;
-    const sectionsHtml = Object.keys(byCat).map(cat => {
-      const rows = byCat[cat].map(item => {
-        num += 1;
-        const current = flags[item.id] || "";
-        const obs = (getObsLog(item.id).current || "").trim();
-        return `<tr>
-          <td class="col-num">${String(num).padStart(2, "0")}</td>
-          <td>${escapeHtml(item.shortPrint || item.title)}</td>
-          <td class="col-flags">
-            ${flagChipHtml(current, "ok", "OK")}
-            ${flagChipHtml(current, "nh", "NÃO HOUVE")}
-            ${flagChipHtml(current, "sc", "SALDO CREDOR")}
-            ${flagChipHtml(current, "pend", "PEND")}
-          </td>
-          <td>${escapeHtml(obs || "")}</td>
-        </tr>`;
-      }).join("");
-      return `<div class="category-header">${escapeHtml(cat)}</div>
-        <table class="print-capa-table">
-          <thead><tr><th class="col-num">#</th><th>Item / relatório + guia</th><th class="col-flags">Flag</th><th>Observação</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>`;
-    }).join("");
 
     return `
       <div class="print-capa-brand">
         <img src="assets/nascel-logo.jpg" alt="Nascel">
         <div>
           <h1>Fechamento - (${escapeHtml(regimeTitle)})</h1>
-          <p>Código ${escapeHtml(code)}${(rec && rec.retificaDe) ? " · Retifica " + escapeHtml(rec.retificaDe) : ""} · ${escapeHtml(statusTxt)}${semMov ? " · SEM MOVIMENTO" : ""} · ${escapeHtml(MONTH_NAMES[month] || month)}/${escapeHtml(year)}</p>
+          <p>Código ${escapeHtml(code)}${(rec && rec.retificaDe) ? " · Retifica " + escapeHtml(rec.retificaDe) : ""}${semMov ? " · SEM MOVIMENTO" : ""} · ${escapeHtml(MONTH_NAMES[month] || month)}/${escapeHtml(year)}</p>
         </div>
       </div>
-      <div class="print-capa-client">
+
+      <div class="category-header">Identificação do cliente</div>
+      <div class="print-capa-client" style="border-top:none;margin-top:0;">
         <div class="fg span-2"><label>Cliente</label><div class="v">${escapeHtml(name)}</div></div>
         <div class="fg"><label>CNPJ / UF</label><div class="v">${escapeHtml(cnpj)}</div></div>
         <div class="fg"><label>Código</label><div class="v">${escapeHtml(code)}</div></div>
-        <div class="fg span-2"><label>IE-ST</label><div class="v">${escapeHtml(ieSt)}${ieStUfs && ieStUfs !== "-" ? " · " + escapeHtml(ieStUfs) : ""}</div></div>
+        <div class="fg span-2"><label>IE-ST</label><div class="v">${escapeHtml(ieSt)}${ieStUfs ? " · " + escapeHtml(ieStUfs) : ""}</div></div>
         <div class="fg"><label>Responsável</label><div class="v">${escapeHtml(operator)}</div></div>
         <div class="fg"><label>Revisor</label><div class="v">${escapeHtml(reviewer)}</div></div>
       </div>
-      ${sectionsHtml || `<p>Sem itens de fechamento nesta visão.</p>`}
+
+      ${buildCapaSectionTable("Guias", guias, flags)}
+      ${buildCapaSectionTable("Livros e demonstrativos", livros, flags)}
+
       <div class="print-sign-grid">
-        <div class="print-sign-box">Assinatura / Visto - Operador Fiscal<br>${escapeHtml(operator)}<br>____/____/________</div>
-        <div class="print-sign-box">Aprovação - Revisão Técnica<br>${escapeHtml(reviewer)}<br>____/____/________</div>
+        <div class="print-sign-box">Operador Fiscal<br>${escapeHtml(operator)}<br>____/____/________</div>
+        <div class="print-sign-box">Revisor Técnico<br>${escapeHtml(reviewer)}<br>____/____/________</div>
       </div>
-      <div class="print-obs"><strong>Observação geral:</strong></div>
     `;
   }
 
