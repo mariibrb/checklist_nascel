@@ -135,9 +135,13 @@
       padding: 18px 22px;
       margin-bottom: 20px;
       display: grid;
-      grid-template-columns: 2fr 1.2fr 0.9fr 1.1fr 1.1fr;
+      grid-template-columns: repeat(4, 1fr);
       gap: 14px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    }
+
+    .client-bar .field-group.span-2 {
+      grid-column: span 2;
     }
 
     .field-group {
@@ -303,51 +307,65 @@
     .pill-na { background: var(--na-bg); color: var(--na-text); border: 1px solid var(--na-border); }
     .pill-pend { background: var(--pend-bg); color: var(--pend-text); border: 1px solid var(--pend-border); }
 
-    .paths-box {
-      background: var(--primary-soft);
-      border: 1px dashed var(--primary-light);
-      border-radius: 10px;
-      padding: 14px 18px;
-      margin-bottom: 20px;
-    }
-
-    .paths-box h3 {
-      font-size: 0.85rem;
-      color: var(--ink);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .paths-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .path-item {
+    .attach-box {
+      margin-top: 6px;
       display: flex;
       flex-direction: column;
       gap: 4px;
     }
 
-    .path-item span {
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--ink);
+    .attach-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
     }
 
-    .path-item input {
-      padding: 7px 10px;
-      border: 1px solid #f5d19a;
-      border-radius: 6px;
-      font-family: 'Consolas', monospace;
-      font-size: 0.82rem;
+    .attach-btn {
+      border: 1px solid var(--border);
       background: #fff;
-      color: #334155;
+      color: var(--ink);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .attach-btn:hover {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+    }
+
+    .attach-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .attach-list li {
+      font-size: 0.72rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 2px 0;
+    }
+
+    .attach-list button {
+      border: none;
+      background: transparent;
+      color: #b45309;
+      cursor: pointer;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .db-hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 8px;
+      grid-column: 1 / -1;
     }
 
     .checklist-card {
@@ -601,74 +619,6 @@
       color: #94a3b8;
     }
 
-    .closings-box {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px 18px;
-      margin-top: 20px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-    }
-
-    .closings-box h3 {
-      font-size: 0.85rem;
-      color: var(--ink);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 10px;
-    }
-
-    .closings-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .closing-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: #fafafa;
-    }
-
-    .closing-item strong {
-      color: var(--text);
-      font-size: 0.88rem;
-    }
-
-    .closing-item span {
-      display: block;
-      font-size: 0.75rem;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .closing-actions {
-      display: flex;
-      gap: 6px;
-    }
-
-    .closing-actions button {
-      border: 1px solid var(--border);
-      background: #fff;
-      color: var(--ink);
-      border-radius: 6px;
-      padding: 6px 10px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .closing-actions button:hover {
-      border-color: var(--primary);
-      background: var(--primary-soft);
-    }
-
     .Signoff-card {
       margin-top: 20px;
       background: var(--card);
@@ -713,13 +663,15 @@
       }
       .client-bar,
       .status-panel,
-      .paths-box,
       .checklist-card,
       .Signoff-card {
         box-shadow: none !important;
         border: 1px solid #000 !important;
         margin-bottom: 10px;
         break-inside: avoid;
+      }
+      .attach-box {
+        display: none !important;
       }
       .checklist-table th,
       .checklist-table td {
@@ -745,9 +697,12 @@
     @media (max-width: 960px) {
       .client-bar,
       .tabs-bar,
-      .paths-grid,
       .Signoff-card {
         grid-template-columns: 1fr;
+      }
+
+      .client-bar .field-group.span-2 {
+        grid-column: span 1;
       }
 
       .type-bar {
@@ -765,38 +720,72 @@
       <img class="header-logo" src="assets/nascel-logo.jpg" alt="Nascel Contabilidade">
       <div class="header-title">
         <h1 id="pageMainTitle">Fechamento Operacional de Apuração Fiscal</h1>
-        <p>Fluxo Padrão: SIEG • Portal Nacional • App Coletor • Domínio Sistemas • App Fechamento • Nibo</p>
       </div>
     </div>
     <div class="header-actions">
-      <button class="btn btn-white" onclick="saveClosingSnapshot()">Salvar Fechamento</button>
+      <button class="btn btn-white" onclick="saveCurrentClient()">Salvar Cliente</button>
+      <button class="btn btn-outline" onclick="exportBackupJson()">Backup JSON</button>
+      <button class="btn btn-outline" onclick="document.getElementById('importBackupInput').click()">Importar JSON</button>
+      <input type="file" id="importBackupInput" accept="application/json,.json" style="display:none" onchange="importBackupJson(event)">
       <button class="btn btn-outline" onclick="window.print()">Imprimir Fechamento (A4)</button>
       <button class="btn btn-outline" onclick="markAllOk()">Marcar Tudo OK</button>
-      <button class="btn btn-outline" onclick="resetCurrentRegime()">Limpar Aba Atual</button>
+      <button class="btn btn-outline" onclick="resetCurrentRegime()">Limpar Etapa Atual</button>
     </div>
   </header>
 
   <section class="client-bar">
     <div class="field-group">
+      <label>Ano</label>
+      <select id="filterYear" onchange="onYearMonthChange()"></select>
+    </div>
+    <div class="field-group">
+      <label>Mês</label>
+      <select id="filterMonth" onchange="onYearMonthChange()">
+        <option value="01">01 - Janeiro</option>
+        <option value="02">02 - Fevereiro</option>
+        <option value="03">03 - Março</option>
+        <option value="04">04 - Abril</option>
+        <option value="05">05 - Maio</option>
+        <option value="06">06 - Junho</option>
+        <option value="07">07 - Julho</option>
+        <option value="08">08 - Agosto</option>
+        <option value="09">09 - Setembro</option>
+        <option value="10">10 - Outubro</option>
+        <option value="11">11 - Novembro</option>
+        <option value="12">12 - Dezembro</option>
+      </select>
+    </div>
+    <div class="field-group span-2">
+      <label>Cliente salvo neste Ano/Mês</label>
+      <select id="filterClient" onchange="onClientSelectChange()">
+        <option value="">+ Novo cliente / digitar abaixo</option>
+      </select>
+    </div>
+    <div class="field-group span-2">
       <label>Empresa / Cliente (Código Domínio + Razão Social)</label>
-      <input type="text" id="clientName" placeholder="Ex: 0145 - Empresa Exemplo LTDA" oninput="saveHeaderData()">
+      <input type="text" id="clientName" placeholder="Ex: 0145 - Empresa Exemplo LTDA" oninput="onClientNameInput()">
     </div>
     <div class="field-group">
       <label>CNPJ / UF</label>
-      <input type="text" id="clientCnpj" placeholder="00.000.000/0001-00 (SP/MG)" oninput="saveHeaderData()">
+      <input type="text" id="clientCnpj" placeholder="00.000.000/0001-00 (SP/MG)" oninput="persistWorkingDraft()">
     </div>
     <div class="field-group">
-      <label>Competência</label>
-      <input type="month" id="clientComp" value="2026-11" onchange="saveHeaderData()">
+      <label>IE-ST / Modo de Recolhimento</label>
+      <select id="clientIeSt" onchange="persistWorkingDraft()">
+        <option value="nao_aplica">Não se aplica</option>
+        <option value="por_operacao">Sem IE-ST → Por Operação (GNRE/DARE/DAE)</option>
+        <option value="por_apuracao">Com IE-ST → Por Apuração (GIA-ST/DeSTDA/SPED)</option>
+      </select>
     </div>
     <div class="field-group">
       <label>Responsável Apuração</label>
-      <input type="text" id="clientOperator" placeholder="Nome do Operador" oninput="saveHeaderData()">
+      <input type="text" id="clientOperator" placeholder="Nome do Operador" oninput="persistWorkingDraft()">
     </div>
     <div class="field-group">
       <label>Revisor Técnico</label>
-      <input type="text" id="clientReviewer" placeholder="Nome do revisor" oninput="saveHeaderData()">
+      <input type="text" id="clientReviewer" placeholder="Nome do revisor" oninput="persistWorkingDraft()">
     </div>
+    <p class="db-hint">Os fechamentos ficam organizados por <strong>Ano → Mês → Cliente</strong>. Escolha Ano/Mês e um cliente já salvo para carregar; ou digite um novo e clique em <strong>Salvar Cliente</strong>. Use Backup JSON para compartilhar com a equipe. Anexos ficam vinculados ao item e, no futuro, irão para a pasta de rede do fechamento.</p>
   </section>
 
   <nav class="tabs-bar">
@@ -831,28 +820,7 @@
     </div>
   </section>
 
-  <section class="paths-box">
-    <h3>Diretórios Padrão de Salvamento na Rede (Preenchimento da equipe)</h3>
-    <div class="paths-grid">
-      <div class="path-item">
-        <span>1. Pasta para Salvar XMLs Brutos (SIEG / Prefeitura) + Relatório App Coletor:</span>
-        <input type="text" id="pathXmlInput" placeholder="Ex: Z:\Clientes\[EMPRESA]\2026\Fiscal\[MM-AAAA]\01_XMLs_e_Coletor" oninput="savePathsData()">
-      </div>
-      <div class="path-item">
-        <span>2. Pasta para Salvar Relatórios Domínio, Livros Fiscais, SPEDs e Guias (App Fechamento):</span>
-        <input type="text" id="pathCloseInput" placeholder="Ex: Z:\Clientes\[EMPRESA]\2026\Fiscal\[MM-AAAA]\02_Fechamento_e_Livros" oninput="savePathsData()">
-      </div>
-    </div>
-  </section>
-
   <main class="checklist-card" id="checklistContainer"></main>
-
-  <section class="closings-box">
-    <h3>Histórico de Fechamentos Salvos (neste navegador)</h3>
-    <div class="closings-list" id="closingsList">
-      <div class="obs-empty">Nenhum fechamento salvo ainda. Use “Salvar Fechamento” no topo.</div>
-    </div>
-  </section>
 
   <footer class="Signoff-card">
     <div>
@@ -894,7 +862,11 @@
         { id: "sn_21", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Montar pacote completo no App Fechamento e enviar p/ Revisão Técnica", desc: "Subir no App Fechamento: DAS, Extrato/Recibo PGDAS, Relatório Domínio, Relatório App Coletor, Livros e Guias extras.", path: "App Fechamento" },
         { id: "sn_22", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Transmitir DeSTDA (SEDIF-SN) e encerrar escrituração no site da Prefeitura", desc: "Gerar DeSTDA para contribuintes com IE e fechar competência municipal de ISS.", path: "Domínio: Relatórios > Informativos > Estaduais > DeSTDA" },
         { id: "sn_23", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "(Pós-Revisão) Postar guias validadas para o cliente via Nibo / WhatsApp", desc: "Liberar para o cliente somente após o OK do revisor no App Fechamento.", path: "Nibo / WhatsApp" },
-        { id: "sn_24", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Fechar / Travar o Período Fiscal no Domínio Sistemas", desc: "Bloquear o mês apurado para impedir alterações acidentais.", path: "Domínio: Utilitários > Fechamento de Período" }
+        { id: "sn_24", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Fechar / Travar o Período Fiscal no Domínio Sistemas", desc: "Bloquear o mês apurado para impedir alterações acidentais.", path: "Domínio: Utilitários > Fechamento de Período" },
+        { id: "sn_25", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir Inscrição Estadual de Substituto Tributário (IE-ST) em outras UFs", desc: "Se possui IE-ST ativa: recolhimento mensal Por Apuração (GIA-ST / DeSTDA / SPED Fiscal). Se não possui IE-ST: recolhimento Por Operação a cada NF-e (GNRE/DARE/DAE anexada).", path: "Cadastro SEFAZ / Domínio: Controle > Parâmetros > Estaduais" },
+        { id: "sn_26", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Segregar e conferir ICMS-ST Por Operação vs. Por Apuração", desc: "Por Operação: guias nota a nota (saída/entrada interestadual). Por Apuração: saldo mensal no Domínio (Relatórios > Impostos > ICMS ST).", path: "Domínio: Relatórios > Impostos > ICMS ST" },
+        { id: "sn_27", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir DIFAL (EC 87/2015 e Uso/Consumo/Ativo) Por Operação vs. Por Apuração", desc: "Por Operação: GNRE/DARE/DAE emitida nota a nota. Por Apuração: quando há inscrição/cadastro na UF de destino ou apuração em conta gráfica/guia mensal.", path: "Domínio: Movimentos > Entradas/Saídas | Relatórios > Impostos" },
+        { id: "sn_28", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Validar FECP / FCP / FEM (próprio, ST e DIFAL) Por Operação e Por Apuração", desc: "Conferir cálculo e emissão das guias separadas ou unificadas de FECP/FEM, validando o pago Por Operação e o gerado Por Apuração no fechamento mensal.", path: "Domínio: Relatórios > Impostos > ICMS / FECP" }
       ]
     },
     presumido: {
@@ -917,7 +889,11 @@
         { id: "lp_15", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Emitir todos os Livros Fiscais em PDF na Domínio Sistemas", desc: "Livros de Entradas, Saídas, Apuração de ICMS, Apuração de IPI (se indústria) e ISS.", path: "Domínio: Relatórios > Livros > Entradas / Saídas / Apuração ICMS / ISS" },
         { id: "lp_16", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Gerar e validar SPED Fiscal, EFD-Contribuições, EFD-Reinf, DCTFWeb/MIT e GIA/DAPI", desc: "Validar arquivos nos PVAs, transmitir obrigações e gerar todos os DARFs, DARE/DAE e guias de ISS.", path: "Domínio: Relatórios > Informativos > Federais e Estaduais" },
         { id: "lp_17", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Salvar na rede, montar pacote completo no App Fechamento e enviar p/ Revisão Técnica", desc: "Subir no App Fechamento: Relatórios de Impostos, Relatório App Coletor, Livros Fiscais, Recibos SPED e Guias.", path: "App Fechamento" },
-        { id: "lp_18", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "(Pós-Revisão) Enviar guias via Nibo/WhatsApp e travar período no Domínio", desc: "Liberar ao cliente após revisão e bloquear mês fiscal.", path: "Domínio: Utilitários > Fechamento de Período" }
+        { id: "lp_18", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "(Pós-Revisão) Enviar guias via Nibo/WhatsApp e travar período no Domínio", desc: "Liberar ao cliente após revisão e bloquear mês fiscal.", path: "Domínio: Utilitários > Fechamento de Período" },
+        { id: "lp_19", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir Inscrição Estadual de Substituto Tributário (IE-ST) em outras UFs", desc: "Com IE-ST: recolhimento mensal Por Apuração (GIA-ST / DeSTDA / SPED Fiscal). Sem IE-ST: Por Operação via GNRE/DARE/DAE anexada à NF-e.", path: "Cadastro SEFAZ / Domínio: Controle > Parâmetros > Estaduais" },
+        { id: "lp_20", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Segregar e conferir ICMS-ST Por Operação vs. Por Apuração", desc: "Por Operação: guias nota a nota. Por Apuração: saldo mensal no Domínio (Relatórios > Impostos > ICMS ST).", path: "Domínio: Relatórios > Impostos > ICMS ST" },
+        { id: "lp_21", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir DIFAL (EC 87/2015 e Uso/Consumo/Ativo) Por Operação vs. Por Apuração", desc: "Por Operação: GNRE nota a nota. Por Apuração: inscrição na UF de destino ou conta gráfica/guia mensal.", path: "Domínio: Movimentos > Entradas/Saídas | Relatórios > Impostos" },
+        { id: "lp_22", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Validar FECP / FCP / FEM (próprio, ST e DIFAL) Por Operação e Por Apuração", desc: "Conferir guias separadas ou unificadas de FECP/FEM no fechamento mensal da Domínio.", path: "Domínio: Relatórios > Impostos > ICMS / FECP" }
       ]
     },
     real: {
@@ -941,7 +917,11 @@
         { id: "lr_16", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Emitir todos os Livros Fiscais em PDF (Entradas, Saídas, Apuração ICMS, IPI, ISS e Inventário)", desc: "Gerar livros oficiais do período para compor o fechamento.", path: "Domínio: Relatórios > Livros > Entradas / Saídas / ICMS / IPI / ISS / Inventário" },
         { id: "lr_17", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Gerar e validar SPED Fiscal, EFD-Contribuições (Blocos F e M), EFD-Reinf, DCTFWeb/MIT e GIA/DAPI", desc: "Validar no PVA, conferir créditos no Bloco M e gerar todas as guias de pagamento.", path: "Domínio: Relatórios > Informativos > Federais e Estaduais" },
         { id: "lr_18", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Salvar na rede, montar dossiê completo no App Fechamento e enviar p/ Revisão Técnica", desc: "Anexar Memória de Créditos, Relatórios Domínio, Relatório App Coletor, Livros, SPEDs e Guias.", path: "App Fechamento" },
-        { id: "lr_19", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "(Pós-Revisão) Liberar guias no Nibo/WhatsApp e travar período fiscal no Domínio", desc: "Enviar ao cliente após validação técnica e bloquear mês na Domínio.", path: "Domínio: Utilitários > Fechamento de Período" }
+        { id: "lr_19", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "(Pós-Revisão) Liberar guias no Nibo/WhatsApp e travar período fiscal no Domínio", desc: "Enviar ao cliente após validação técnica e bloquear mês na Domínio.", path: "Domínio: Utilitários > Fechamento de Período" },
+        { id: "lr_20", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir Inscrição Estadual de Substituto Tributário (IE-ST) em outras UFs", desc: "Com IE-ST: recolhimento mensal Por Apuração (GIA-ST / DeSTDA / SPED Fiscal). Sem IE-ST: Por Operação via GNRE/DARE/DAE anexada à NF-e.", path: "Cadastro SEFAZ / Domínio: Controle > Parâmetros > Estaduais" },
+        { id: "lr_21", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Segregar e conferir ICMS-ST Por Operação vs. Por Apuração", desc: "Por Operação: guias nota a nota. Por Apuração: saldo mensal no Domínio (Relatórios > Impostos > ICMS ST).", path: "Domínio: Relatórios > Impostos > ICMS ST" },
+        { id: "lr_22", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir DIFAL (EC 87/2015 e Uso/Consumo/Ativo) Por Operação vs. Por Apuração", desc: "Por Operação: GNRE nota a nota. Por Apuração: inscrição na UF de destino ou conta gráfica/guia mensal.", path: "Domínio: Movimentos > Entradas/Saídas | Relatórios > Impostos" },
+        { id: "lr_23", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Validar FECP / FCP / FEM (próprio, ST e DIFAL) Por Operação e Por Apuração", desc: "Conferir guias separadas ou unificadas de FECP/FEM no fechamento mensal da Domínio.", path: "Domínio: Relatórios > Impostos > ICMS / FECP" }
       ]
     },
     mei: {
@@ -960,8 +940,9 @@
     }
   };
 
-  const STORAGE_KEY = "mari_fiscal_checklists_v2";
-  const LEGACY_KEY = "mari_fiscal_checklists_v1";
+  const STORAGE_KEY = "nascel_fechamento_db_v3";
+  const LEGACY_KEYS = ["mari_fiscal_checklists_v2", "mari_fiscal_checklists_v1"];
+  const MAX_ATTACH_BYTES = 350 * 1024;
 
   const CHECKLIST_TYPES = {
     importacao: { title: "Importação" },
@@ -975,19 +956,22 @@
     sn_05: "analise", sn_06: "analise", sn_07: "analise", sn_08: "analise", sn_09: "analise",
     sn_10: "analise", sn_11: "analise", sn_12: "analise", sn_13: "analise", sn_14: "analise",
     sn_15: "analise", sn_16: "analise",
-    sn_18: "obrigacoes", sn_19: "obrigacoes", sn_20: "obrigacoes", sn_22: "obrigacoes",
+    sn_25: "analise", sn_26: "analise", sn_27: "analise",
+    sn_18: "obrigacoes", sn_19: "obrigacoes", sn_20: "obrigacoes", sn_22: "obrigacoes", sn_28: "obrigacoes",
     sn_17: "fechamento", sn_21: "fechamento", sn_23: "fechamento", sn_24: "fechamento",
 
     lp_01: "importacao", lp_02: "importacao", lp_03: "importacao", lp_04: "importacao",
     lp_05: "analise", lp_06: "analise", lp_07: "analise", lp_08: "analise",
     lp_09: "analise", lp_10: "analise", lp_11: "analise", lp_12: "analise", lp_13: "analise",
-    lp_15: "obrigacoes", lp_16: "obrigacoes",
+    lp_19: "analise", lp_20: "analise", lp_21: "analise",
+    lp_15: "obrigacoes", lp_16: "obrigacoes", lp_22: "obrigacoes",
     lp_14: "fechamento", lp_17: "fechamento", lp_18: "fechamento",
 
     lr_01: "importacao", lr_02: "importacao", lr_03: "importacao", lr_04: "importacao", lr_05: "importacao",
     lr_06: "analise", lr_07: "analise", lr_08: "analise", lr_09: "analise",
     lr_10: "analise", lr_11: "analise", lr_12: "analise", lr_13: "analise", lr_14: "analise",
-    lr_16: "obrigacoes", lr_17: "obrigacoes",
+    lr_20: "analise", lr_21: "analise", lr_22: "analise",
+    lr_16: "obrigacoes", lr_17: "obrigacoes", lr_23: "obrigacoes",
     lr_15: "fechamento", lr_18: "fechamento", lr_19: "fechamento",
 
     mei_01: "importacao", mei_02: "importacao", mei_03: "importacao",
@@ -996,9 +980,16 @@
     mei_08: "fechamento", mei_09: "fechamento"
   };
 
+  const MONTH_NAMES = {
+    "01": "Janeiro", "02": "Fevereiro", "03": "Março", "04": "Abril",
+    "05": "Maio", "06": "Junho", "07": "Julho", "08": "Agosto",
+    "09": "Setembro", "10": "Outubro", "11": "Novembro", "12": "Dezembro"
+  };
+
   let currentRegime = "simples";
   let currentChecklistType = "importacao";
-  let savedState = loadState();
+  let skipAutoSave = false;
+  let appDb = loadDatabase();
 
   function sanitizePersonName(value) {
     const text = String(value || "").trim();
@@ -1006,86 +997,286 @@
     return text;
   }
 
-  function defaultState() {
+  function nowParts() {
+    const d = new Date();
     return {
-      header: { name: "", cnpj: "", comp: "2026-11", operator: "", reviewer: "" },
-      paths: {
-        simples: { xml: "", close: "" },
-        presumido: { xml: "", close: "" },
-        real: { xml: "", close: "" },
-        mei: { xml: "", close: "" }
-      },
-      flags: {},
-      obsLogs: {},
-      closings: []
+      year: String(d.getFullYear()),
+      month: String(d.getMonth() + 1).padStart(2, "0")
     };
   }
 
-  function loadState() {
+  function emptyClientRecord() {
+    return {
+      header: { name: "", cnpj: "", operator: "", reviewer: "", ieSt: "nao_aplica" },
+      regime: "simples",
+      checklistType: "importacao",
+      flags: {},
+      obsLogs: {},
+      attachments: {},
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  function defaultDatabase() {
+    const n = nowParts();
+    return {
+      version: 3,
+      ui: { year: n.year, month: n.month, clientKey: "" },
+      db: {}
+    };
+  }
+
+  function ensureDbPath(year, month) {
+    if (!appDb.db[year]) appDb.db[year] = {};
+    if (!appDb.db[year][month]) appDb.db[year][month] = {};
+    return appDb.db[year][month];
+  }
+
+  function clientKeyFromName(name) {
+    return String(name || "").trim();
+  }
+
+  function loadDatabase() {
     try {
-      const rawV2 = localStorage.getItem(STORAGE_KEY);
-      if (rawV2) {
-        const parsed = JSON.parse(rawV2);
-        return normalizeState(parsed);
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.db) return parsed;
       }
-      const rawV1 = localStorage.getItem(LEGACY_KEY);
-      if (rawV1) {
-        return migrateLegacyState(JSON.parse(rawV1));
+      for (const key of LEGACY_KEYS) {
+        const legacyRaw = localStorage.getItem(key);
+        if (!legacyRaw) continue;
+        return migrateLegacyToV3(JSON.parse(legacyRaw));
       }
     } catch (e) {}
-    return defaultState();
+    return defaultDatabase();
   }
 
-  function migrateLegacyState(legacy) {
-    const next = defaultState();
-    next.header = legacy.header || next.header;
-    next.paths = legacy.paths || next.paths;
-    next.flags = legacy.flags || {};
-    next.obsLogs = {};
-    Object.keys(legacy.obs || {}).forEach(itemId => {
-      const text = String(legacy.obs[itemId] || "").trim();
-      if (!text) return;
-      next.obsLogs[itemId] = {
-        current: text,
-        history: [{
-          text,
-          at: new Date().toISOString(),
-          by: (legacy.header && legacy.header.operator) || "Operador",
-          flag: (legacy.flags && legacy.flags[itemId]) || ""
-        }]
-      };
-    });
-    next.closings = [];
-    return next;
-  }
-
-  function normalizeState(state) {
-    const base = defaultState();
-    const merged = Object.assign(base, state || {});
-    merged.header = Object.assign(base.header, (state && state.header) || {});
-    merged.header.reviewer = sanitizePersonName(merged.header.reviewer);
-    merged.header.operator = sanitizePersonName(merged.header.operator);
-    merged.paths = Object.assign(base.paths, (state && state.paths) || {});
-    merged.flags = (state && state.flags) || {};
-    merged.obsLogs = (state && state.obsLogs) || {};
-    merged.closings = Array.isArray(state && state.closings) ? state.closings : [];
-
-    if (state && state.obs && !state.obsLogs) {
-      Object.keys(state.obs).forEach(itemId => {
-        const text = String(state.obs[itemId] || "").trim();
+  function migrateLegacyToV3(legacy) {
+    const next = defaultDatabase();
+    const header = legacy.header || {};
+    const name = clientKeyFromName(header.name || "Cliente legado");
+    let year = next.ui.year;
+    let month = next.ui.month;
+    if (header.comp && /^\d{4}-\d{2}$/.test(header.comp)) {
+      year = header.comp.slice(0, 4);
+      month = header.comp.slice(5, 7);
+    }
+    if (!next.db[year]) next.db[year] = {};
+    if (!next.db[year][month]) next.db[year][month] = {};
+    const obsLogs = legacy.obsLogs || {};
+    if (legacy.obs && !legacy.obsLogs) {
+      Object.keys(legacy.obs).forEach(itemId => {
+        const text = String(legacy.obs[itemId] || "").trim();
         if (!text) return;
-        merged.obsLogs[itemId] = {
+        obsLogs[itemId] = {
           current: text,
-          history: [{
-            text,
-            at: new Date().toISOString(),
-            by: merged.header.operator || "Operador",
-            flag: merged.flags[itemId] || ""
-          }]
+          history: [{ text, at: new Date().toISOString(), by: header.operator || "Operador", flag: (legacy.flags || {})[itemId] || "" }]
         };
       });
     }
-    return merged;
+    next.db[year][month][name] = {
+      header: {
+        name,
+        cnpj: header.cnpj || "",
+        operator: sanitizePersonName(header.operator),
+        reviewer: sanitizePersonName(header.reviewer),
+        ieSt: "nao_aplica"
+      },
+      regime: "simples",
+      checklistType: "importacao",
+      flags: legacy.flags || {},
+      obsLogs,
+      attachments: {},
+      updatedAt: new Date().toISOString()
+    };
+    next.ui = { year, month, clientKey: name };
+    return next;
+  }
+
+  function saveDatabase() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(appDb));
+  }
+
+  function getSelectedYear() {
+    return document.getElementById("filterYear").value;
+  }
+
+  function getSelectedMonth() {
+    return document.getElementById("filterMonth").value;
+  }
+
+  function getClientsForSelection() {
+    const year = getSelectedYear();
+    const month = getSelectedMonth();
+    const bucket = (appDb.db[year] && appDb.db[year][month]) || {};
+    return Object.keys(bucket).sort((a, b) => a.localeCompare(b, "pt-BR"));
+  }
+
+  function getCurrentClientRecord() {
+    const year = getSelectedYear();
+    const month = getSelectedMonth();
+    const key = clientKeyFromName(document.getElementById("clientName").value);
+    if (!key) return null;
+    const bucket = (appDb.db[year] && appDb.db[year][month]) || {};
+    return bucket[key] || null;
+  }
+
+  function ensureWorkingRecord() {
+    const key = clientKeyFromName(document.getElementById("clientName").value);
+    if (!key) return null;
+    const year = getSelectedYear();
+    const month = getSelectedMonth();
+    const bucket = ensureDbPath(year, month);
+    if (!bucket[key]) {
+      bucket[key] = emptyClientRecord();
+      bucket[key].header.name = key;
+    }
+    return bucket[key];
+  }
+
+  function readFormIntoRecord(rec) {
+    rec.header = {
+      name: clientKeyFromName(document.getElementById("clientName").value),
+      cnpj: document.getElementById("clientCnpj").value,
+      operator: sanitizePersonName(document.getElementById("clientOperator").value),
+      reviewer: sanitizePersonName(document.getElementById("clientReviewer").value),
+      ieSt: document.getElementById("clientIeSt").value || "nao_aplica"
+    };
+    rec.regime = currentRegime;
+    rec.checklistType = currentChecklistType;
+    rec.updatedAt = new Date().toISOString();
+  }
+
+  function persistWorkingDraft() {
+    if (skipAutoSave) return;
+    const key = clientKeyFromName(document.getElementById("clientName").value);
+    if (!key) return;
+    const rec = ensureWorkingRecord();
+    if (!rec) return;
+    readFormIntoRecord(rec);
+    appDb.ui.year = getSelectedYear();
+    appDb.ui.month = getSelectedMonth();
+    appDb.ui.clientKey = key;
+    saveDatabase();
+    refreshClientSelect(key);
+  }
+
+  function fillYearOptions() {
+    const sel = document.getElementById("filterYear");
+    const currentYear = Number(nowParts().year);
+    const years = new Set();
+    Object.keys(appDb.db || {}).forEach(y => years.add(y));
+    for (let y = currentYear - 2; y <= currentYear + 2; y++) years.add(String(y));
+    const sorted = Array.from(years).sort();
+    sel.innerHTML = sorted.map(y => `<option value="${y}">${y}</option>`).join("");
+  }
+
+  function refreshClientSelect(selectedKey) {
+    const sel = document.getElementById("filterClient");
+    const clients = getClientsForSelection();
+    const current = selectedKey != null ? selectedKey : clientKeyFromName(document.getElementById("clientName").value);
+    sel.innerHTML = `<option value="">+ Novo cliente / digitar abaixo</option>` +
+      clients.map(name => `<option value="${escapeAttr(name)}">${escapeHtml(name)}</option>`).join("");
+    if (current && clients.includes(current)) sel.value = current;
+    else sel.value = "";
+  }
+
+  function applyRecordToForm(rec) {
+    skipAutoSave = true;
+    document.getElementById("clientName").value = (rec.header && rec.header.name) || "";
+    document.getElementById("clientCnpj").value = (rec.header && rec.header.cnpj) || "";
+    document.getElementById("clientOperator").value = sanitizePersonName(rec.header && rec.header.operator) || "";
+    document.getElementById("clientReviewer").value = sanitizePersonName(rec.header && rec.header.reviewer) || "";
+    document.getElementById("clientIeSt").value = (rec.header && rec.header.ieSt) || "nao_aplica";
+    currentRegime = rec.regime || "simples";
+    currentChecklistType = rec.checklistType || "importacao";
+    skipAutoSave = false;
+    switchRegime(currentRegime);
+  }
+
+  function clearFormForNewClient() {
+    skipAutoSave = true;
+    document.getElementById("clientName").value = "";
+    document.getElementById("clientCnpj").value = "";
+    document.getElementById("clientOperator").value = "";
+    document.getElementById("clientReviewer").value = "";
+    document.getElementById("clientIeSt").value = "nao_aplica";
+    currentRegime = "simples";
+    currentChecklistType = "importacao";
+    skipAutoSave = false;
+    switchRegime("simples");
+  }
+
+  function onYearMonthChange() {
+    appDb.ui.year = getSelectedYear();
+    appDb.ui.month = getSelectedMonth();
+    saveDatabase();
+    refreshClientSelect("");
+    clearFormForNewClient();
+  }
+
+  function onClientSelectChange() {
+    const key = document.getElementById("filterClient").value;
+    if (!key) {
+      clearFormForNewClient();
+      return;
+    }
+    const year = getSelectedYear();
+    const month = getSelectedMonth();
+    const rec = appDb.db[year] && appDb.db[year][month] && appDb.db[year][month][key];
+    if (!rec) return;
+    appDb.ui.clientKey = key;
+    saveDatabase();
+    applyRecordToForm(rec);
+  }
+
+  function onClientNameInput() {
+    persistWorkingDraft();
+  }
+
+  function saveCurrentClient() {
+    const key = clientKeyFromName(document.getElementById("clientName").value);
+    if (!key) {
+      alert("Informe o nome do cliente antes de salvar.");
+      return;
+    }
+    const rec = ensureWorkingRecord();
+    readFormIntoRecord(rec);
+    appDb.ui.clientKey = key;
+    saveDatabase();
+    refreshClientSelect(key);
+    alert("Cliente salvo em " + getSelectedYear() + " > " + MONTH_NAMES[getSelectedMonth()] + " > " + key);
+  }
+
+  function exportBackupJson() {
+    const blob = new Blob([JSON.stringify(appDb, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "backup-fechamento-nascel-" + nowParts().year + "-" + nowParts().month + ".json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function importBackupJson(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function () {
+      try {
+        const parsed = JSON.parse(reader.result);
+        if (!parsed || !parsed.db) throw new Error("JSON inválido");
+        if (!confirm("Importar este backup? Os dados atuais deste navegador serão substituídos.")) return;
+        appDb = parsed;
+        saveDatabase();
+        initApp();
+        alert("Backup importado com sucesso.");
+      } catch (e) {
+        alert("Não foi possível importar o JSON.");
+      }
+      event.target.value = "";
+    };
+    reader.readAsText(file);
   }
 
   function escapeAttr(text) {
@@ -1104,24 +1295,33 @@
   }
 
   function formatDateTime(iso) {
-    try {
-      return new Date(iso).toLocaleString("pt-BR");
-    } catch (e) {
-      return iso || "";
-    }
+    try { return new Date(iso).toLocaleString("pt-BR"); }
+    catch (e) { return iso || ""; }
+  }
+
+  function getWorkingFlags() {
+    const rec = getCurrentClientRecord() || ensureWorkingRecord();
+    if (!rec) return {};
+    if (!rec.flags) rec.flags = {};
+    return rec.flags;
   }
 
   function getObsLog(itemId) {
-    if (!savedState.obsLogs[itemId]) {
-      savedState.obsLogs[itemId] = { current: "", history: [] };
-    }
-    if (!Array.isArray(savedState.obsLogs[itemId].history)) {
-      savedState.obsLogs[itemId].history = [];
-    }
-    if (typeof savedState.obsLogs[itemId].current !== "string") {
-      savedState.obsLogs[itemId].current = "";
-    }
-    return savedState.obsLogs[itemId];
+    const rec = ensureWorkingRecord();
+    if (!rec) return { current: "", history: [] };
+    if (!rec.obsLogs) rec.obsLogs = {};
+    if (!rec.obsLogs[itemId]) rec.obsLogs[itemId] = { current: "", history: [] };
+    if (!Array.isArray(rec.obsLogs[itemId].history)) rec.obsLogs[itemId].history = [];
+    if (typeof rec.obsLogs[itemId].current !== "string") rec.obsLogs[itemId].current = "";
+    return rec.obsLogs[itemId];
+  }
+
+  function getAttachments(itemId) {
+    const rec = ensureWorkingRecord();
+    if (!rec) return [];
+    if (!rec.attachments) rec.attachments = {};
+    if (!Array.isArray(rec.attachments[itemId])) rec.attachments[itemId] = [];
+    return rec.attachments[itemId];
   }
 
   function getRegimeItems() {
@@ -1137,55 +1337,36 @@
   }
 
   function initApp() {
-    document.getElementById("clientName").value = savedState.header.name || "";
-    document.getElementById("clientCnpj").value = savedState.header.cnpj || "";
-    document.getElementById("clientComp").value = savedState.header.comp || "2026-11";
-    document.getElementById("clientOperator").value = savedState.header.operator || "";
-    document.getElementById("clientReviewer").value = savedState.header.reviewer || "";
-    switchRegime("simples");
-    renderClosingsList();
-  }
-
-  function saveToStorage() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedState));
-  }
-
-  function saveHeaderData() {
-    savedState.header = {
-      name: document.getElementById("clientName").value,
-      cnpj: document.getElementById("clientCnpj").value,
-      comp: document.getElementById("clientComp").value,
-      operator: document.getElementById("clientOperator").value,
-      reviewer: document.getElementById("clientReviewer").value
-    };
-    saveToStorage();
-  }
-
-  function savePathsData() {
-    savedState.paths[currentRegime] = {
-      xml: document.getElementById("pathXmlInput").value,
-      close: document.getElementById("pathCloseInput").value
-    };
-    saveToStorage();
+    fillYearOptions();
+    const n = nowParts();
+    document.getElementById("filterYear").value = appDb.ui.year || n.year;
+    document.getElementById("filterMonth").value = appDb.ui.month || n.month;
+    refreshClientSelect(appDb.ui.clientKey || "");
+    if (appDb.ui.clientKey) {
+      const year = getSelectedYear();
+      const month = getSelectedMonth();
+      const rec = appDb.db[year] && appDb.db[year][month] && appDb.db[year][month][appDb.ui.clientKey];
+      if (rec) applyRecordToForm(rec);
+      else {
+        document.getElementById("clientName").value = "";
+        switchRegime("simples");
+      }
+    } else {
+      switchRegime("simples");
+    }
   }
 
   function switchRegime(regimeKey) {
     currentRegime = regimeKey;
-
     document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
     const regimeBtn = document.getElementById("regime-" + regimeKey);
     if (regimeBtn) regimeBtn.classList.add("active");
-
-    const rPaths = (savedState.paths && savedState.paths[regimeKey]) || { xml: "", close: "" };
-    document.getElementById("pathXmlInput").value = rPaths.xml || "";
-    document.getElementById("pathCloseInput").value = rPaths.close || "";
-
     switchChecklistType(currentChecklistType);
+    persistWorkingDraft();
   }
 
   function switchChecklistType(typeKey) {
     currentChecklistType = typeKey;
-
     document.querySelectorAll(".type-pill").forEach(btn => btn.classList.remove("active"));
     const tabBtn = document.getElementById("tab-" + typeKey);
     if (tabBtn) tabBtn.classList.add("active");
@@ -1197,6 +1378,28 @@
 
     renderChecklistTable();
     updateCounters();
+    persistWorkingDraft();
+  }
+
+  function renderAttachCell(itemId) {
+    const files = getAttachments(itemId);
+    const list = files.length
+      ? `<ul class="attach-list">${files.map((f, idx) => `
+          <li>
+            <span title="${escapeAttr(f.name)}">${escapeHtml(f.name)} (${Math.round((f.size || 0) / 1024)} KB)</span>
+            <button type="button" onclick="removeAttachment('${itemId}', ${idx})">remover</button>
+          </li>`).join("")}</ul>`
+      : `<div class="obs-empty">Sem anexos</div>`;
+
+    return `
+      <div class="attach-box">
+        <div class="attach-row">
+          <button type="button" class="attach-btn" onclick="document.getElementById('file-${itemId}').click()">Anexar</button>
+          <input type="file" id="file-${itemId}" style="display:none" onchange="addAttachment('${itemId}', this)">
+        </div>
+        ${list}
+      </div>
+    `;
   }
 
   function renderObsCell(itemId) {
@@ -1204,26 +1407,23 @@
     const current = log.current || "";
     const history = (log.history || []).slice().reverse();
     const older = history.filter((entry, idx) => !(idx === 0 && entry.text === current));
-
-    let historyHtml = "";
-    if (older.length) {
-      historyHtml = `<ul class="obs-history">${older.map(entry => `
-        <li>
-          <span class="obs-meta">${escapeHtml(formatDateTime(entry.at))} · ${escapeHtml(entry.by || "Operador")}${entry.flag ? " · " + escapeHtml(String(entry.flag).toUpperCase()) : ""}</span><br>
-          ${escapeHtml(entry.text)}
-        </li>`).join("")}</ul>`;
-    } else {
-      historyHtml = `<div class="obs-empty">Sem histórico anterior</div>`;
-    }
+    let historyHtml = older.length
+      ? `<ul class="obs-history">${older.map(entry => `
+          <li>
+            <span class="obs-meta">${escapeHtml(formatDateTime(entry.at))} · ${escapeHtml(entry.by || "Operador")}${entry.flag ? " · " + escapeHtml(String(entry.flag).toUpperCase()) : ""}</span><br>
+            ${escapeHtml(entry.text)}
+          </li>`).join("")}</ul>`
+      : `<div class="obs-empty">Sem histórico anterior</div>`;
 
     return `
       <div class="obs-box">
         <div class="obs-row">
           <input type="text" class="obs-input" placeholder="Anotar dúvida / motivo..." value="${escapeAttr(current)}" oninput="saveObsDraft('${itemId}', this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();registerObsLog('${itemId}');}">
-          <button type="button" class="obs-log-btn" onclick="registerObsLog('${itemId}')" title="Registrar no log e manter a atual visível">Log</button>
+          <button type="button" class="obs-log-btn" onclick="registerObsLog('${itemId}')" title="Registrar no log">Log</button>
         </div>
         <div class="obs-current"><strong>Atual:</strong> ${current ? escapeHtml(current) : "<em style='color:#94a3b8'>sem observação</em>"}</div>
         ${historyHtml}
+        ${renderAttachCell(itemId)}
       </div>
     `;
   }
@@ -1231,20 +1431,22 @@
   function renderChecklistTable() {
     const container = document.getElementById("checklistContainer");
     const items = getCurrentItems();
-
+    if (!clientKeyFromName(document.getElementById("clientName").value)) {
+      container.innerHTML = `<div class="category-header">Informe o cliente (Ano → Mês → Cliente) para iniciar o fechamento.</div>`;
+      return;
+    }
     if (!items.length) {
       container.innerHTML = `<div class="category-header">Nenhum item nesta etapa para o regime selecionado.</div>`;
       return;
     }
 
+    const flags = getWorkingFlags();
     let html = "";
     let lastCategory = "";
 
     items.forEach((item, index) => {
       if (item.cat !== lastCategory) {
-        if (lastCategory !== "") {
-          html += `</tbody></table>`;
-        }
+        if (lastCategory !== "") html += `</tbody></table>`;
         lastCategory = item.cat;
         html += `
           <div class="category-header">${item.cat}</div>
@@ -1255,14 +1457,14 @@
                 <th class="col-check">✓</th>
                 <th>O que fazer / Onde clicar na Domínio e Sistemas</th>
                 <th class="col-flags">Flag Mensal</th>
-                <th class="col-obs">Observação / Log</th>
+                <th class="col-obs">Observação / Log / Anexo</th>
               </tr>
             </thead>
             <tbody>
         `;
       }
 
-      const currentFlag = savedState.flags[item.id] || "";
+      const currentFlag = flags[item.id] || "";
       const rowStatusClass = currentFlag ? `status-${currentFlag}` : "";
       const isChecked = (currentFlag === "ok" || currentFlag === "na") ? "checked" : "";
 
@@ -1284,9 +1486,7 @@
               <button type="button" class="flag-btn ${currentFlag === 'pend' ? 'active-pend' : ''}" onclick="setFlag('${item.id}', 'pend')">[ PEND ]</button>
             </div>
           </td>
-          <td class="col-obs">
-            ${renderObsCell(item.id)}
-          </td>
+          <td class="col-obs">${renderObsCell(item.id)}</td>
         </tr>
       `;
     });
@@ -1296,31 +1496,32 @@
   }
 
   function setFlag(itemId, flagValue) {
-    if (savedState.flags[itemId] === flagValue) {
-      delete savedState.flags[itemId];
-    } else {
-      savedState.flags[itemId] = flagValue;
-    }
-    saveToStorage();
+    const rec = ensureWorkingRecord();
+    if (!rec) { alert("Informe o cliente antes de marcar itens."); return; }
+    if (!rec.flags) rec.flags = {};
+    if (rec.flags[itemId] === flagValue) delete rec.flags[itemId];
+    else rec.flags[itemId] = flagValue;
+    persistWorkingDraft();
     renderChecklistTable();
     updateCounters();
   }
 
   function toggleMainCheck(itemId, checked) {
-    if (checked) {
-      savedState.flags[itemId] = "ok";
-    } else {
-      delete savedState.flags[itemId];
-    }
-    saveToStorage();
+    const rec = ensureWorkingRecord();
+    if (!rec) { alert("Informe o cliente antes de marcar itens."); return; }
+    if (!rec.flags) rec.flags = {};
+    if (checked) rec.flags[itemId] = "ok";
+    else delete rec.flags[itemId];
+    persistWorkingDraft();
     renderChecklistTable();
     updateCounters();
   }
 
   function saveObsDraft(itemId, text) {
+    if (!ensureWorkingRecord()) return;
     const log = getObsLog(itemId);
     log.current = text;
-    saveToStorage();
+    persistWorkingDraft();
     const row = document.getElementById("row-" + itemId);
     if (row) {
       const currentBox = row.querySelector(".obs-current");
@@ -1333,33 +1534,59 @@
   }
 
   function registerObsLog(itemId) {
+    if (!ensureWorkingRecord()) { alert("Informe o cliente antes."); return; }
     const log = getObsLog(itemId);
     const text = String(log.current || "").trim();
-    if (!text) {
-      alert("Digite uma observação antes de registrar no log.");
-      return;
-    }
-
+    if (!text) { alert("Digite uma observação antes de registrar no log."); return; }
     const last = log.history[log.history.length - 1];
-    if (last && last.text === text) {
-      alert("Essa observação já está registrada no log.");
-      return;
-    }
-
+    if (last && last.text === text) { alert("Essa observação já está registrada no log."); return; }
+    const flags = getWorkingFlags();
     log.history.push({
       text,
       at: new Date().toISOString(),
-      by: savedState.header.operator || "Operador",
-      flag: savedState.flags[itemId] || ""
+      by: document.getElementById("clientOperator").value || "Operador",
+      flag: flags[itemId] || ""
     });
-    saveToStorage();
+    persistWorkingDraft();
+    renderChecklistTable();
+  }
+
+  function addAttachment(itemId, inputEl) {
+    const file = inputEl.files && inputEl.files[0];
+    if (!file) return;
+    if (!ensureWorkingRecord()) { alert("Informe o cliente antes de anexar."); inputEl.value = ""; return; }
+    if (file.size > MAX_ATTACH_BYTES) {
+      alert("Anexo grande demais para o navegador (máx. ~350 KB). No futuro o arquivo irá direto para a pasta de rede do fechamento.");
+      inputEl.value = "";
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function () {
+      const list = getAttachments(itemId);
+      list.push({
+        name: file.name,
+        size: file.size,
+        type: file.type || "application/octet-stream",
+        dataUrl: reader.result,
+        addedAt: new Date().toISOString(),
+        pendingFolder: true
+      });
+      persistWorkingDraft();
+      renderChecklistTable();
+    };
+    reader.readAsDataURL(file);
+    inputEl.value = "";
+  }
+
+  function removeAttachment(itemId, index) {
+    const list = getAttachments(itemId);
+    list.splice(index, 1);
+    persistWorkingDraft();
     renderChecklistTable();
   }
 
   function countFlagsForItems(items, flags) {
-    let okCount = 0;
-    let naCount = 0;
-    let pendCount = 0;
+    let okCount = 0, naCount = 0, pendCount = 0;
     items.forEach(item => {
       const f = flags[item.id];
       if (f === "ok") okCount++;
@@ -1371,10 +1598,10 @@
 
   function updateCounters() {
     const items = getCurrentItems();
-    const counts = countFlagsForItems(items, savedState.flags);
+    const flags = getWorkingFlags();
+    const counts = countFlagsForItems(items, flags);
     const done = counts.okCount + counts.naCount;
     const pct = counts.total > 0 ? Math.round((done / counts.total) * 100) : 0;
-
     document.getElementById("countOk").innerText = counts.okCount;
     document.getElementById("countNa").innerText = counts.naCount;
     document.getElementById("countPend").innerText = counts.pendCount;
@@ -1383,143 +1610,33 @@
   }
 
   function markAllOk() {
-    const items = getCurrentItems();
-    items.forEach(item => {
-      if (!savedState.flags[item.id]) {
-        savedState.flags[item.id] = "ok";
-      }
+    const rec = ensureWorkingRecord();
+    if (!rec) { alert("Informe o cliente antes."); return; }
+    if (!rec.flags) rec.flags = {};
+    getCurrentItems().forEach(item => {
+      if (!rec.flags[item.id]) rec.flags[item.id] = "ok";
     });
-    saveToStorage();
+    persistWorkingDraft();
     renderChecklistTable();
     updateCounters();
   }
 
   function resetCurrentRegime() {
-    if (!confirm("Deseja limpar as marcações e a observação atual desta etapa? O histórico de logs e os fechamentos salvos serão mantidos.")) return;
-    const items = getCurrentItems();
-    items.forEach(item => {
-      delete savedState.flags[item.id];
-      if (savedState.obsLogs[item.id]) {
-        savedState.obsLogs[item.id].current = "";
-      }
+    if (!confirm("Deseja limpar as marcações e a observação atual desta etapa? Logs, anexos e outros clientes do mês serão mantidos.")) return;
+    const rec = ensureWorkingRecord();
+    if (!rec) return;
+    if (!rec.flags) rec.flags = {};
+    getCurrentItems().forEach(item => {
+      delete rec.flags[item.id];
+      if (rec.obsLogs && rec.obsLogs[item.id]) rec.obsLogs[item.id].current = "";
     });
-    saveToStorage();
+    persistWorkingDraft();
     renderChecklistTable();
     updateCounters();
   }
 
-  function saveClosingSnapshot() {
-    saveHeaderData();
-    savePathsData();
-
-    const company = (savedState.header.name || "").trim();
-    if (!company) {
-      alert("Preencha a Empresa / Cliente antes de salvar o fechamento.");
-      return;
-    }
-
-    const items = getRegimeItems();
-    items.forEach(item => {
-      const log = getObsLog(item.id);
-      const text = String(log.current || "").trim();
-      if (!text) return;
-      const last = log.history[log.history.length - 1];
-      if (!last || last.text !== text) {
-        log.history.push({
-          text,
-          at: new Date().toISOString(),
-          by: savedState.header.operator || "Operador",
-          flag: savedState.flags[item.id] || "",
-          note: "snapshot"
-        });
-      }
-    });
-
-    const summary = countFlagsForItems(items, savedState.flags);
-    const snapshot = {
-      id: "close_" + Date.now(),
-      savedAt: new Date().toISOString(),
-      regime: currentRegime,
-      regimeTitle: regimesData[currentRegime].title,
-      checklistType: currentChecklistType,
-      checklistTypeTitle: CHECKLIST_TYPES[currentChecklistType].title,
-      header: Object.assign({}, savedState.header),
-      paths: Object.assign({}, savedState.paths[currentRegime] || {}),
-      flags: Object.assign({}, savedState.flags),
-      obsLogs: JSON.parse(JSON.stringify(savedState.obsLogs)),
-      summary
-    };
-
-    savedState.closings.unshift(snapshot);
-    if (savedState.closings.length > 40) {
-      savedState.closings = savedState.closings.slice(0, 40);
-    }
-    saveToStorage();
-    renderClosingsList();
-    alert("Fechamento salvo no histórico deste navegador.");
-  }
-
-  function renderClosingsList() {
-    const box = document.getElementById("closingsList");
-    if (!box) return;
-
-    const list = savedState.closings || [];
-    if (!list.length) {
-      box.innerHTML = `<div class="obs-empty">Nenhum fechamento salvo ainda. Use “Salvar Fechamento” no topo.</div>`;
-      return;
-    }
-
-    box.innerHTML = list.map(item => {
-      const done = (item.summary && (item.summary.okCount + item.summary.naCount)) || 0;
-      const total = (item.summary && item.summary.total) || 0;
-      const pend = (item.summary && item.summary.pendCount) || 0;
-      return `
-        <div class="closing-item">
-          <div>
-            <strong>${escapeHtml(item.header && item.header.name ? item.header.name : "Empresa sem nome")}</strong>
-            <span>${escapeHtml(formatDateTime(item.savedAt))} · ${escapeHtml(item.regimeTitle || item.regime)}${item.checklistTypeTitle ? " · " + escapeHtml(item.checklistTypeTitle) : ""} · Comp. ${escapeHtml((item.header && item.header.comp) || "-")} · ${done}/${total} OK/N/A · ${pend} PEND</span>
-          </div>
-          <div class="closing-actions">
-            <button type="button" onclick="loadClosingSnapshot('${item.id}')">Carregar</button>
-            <button type="button" onclick="deleteClosingSnapshot('${item.id}')">Excluir</button>
-          </div>
-        </div>
-      `;
-    }).join("");
-  }
-
-  function loadClosingSnapshot(closingId) {
-    const snap = (savedState.closings || []).find(c => c.id === closingId);
-    if (!snap) return;
-    if (!confirm("Carregar este fechamento? A tela atual será substituída pelos dados salvos.")) return;
-
-    savedState.header = Object.assign({}, snap.header || {});
-    savedState.flags = Object.assign({}, snap.flags || {});
-    savedState.obsLogs = JSON.parse(JSON.stringify(snap.obsLogs || {}));
-    if (snap.regime && snap.paths) {
-      savedState.paths[snap.regime] = Object.assign({}, snap.paths);
-    }
-
-    document.getElementById("clientName").value = savedState.header.name || "";
-    document.getElementById("clientCnpj").value = savedState.header.cnpj || "";
-    document.getElementById("clientComp").value = savedState.header.comp || "2026-11";
-    document.getElementById("clientOperator").value = savedState.header.operator || "";
-    document.getElementById("clientReviewer").value = sanitizePersonName(savedState.header.reviewer) || "";
-
-    saveToStorage();
-    currentChecklistType = snap.checklistType || "importacao";
-    switchRegime(snap.regime || "simples");
-    renderClosingsList();
-  }
-
-  function deleteClosingSnapshot(closingId) {
-    if (!confirm("Excluir este fechamento do histórico?")) return;
-    savedState.closings = (savedState.closings || []).filter(c => c.id !== closingId);
-    saveToStorage();
-    renderClosingsList();
-  }
-
   window.onload = initApp;
+
 </script>
 
 </body>

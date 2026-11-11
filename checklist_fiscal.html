@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Central de Fechamentos Fiscais - Mensal</title>
+  <style>
+    :root {
+      --primary: #fca422;
+      --primary-light: #ffb84d;
+      --primary-soft: #fff8ed;
+      --accent: #fca422;
+      --ink: #746a69;
+      --bg: #f7f6f5;
+      --card: #ffffff;
+      --text: #3f3837;
+      --muted: #746a69;
+      --border: #e4dfde;
+      --ok-bg: #dcfce7;
+      --ok-text: #15803d;
+      --ok-border: #86efac;
+      --na-bg: #f1f5f9;
+      --na-text: #475569;
+      --na-border: #cbd5e1;
+      --pend-bg: #fff1e6;
+      --pend-text: #b45309;
+      --pend-border: #fdba74;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 24px;
+      line-height: 1.45;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .header-card {
+      background: var(--card);
+      color: var(--ink);
+      border: 1px solid var(--border);
+      padding: 20px 28px;
+      border-radius: 14px;
+      box-shadow: 0 10px 25px -5px rgba(116, 106, 105, 0.12);
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .header-logo {
+      height: 56px;
+      width: auto;
+      display: block;
+      flex-shrink: 0;
+    }
+
+    .header-title h1 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+
+    .header-title p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-white {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .btn-white:hover {
+      background: #e89410;
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: #ffffff;
+      color: var(--ink);
+      border: 1px solid var(--border);
+    }
+
+    .btn-outline:hover {
+      background: var(--primary-soft);
+      border-color: var(--primary);
+    }
+
+    .client-bar {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 22px;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    }
+
+    .client-bar .field-group.span-2 {
+      grid-column: span 2;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .field-group label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--ink);
+      letter-spacing: 0.04em;
+    }
+
+    .field-group input,
+    .field-group select {
+      padding: 8px 11px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: 0.9rem;
+      color: var(--text);
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    .field-group input:focus,
+    .field-group select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(252, 164, 34, 0.18);
+    }
+
+    .tabs-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .tab-btn {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .tab-btn:hover {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 6px 16px rgba(252, 164, 34, 0.28);
+    }
+
+    .type-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+
+    .type-bar-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+      margin-right: 4px;
+    }
+
+    .type-pill {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 7px 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .type-pill:hover {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+    }
+
+    .type-pill.active {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: #fff;
+    }
+
+    .status-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 22px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .progress-wrap {
+      flex: 1;
+      min-width: 260px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 10px;
+      background: #e2e8f0;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #e89410 0%, var(--primary) 100%);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .counters {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .counter-pill {
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pill-ok { background: var(--ok-bg); color: var(--ok-text); border: 1px solid var(--ok-border); }
+    .pill-na { background: var(--na-bg); color: var(--na-text); border: 1px solid var(--na-border); }
+    .pill-pend { background: var(--pend-bg); color: var(--pend-text); border: 1px solid var(--pend-border); }
+
+    .attach-box {
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .attach-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .attach-btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .attach-btn:hover {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+    }
+
+    .attach-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .attach-list li {
+      font-size: 0.72rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 2px 0;
+    }
+
+    .attach-list button {
+      border: none;
+      background: transparent;
+      color: #b45309;
+      cursor: pointer;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .db-hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 8px;
+      grid-column: 1 / -1;
+    }
+
+    .checklist-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+
+    .category-header {
+      background: #f7f6f5;
+      padding: 11px 18px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: var(--ink);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .checklist-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .checklist-table th {
+      background: #f8fafc;
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .checklist-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+      font-size: 0.9rem;
+    }
+
+    .checklist-row {
+      transition: background 0.15s;
+    }
+
+    .checklist-row:hover {
+      background-color: #fcfcfd;
+    }
+
+    .checklist-row.status-ok {
+      background-color: #f0fdf4;
+    }
+
+    .checklist-row.status-ok .task-title {
+      text-decoration: line-through;
+      color: #15803d;
+    }
+
+    .checklist-row.status-na {
+      background-color: #f8fafc;
+      opacity: 0.72;
+    }
+
+    .checklist-row.status-na .task-title {
+      text-decoration: line-through;
+      color: #64748b;
+    }
+
+    .checklist-row.status-pend {
+      background-color: #fff8ed;
+    }
+
+    .col-num {
+      width: 48px;
+      font-weight: 700;
+      color: var(--ink);
+      text-align: center;
+    }
+
+    .col-check {
+      width: 42px;
+      text-align: center;
+    }
+
+    .main-checkbox {
+      width: 19px;
+      height: 19px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .task-title {
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+
+    .task-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .dominio-badge {
+      display: inline-block;
+      margin-top: 5px;
+      padding: 2px 8px;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      font-family: 'Consolas', monospace;
+      font-size: 0.75rem;
+      color: #334155;
+    }
+
+    .col-flags {
+      width: 215px;
+      white-space: nowrap;
+    }
+
+    .flag-group {
+      display: inline-flex;
+      gap: 5px;
+    }
+
+    .flag-btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--muted);
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .flag-btn:hover {
+      border-color: #94a3b8;
+    }
+
+    .flag-btn.active-ok {
+      background: var(--ok-text);
+      color: #fff;
+      border-color: var(--ok-text);
+    }
+
+    .flag-btn.active-na {
+      background: var(--na-text);
+      color: #fff;
+      border-color: var(--na-text);
+    }
+
+    .flag-btn.active-pend {
+      background: var(--pend-text);
+      color: #fff;
+      border-color: var(--pend-text);
+    }
+
+    .col-obs {
+      width: 290px;
+      min-width: 240px;
+    }
+
+    .obs-box {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .obs-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .obs-input {
+      flex: 1;
+      width: 100%;
+      padding: 6px 9px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.82rem;
+      background: rgba(255, 255, 255, 0.85);
+    }
+
+    .obs-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(252, 164, 34, 0.15);
+    }
+
+    .obs-log-btn {
+      border: 1px solid var(--primary);
+      background: var(--primary-soft);
+      color: var(--ink);
+      border-radius: 6px;
+      padding: 6px 8px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .obs-log-btn:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .obs-current {
+      font-size: 0.78rem;
+      color: var(--text);
+      background: #fff8ed;
+      border: 1px solid #f5d19a;
+      border-radius: 6px;
+      padding: 6px 8px;
+      line-height: 1.35;
+    }
+
+    .obs-current strong {
+      color: var(--ink);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .obs-history {
+      margin: 0;
+      padding-left: 14px;
+      max-height: 72px;
+      overflow-y: auto;
+    }
+
+    .obs-history li {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+
+    .obs-history .obs-meta {
+      font-weight: 600;
+      color: #8a7f7e;
+    }
+
+    .obs-empty {
+      font-size: 0.72rem;
+      color: #94a3b8;
+    }
+
+    .Signoff-card {
+      margin-top: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 22px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+
+    .sign-box {
+      border-top: 1px solid #94a3b8;
+      padding-top: 8px;
+      margin-top: 28px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+        font-size: 11px;
+      }
+      .header-actions,
+      .tabs-bar,
+      .type-bar {
+        display: none !important;
+      }
+      .header-card {
+        background: #fff !important;
+        color: #000 !important;
+        border: 2px solid #000;
+        padding: 12px;
+        box-shadow: none;
+        margin-bottom: 12px;
+      }
+      .header-logo {
+        height: 42px;
+      }
+      .client-bar,
+      .status-panel,
+      .checklist-card,
+      .Signoff-card {
+        box-shadow: none !important;
+        border: 1px solid #000 !important;
+        margin-bottom: 10px;
+        break-inside: avoid;
+      }
+      .attach-box {
+        display: none !important;
+      }
+      .checklist-table th,
+      .checklist-table td {
+        padding: 6px 8px;
+        border-bottom: 1px solid #999;
+      }
+      .flag-btn {
+        border: 1px solid #000 !important;
+        color: #000 !important;
+        padding: 2px 6px;
+        font-size: 9px;
+      }
+      .flag-btn.active-ok,
+      .flag-btn.active-na,
+      .flag-btn.active-pend {
+        background: #000 !important;
+        color: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+
+    @media (max-width: 960px) {
+      .client-bar,
+      .tabs-bar,
+      .Signoff-card {
+        grid-template-columns: 1fr;
+      }
+
+      .client-bar .field-group.span-2 {
+        grid-column: span 1;
+      }
+
+      .type-bar {
+        align-items: flex-start;
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header class="header-card">
+    <div class="header-brand">
+      <img class="header-logo" src="assets/nascel-logo.jpg" alt="Nascel Contabilidade">
+      <div class="header-title">
+        <h1 id="pageMainTitle">Fechamento Operacional de Apuração Fiscal</h1>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-white" onclick="saveCurrentClient()">Salvar Cliente</button>
+      <button class="btn btn-outline" onclick="exportBackupJson()">Backup JSON</button>
+      <button class="btn btn-outline" onclick="document.getElementById('importBackupInput').click()">Importar JSON</button>
+      <input type="file" id="importBackupInput" accept="application/json,.json" style="display:none" onchange="importBackupJson(event)">
+      <button class="btn btn-outline" onclick="window.print()">Imprimir Fechamento (A4)</button>
+      <button class="btn btn-outline" onclick="markAllOk()">Marcar Tudo OK</button>
+      <button class="btn btn-outline" onclick="resetCurrentRegime()">Limpar Etapa Atual</button>
+    </div>
+  </header>
+
+  <section class="client-bar">
+    <div class="field-group">
+      <label>Ano</label>
+      <select id="filterYear" onchange="onYearMonthChange()"></select>
+    </div>
+    <div class="field-group">
+      <label>Mês</label>
+      <select id="filterMonth" onchange="onYearMonthChange()">
+        <option value="01">01 - Janeiro</option>
+        <option value="02">02 - Fevereiro</option>
+        <option value="03">03 - Março</option>
+        <option value="04">04 - Abril</option>
+        <option value="05">05 - Maio</option>
+        <option value="06">06 - Junho</option>
+        <option value="07">07 - Julho</option>
+        <option value="08">08 - Agosto</option>
+        <option value="09">09 - Setembro</option>
+        <option value="10">10 - Outubro</option>
+        <option value="11">11 - Novembro</option>
+        <option value="12">12 - Dezembro</option>
+      </select>
+    </div>
+    <div class="field-group span-2">
+      <label>Cliente salvo neste Ano/Mês</label>
+      <select id="filterClient" onchange="onClientSelectChange()">
+        <option value="">+ Novo cliente / digitar abaixo</option>
+      </select>
+    </div>
+    <div class="field-group span-2">
+      <label>Empresa / Cliente (Código Domínio + Razão Social)</label>
+      <input type="text" id="clientName" placeholder="Ex: 0145 - Empresa Exemplo LTDA" oninput="onClientNameInput()">
+    </div>
+    <div class="field-group">
+      <label>CNPJ / UF</label>
+      <input type="text" id="clientCnpj" placeholder="00.000.000/0001-00 (SP/MG)" oninput="persistWorkingDraft()">
+    </div>
+    <div class="field-group">
+      <label>IE-ST / Modo de Recolhimento</label>
+      <select id="clientIeSt" onchange="persistWorkingDraft()">
+        <option value="nao_aplica">Não se aplica</option>
+        <option value="por_operacao">Sem IE-ST → Por Operação (GNRE/DARE/DAE)</option>
+        <option value="por_apuracao">Com IE-ST → Por Apuração (GIA-ST/DeSTDA/SPED)</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <label>Responsável Apuração</label>
+      <input type="text" id="clientOperator" placeholder="Nome do Operador" oninput="persistWorkingDraft()">
+    </div>
+    <div class="field-group">
+      <label>Revisor Técnico</label>
+      <input type="text" id="clientReviewer" placeholder="Nome do revisor" oninput="persistWorkingDraft()">
+    </div>
+    <p class="db-hint">Os fechamentos ficam organizados por <strong>Ano → Mês → Cliente</strong>. Escolha Ano/Mês e um cliente já salvo para carregar; ou digite um novo e clique em <strong>Salvar Cliente</strong>. Use Backup JSON para compartilhar com a equipe. Anexos ficam vinculados ao item e, no futuro, irão para a pasta de rede do fechamento.</p>
+  </section>
+
+  <nav class="tabs-bar">
+    <button type="button" class="tab-btn active" id="regime-simples" onclick="switchRegime('simples')">Simples Nacional</button>
+    <button type="button" class="tab-btn" id="regime-presumido" onclick="switchRegime('presumido')">Lucro Presumido</button>
+    <button type="button" class="tab-btn" id="regime-real" onclick="switchRegime('real')">Lucro Real</button>
+    <button type="button" class="tab-btn" id="regime-mei" onclick="switchRegime('mei')">MEI</button>
+  </nav>
+
+  <div class="type-bar">
+    <span class="type-bar-label">Etapa:</span>
+    <button type="button" class="type-pill active" id="tab-importacao" onclick="switchChecklistType('importacao')">Importação</button>
+    <button type="button" class="type-pill" id="tab-analise" onclick="switchChecklistType('analise')">Análise</button>
+    <button type="button" class="type-pill" id="tab-obrigacoes" onclick="switchChecklistType('obrigacoes')">Obrigações Acessórias</button>
+    <button type="button" class="type-pill" id="tab-fechamento" onclick="switchChecklistType('fechamento')">Fechamento e Entrega</button>
+  </div>
+
+  <section class="status-panel">
+    <div class="progress-wrap">
+      <div class="progress-header">
+        <span id="regimeProgressLabel">Progresso do Fechamento (Simples Nacional)</span>
+        <span id="regimeProgressPct">0% concluído</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBarFill"></div>
+      </div>
+    </div>
+    <div class="counters">
+      <div class="counter-pill pill-ok">OK: <span id="countOk">0</span></div>
+      <div class="counter-pill pill-na">N/A: <span id="countNa">0</span></div>
+      <div class="counter-pill pill-pend">PENDENTE: <span id="countPend">0</span></div>
+    </div>
+  </section>
+
+  <main class="checklist-card" id="checklistContainer"></main>
+
+  <footer class="Signoff-card">
+    <div>
+      <strong>Status p/ App Fechamento:</strong>
+      <p style="font-size: 0.8rem; color: var(--muted); margin-top: 4px;">
+        Só envie para revisão técnica após todos os itens estarem marcados com <strong>OK</strong> ou <strong>N/A</strong> (ou com a dúvida descrita na coluna Observação se marcado <strong>PEND</strong>).
+      </p>
+    </div>
+    <div class="sign-box">Assinatura / Visto - Operador Fiscal</div>
+    <div class="sign-box">Aprovação - Revisão Técnica</div>
+  </footer>
+</div>
+
+<script>
+  const regimesData = {
+    simples: {
+      title: "Simples Nacional",
+      items: [
+        { id: "sn_01", cat: "1. Parâmetros e Coleta (Domínio / SIEG / App Coletor)", title: "Selecionar empresa e competência correta no Domínio (F8) e checar Regime", desc: "Verificar se é Competência ou Caixa.", path: "Domínio: Controle > Parâmetros > Aba Simples Nacional" },
+        { id: "sn_02", cat: "1. Parâmetros e Coleta (Domínio / SIEG / App Coletor)", title: "Baixar parcelas recebidas (Exclusivo se for Regime de Caixa)", desc: "Solicitar extrato/financeiro via WhatsApp/Nibo e baixar recebimentos antes de apurar.", path: "Domínio: Movimentos > Baixa de Parcelas" },
+        { id: "sn_03", cat: "1. Parâmetros e Coleta (Domínio / SIEG / App Coletor)", title: "Baixar e importar XMLs de Mercadorias e Fretes (Ativas e Canceladas)", desc: "NF-e (55), NFC-e (65), SAT (59) e CT-e (57) capturados no SIEG Cofre XML.", path: "Domínio: Utilitários > Importação > Importador de XML" },
+        { id: "sn_04", cat: "1. Parâmetros e Coleta (Domínio / SIEG / App Coletor)", title: "Baixar NFS-e (Prefeitura/Portal Nacional), importar na Domínio e rodar App Coletor", desc: "Passar notas do Emissor Nacional no App Coletor para gerar o relatório de conferência dos Serviços Tomados.", path: "App Coletor + Domínio: Utilitários > Importação > Importação de NFS-e" },
+        { id: "sn_05", cat: "2. Auditoria de Sequência e Entradas (SP / MG / Retenções)", title: "Auditar quebra de sequência numérica e tratar Canceladas / Inutilizadas", desc: "Garantir que não há pulo de nota e que canceladas estão R$ 0,00.", path: "Domínio: Relatórios > Acompanhamento > Verificar Numeração | Movimentos > NF-e Inutilizadas" },
+        { id: "sn_06", cat: "2. Auditoria de Sequência e Entradas (SP / MG / Retenções)", title: "Analisar compras interestaduais (CFOP 2.556/2.551/2.406/2.407) p/ DIFAL Uso/Consumo e Ativo", desc: "Se alíquota interestadual (4% ou 12%) for menor que a interna, calcular DIFAL e emitir DARE-SP ou DAE-MG.", path: "Domínio: Movimentos > Entradas | Relatórios > Acompanhamento > Demonstrativo de CFOPs" },
+        { id: "sn_07", cat: "2. Auditoria de Sequência e Entradas (SP / MG / Retenções)", title: "Analisar compras interestaduais de revenda (CFOP 2.101/2.102/2.403) - Regra SP vs. MG", desc: "Em SP: checar NCM p/ Antecipação ST (Art. 426-A). Em MG: calcular Antecipação de Alíquota MG. Em 2.403: checar GNRE paga.", path: "Domínio: Movimentos > Entradas" },
+        { id: "sn_08", cat: "2. Auditoria de Sequência e Entradas (SP / MG / Retenções)", title: "Cruzar Relatório do App Coletor com Entradas: ISS Retido em Serviços Tomados", desc: "Conferir notas com ISS Retido = SIM no relatório do Coletor e emitir guia de ISS Tomador na Prefeitura.", path: "App Coletor + Portal Prefeitura + Domínio: Movimentos > Entradas" },
+        { id: "sn_09", cat: "2. Auditoria de Sequência e Entradas (SP / MG / Retenções)", title: "Cruzar Relatório do App Coletor: Retenções Federais (INSS, IRRF e CSRF 4,65%)", desc: "Lançar retenções de INSS (11%/3,5%), IRRF (1,5%/1%) e CSRF (4,65%) na nota para envio da EFD-Reinf / DCTFWeb.", path: "App Coletor + Domínio: Movimentos > Entradas" },
+        { id: "sn_10", cat: "3. Segregação de Saídas (Comércio, Indústria e Serviços)", title: "Retirar CFOPs de Não-Faturamento da Receita Bruta do Simples", desc: "Remessas, consertos, brindes, bonificações, devolução de compra (5.910, 5.915, 5.949, 5.202) e cupom referenciado (5.929).", path: "Domínio: Utilitários > Alterar Notas > Saídas" },
+        { id: "sn_11", cat: "3. Segregação de Saídas (Comércio, Indústria e Serviços)", title: "Conferir Devoluções de Venda (CFOP 1.201, 1.202, 1.411, 2.202)", desc: "Devem estar em acumulador que DEDUZ da Receita Bruta no mesmo Anexo e regra da venda original.", path: "Domínio: Movimentos > Entradas" },
+        { id: "sn_12", cat: "3. Segregação de Saídas (Comércio, Indústria e Serviços)", title: "Segregar Vendas com Substituição Tributária de ICMS (CFOP 5.405 / 6.404)", desc: "Alocar no acumulador COM Substituição Tributária de ICMS para zerar o percentual de ICMS no DAS.", path: "Domínio: Relatórios > Impostos > Simples Nacional" },
+        { id: "sn_13", cat: "3. Segregação de Saídas (Comércio, Indústria e Serviços)", title: "Segregar Vendas de Produtos Monofásicos de PIS e COFINS por NCM", desc: "Bebidas frias, medicamentos, perfumaria/cosméticos, autopeças/pneus e combustíveis/GLP.", path: "Domínio: Relatórios > Impostos > Simples Nacional > Produtos" },
+        { id: "sn_14", cat: "3. Segregação de Saídas (Comércio, Indústria e Serviços)", title: "Sincronizar Folha de Salários (12 meses) e validar Fator R (Anexo III vs. Anexo V)", desc: "Se Fator R >= 28% apura no Anexo III (6%); se < 28% apura no Anexo V (15,5%).", path: "Domínio: Movimentos > Outros Dados > Simples Nacional > Dados da Folha" },
+        { id: "sn_15", cat: "3. Segregação de Saídas (Comércio, Indústria e Serviços)", title: "Segregar Notas de Serviços Prestados COM Retenção de ISS", desc: "Notas emitidas com ISS Retido = SIM devem descontar o ISS dentro do DAS.", path: "Domínio: Movimentos > Saídas" },
+        { id: "sn_16", cat: "3. Segregação de Saídas (Comércio, Indústria e Serviços)", title: "Comunicar DP sobre faturamento no Anexo IV (INSS Patronal / CPP de 20% fora do DAS)", desc: "Avisar Folha de Pagamento caso a empresa tenha receita no Anexo IV.", path: "Comunicação Interna DP / DCTFWeb" },
+        { id: "sn_17", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Processar Apuração (F6) e fazer Prova Real Matemática da Receita Bruta", desc: "Confirmar na calculadora: (Vendas + Serviços Ativos) - (Devoluções de Venda) = Receita Bruta RPA.", path: "Domínio: Movimentos > Apuração | Relatórios > Impostos > Simples Nacional" },
+        { id: "sn_18", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Validar se o RBT12 do Domínio está idêntico ao RBT12 do Portal PGDAS-D", desc: "Se houver diferença nos 12 meses anteriores, ajustar em Receitas Anteriores.", path: "Domínio: Movimentos > Outros Dados > Simples Nacional > Receitas Anteriores" },
+        { id: "sn_19", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Bater centavos (Valor do DAS no PGDAS-D == Valor do Domínio) e gerar Guia/Recibo/Extrato", desc: "Só transmitir o PGDAS-D após o valor bater 100% com o demonstrativo do Domínio.", path: "Portal Simples Nacional / e-CAC" },
+        { id: "sn_20", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Emitir Livros Fiscais (Entradas, Saídas, ISS) e Demonstrativos em PDF na Domínio", desc: "Salvar todos os relatórios e livros na pasta de rede do cliente.", path: "Domínio: Relatórios > Livros > Entradas / Saídas / ISS" },
+        { id: "sn_21", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Montar pacote completo no App Fechamento e enviar p/ Revisão Técnica", desc: "Subir no App Fechamento: DAS, Extrato/Recibo PGDAS, Relatório Domínio, Relatório App Coletor, Livros e Guias extras.", path: "App Fechamento" },
+        { id: "sn_22", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Transmitir DeSTDA (SEDIF-SN) e encerrar escrituração no site da Prefeitura", desc: "Gerar DeSTDA para contribuintes com IE e fechar competência municipal de ISS.", path: "Domínio: Relatórios > Informativos > Estaduais > DeSTDA" },
+        { id: "sn_23", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "(Pós-Revisão) Postar guias validadas para o cliente via Nibo / WhatsApp", desc: "Liberar para o cliente somente após o OK do revisor no App Fechamento.", path: "Nibo / WhatsApp" },
+        { id: "sn_24", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Fechar / Travar o Período Fiscal no Domínio Sistemas", desc: "Bloquear o mês apurado para impedir alterações acidentais.", path: "Domínio: Utilitários > Fechamento de Período" },
+        { id: "sn_25", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir Inscrição Estadual de Substituto Tributário (IE-ST) em outras UFs", desc: "Se possui IE-ST ativa: recolhimento mensal Por Apuração (GIA-ST / DeSTDA / SPED Fiscal). Se não possui IE-ST: recolhimento Por Operação a cada NF-e (GNRE/DARE/DAE anexada).", path: "Cadastro SEFAZ / Domínio: Controle > Parâmetros > Estaduais" },
+        { id: "sn_26", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Segregar e conferir ICMS-ST Por Operação vs. Por Apuração", desc: "Por Operação: guias nota a nota (saída/entrada interestadual). Por Apuração: saldo mensal no Domínio (Relatórios > Impostos > ICMS ST).", path: "Domínio: Relatórios > Impostos > ICMS ST" },
+        { id: "sn_27", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir DIFAL (EC 87/2015 e Uso/Consumo/Ativo) Por Operação vs. Por Apuração", desc: "Por Operação: GNRE/DARE/DAE emitida nota a nota. Por Apuração: quando há inscrição/cadastro na UF de destino ou apuração em conta gráfica/guia mensal.", path: "Domínio: Movimentos > Entradas/Saídas | Relatórios > Impostos" },
+        { id: "sn_28", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Validar FECP / FCP / FEM (próprio, ST e DIFAL) Por Operação e Por Apuração", desc: "Conferir cálculo e emissão das guias separadas ou unificadas de FECP/FEM, validando o pago Por Operação e o gerado Por Apuração no fechamento mensal.", path: "Domínio: Relatórios > Impostos > ICMS / FECP" }
+      ]
+    },
+    presumido: {
+      title: "Lucro Presumido",
+      items: [
+        { id: "lp_01", cat: "1. Coleta, Parâmetros, SIEG e App Coletor", title: "Selecionar empresa e competência no Domínio (F8) e checar regime (Caixa ou Competência)", desc: "Conferir parametrização federal/estadual e solicitar extratos de aplicação financeira no trimestre.", path: "Domínio: Controle > Parâmetros" },
+        { id: "lp_02", cat: "1. Coleta, Parâmetros, SIEG e App Coletor", title: "Baixar no SIEG e importar no Domínio XMLs de NF-e, NFC-e, SAT e CT-e (Ativas e Canceladas)", desc: "Importar lotes de entradas, saídas e conhecimentos de transporte.", path: "Domínio: Utilitários > Importação > Importador de XML" },
+        { id: "lp_03", cat: "1. Coleta, Parâmetros, SIEG e App Coletor", title: "Baixar NFS-e (Prefeitura/Portal Nacional), importar na Domínio e rodar o App Coletor", desc: "Gerar no App Coletor o relatório de auditoria das retenções de Serviços Tomados.", path: "App Coletor + Domínio: Utilitários > Importação > NFS-e" },
+        { id: "lp_04", cat: "1. Coleta, Parâmetros, SIEG e App Coletor", title: "Auditar sequência numérica de Saídas e tratar Canceladas / Inutilizadas", desc: "Confirmar que não há pulo de numeração em NF-e, NFC-e e NFS-e.", path: "Domínio: Relatórios > Acompanhamento > Verificar Numeração" },
+        { id: "lp_05", cat: "2. Auditoria de Entradas (Crédito ICMS/IPI, Fronteira e App Coletor)", title: "Conferir crédito de ICMS/IPI nas entradas de revenda/insumos e bloqueio em ST/Uso e Consumo", desc: "CFOPs 1.101/1.102/2.102 tributados geram crédito de ICMS; 1.403 (ST) e 1.556 (Uso/Consumo) não geram crédito.", path: "Domínio: Movimentos > Entradas" },
+        { id: "lp_06", cat: "2. Auditoria de Entradas (Crédito ICMS/IPI, Fronteira e App Coletor)", title: "Auditar compras interestaduais (CFOP 2.xxx) p/ DIFAL e Antecipações (SP e MG)", desc: "Verificar DIFAL Uso/Ativo em conta gráfica (SP) ou DAE (MG), Art. 426-A (SP) e Antecipação de Entrada (MG).", path: "Domínio: Movimentos > Entradas" },
+        { id: "lp_07", cat: "2. Auditoria de Entradas (Crédito ICMS/IPI, Fronteira e App Coletor)", title: "Cruzar Relatório do App Coletor com Entradas: Guia de ISS Tomador", desc: "Emitir guia municipal para todas as notas apontadas com ISS Retido no relatório do Coletor.", path: "App Coletor + Portal da Prefeitura" },
+        { id: "lp_08", cat: "2. Auditoria de Entradas (Crédito ICMS/IPI, Fronteira e App Coletor)", title: "Cruzar Relatório do App Coletor: Lançar INSS, IRRF e CSRF (4,65%) na Domínio", desc: "Garantir que as retenções de serviços tomados subam para a EFD-Reinf e gerem DARF na DCTFWeb.", path: "App Coletor + Domínio: Movimentos > Entradas" },
+        { id: "lp_09", cat: "3. Auditoria de Saídas (ICMS, ISS, PIS/COFINS Cumulativo, IRPJ e CSLL)", title: "Excluir CFOPs de remessa, conserto, bonificação e devolução de compra da base de faturamento", desc: "CFOPs 5.910, 5.915, 5.949, 5.202 não podem compor base de PIS, COFINS, IRPJ e CSLL.", path: "Domínio: Relatórios > Acompanhamento > Demonstrativo de CFOPs" },
+        { id: "lp_10", cat: "3. Auditoria de Saídas (ICMS, ISS, PIS/COFINS Cumulativo, IRPJ e CSLL)", title: "Conferir exclusão do ICMS destacado nas saídas da base do PIS (0,65%) e COFINS (3,00%)", desc: "Validar se o acumulador está abatendo o ICMS próprio da base de PIS/COFINS (Tema 69 STF).", path: "Domínio: Relatórios > Impostos > PIS Cumulativo / COFINS Cumulativo" },
+        { id: "lp_11", cat: "3. Auditoria de Saídas (ICMS, ISS, PIS/COFINS Cumulativo, IRPJ e CSLL)", title: "Segregar produtos Monofásicos (CST 04) e abater Devoluções de Venda (1.202/1.411)", desc: "Itens monofásicos têm alíquota zero na revenda; devoluções deduzem a base do mês.", path: "Domínio: Movimentos > Saídas / Entradas" },
+        { id: "lp_12", cat: "3. Auditoria de Saídas (ICMS, ISS, PIS/COFINS Cumulativo, IRPJ e CSLL)", title: "Abater retenções sofridas nas notas de saída (IRRF e CSRF 4,65% retidos pelos clientes)", desc: "Deduzir das guias de PIS, COFINS, IRPJ e CSLL os valores que os clientes descontaram da nossa empresa.", path: "Domínio: Movimentos > Saídas / Baixa de Parcelas" },
+        { id: "lp_13", cat: "3. Auditoria de Saídas (ICMS, ISS, PIS/COFINS Cumulativo, IRPJ e CSLL)", title: "(Trimestral: Mar/Jun/Set/Dez) Lançar Rendimentos de Aplicação e apurar IRPJ e CSLL Presumido", desc: "Conferir presunção (8%/12% Comércio ou 32% Serviços), somar receitas financeiras e checar adicional de 10% IRPJ.", path: "Domínio: Movimentos > Outros Dados > IRPJ/CSLL" },
+        { id: "lp_14", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Processar Apuração (F6) e emitir Relatórios de Impostos em PDF na Domínio", desc: "Emitir demonstrativos de PIS, COFINS, ICMS, IPI, ISS, Retenções, IRPJ e CSLL.", path: "Domínio: Movimentos > Apuração | Relatórios > Impostos" },
+        { id: "lp_15", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Emitir todos os Livros Fiscais em PDF na Domínio Sistemas", desc: "Livros de Entradas, Saídas, Apuração de ICMS, Apuração de IPI (se indústria) e ISS.", path: "Domínio: Relatórios > Livros > Entradas / Saídas / Apuração ICMS / ISS" },
+        { id: "lp_16", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Gerar e validar SPED Fiscal, EFD-Contribuições, EFD-Reinf, DCTFWeb/MIT e GIA/DAPI", desc: "Validar arquivos nos PVAs, transmitir obrigações e gerar todos os DARFs, DARE/DAE e guias de ISS.", path: "Domínio: Relatórios > Informativos > Federais e Estaduais" },
+        { id: "lp_17", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Salvar na rede, montar pacote completo no App Fechamento e enviar p/ Revisão Técnica", desc: "Subir no App Fechamento: Relatórios de Impostos, Relatório App Coletor, Livros Fiscais, Recibos SPED e Guias.", path: "App Fechamento" },
+        { id: "lp_18", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "(Pós-Revisão) Enviar guias via Nibo/WhatsApp e travar período no Domínio", desc: "Liberar ao cliente após revisão e bloquear mês fiscal.", path: "Domínio: Utilitários > Fechamento de Período" },
+        { id: "lp_19", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir Inscrição Estadual de Substituto Tributário (IE-ST) em outras UFs", desc: "Com IE-ST: recolhimento mensal Por Apuração (GIA-ST / DeSTDA / SPED Fiscal). Sem IE-ST: Por Operação via GNRE/DARE/DAE anexada à NF-e.", path: "Cadastro SEFAZ / Domínio: Controle > Parâmetros > Estaduais" },
+        { id: "lp_20", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Segregar e conferir ICMS-ST Por Operação vs. Por Apuração", desc: "Por Operação: guias nota a nota. Por Apuração: saldo mensal no Domínio (Relatórios > Impostos > ICMS ST).", path: "Domínio: Relatórios > Impostos > ICMS ST" },
+        { id: "lp_21", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir DIFAL (EC 87/2015 e Uso/Consumo/Ativo) Por Operação vs. Por Apuração", desc: "Por Operação: GNRE nota a nota. Por Apuração: inscrição na UF de destino ou conta gráfica/guia mensal.", path: "Domínio: Movimentos > Entradas/Saídas | Relatórios > Impostos" },
+        { id: "lp_22", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Validar FECP / FCP / FEM (próprio, ST e DIFAL) Por Operação e Por Apuração", desc: "Conferir guias separadas ou unificadas de FECP/FEM no fechamento mensal da Domínio.", path: "Domínio: Relatórios > Impostos > ICMS / FECP" }
+      ]
+    },
+    real: {
+      title: "Lucro Real",
+      items: [
+        { id: "lr_01", cat: "1. Coleta Rigorosa, SIEG, App Coletor e Despesas Creditáveis", title: "Selecionar empresa e competência no Domínio (F8)", desc: "Verificar se apuração de IRPJ/CSLL é Trimestral ou Estimativa Mensal (Balanço de Suspensão/Redução).", path: "Domínio: Controle > Parâmetros" },
+        { id: "lr_02", cat: "1. Coleta Rigorosa, SIEG, App Coletor e Despesas Creditáveis", title: "Baixar no SIEG e importar XMLs de NF-e, NFC-e, SAT, CT-e e NF3-e Energia", desc: "Importar 100% dos documentos fiscais estaduais de entradas e saídas.", path: "Domínio: Utilitários > Importação > Importador de XML" },
+        { id: "lr_03", cat: "1. Coleta Rigorosa, SIEG, App Coletor e Despesas Creditáveis", title: "Baixar NFS-e (Prefeitura/Portal Nacional), importar na Domínio e rodar o App Coletor", desc: "Emitir o relatório do App Coletor para auditar retenções e serviços tomados.", path: "App Coletor + Domínio: Utilitários > Importação > NFS-e" },
+        { id: "lr_04", cat: "1. Coleta Rigorosa, SIEG, App Coletor e Despesas Creditáveis", title: "Coletar e lançar faturas de Energia, Aluguéis PJ, Leasing, Fretes e Depreciação", desc: "Lançar despesas que geram crédito de 1,65% PIS e 7,6% COFINS.", path: "Domínio: Movimentos > Outros Dados > PIS/COFINS > Créditos / Ativo" },
+        { id: "lr_05", cat: "1. Coleta Rigorosa, SIEG, App Coletor e Despesas Creditáveis", title: "Conferir sequência numérica de Saídas e tratar Canceladas / Inutilizadas", desc: "Garantir integridade total da numeração antes de apurar os créditos/débitos.", path: "Domínio: Relatórios > Acompanhamento > Verificar Numeração" },
+        { id: "lr_06", cat: "2. Auditoria de Créditos Não-Cumulativos e Retenções nas Entradas", title: "Auditar créditos de ICMS, IPI, PIS (1,65%) e COFINS (7,6%) nas compras de revenda, insumos e fretes", desc: "Conferir CST 50 nas entradas tributadas e regras da Lei 14.592/2023.", path: "Domínio: Movimentos > Entradas" },
+        { id: "lr_07", cat: "2. Auditoria de Créditos Não-Cumulativos e Retenções nas Entradas", title: "Bloquear crédito de PIS/COFINS em compras de Monofásicos (CST 70), Alíquota Zero (CST 73) e Uso/Consumo", desc: "Mercadorias monofásicas ou alíquota zero para revenda não dão direito a crédito na entrada.", path: "Domínio: Movimentos > Entradas" },
+        { id: "lr_08", cat: "2. Auditoria de Créditos Não-Cumulativos e Retenções nas Entradas", title: "Analisar compras interestaduais (CFOP 2.xxx) p/ DIFAL e Antecipações (SP e MG)", desc: "Verificar DIFAL de Uso/Consumo e Ativo Imobilizado e antecipações estaduais.", path: "Domínio: Movimentos > Entradas" },
+        { id: "lr_09", cat: "2. Auditoria de Créditos Não-Cumulativos e Retenções nas Entradas", title: "Cruzar Relatório do App Coletor com Entradas: ISS Tomador + Retenções Federais (INSS, IRRF, CSRF)", desc: "Emitir guia municipal de ISS Retido e lançar INSS/IRRF/CSRF na Domínio para EFD-Reinf e DCTFWeb.", path: "App Coletor + Domínio: Movimentos > Entradas" },
+        { id: "lr_10", cat: "3. Auditoria de Saídas, Receitas Financeiras e Integração Contábil (LALUR)", title: "Conferir exclusão do ICMS próprio destacado nas saídas da base de débito do PIS (1,65%) e COFINS (7,6%)", desc: "Validar se o ICMS da operação própria foi abatido da base de cálculo.", path: "Domínio: Relatórios > Impostos > PIS / COFINS Não-Cumulativo" },
+        { id: "lr_11", cat: "3. Auditoria de Saídas, Receitas Financeiras e Integração Contábil (LALUR)", title: "Segregar saídas de produtos Monofásicos (CST 04) e limpar CFOPs de remessa/não-faturamento", desc: "Garantir que remessas não gerem débito de PIS/COFINS e itens monofásicos fiquem com alíquota zero.", path: "Domínio: Relatórios > Acompanhamento > Demonstrativo de CFOPs" },
+        { id: "lr_12", cat: "3. Auditoria de Saídas, Receitas Financeiras e Integração Contábil (LALUR)", title: "Lançar Receitas Financeiras do mês p/ tributação de 0,65% PIS e 4,00% COFINS (Decreto 8.426/2015)", desc: "Tributar rendimentos de aplicação, juros ativos e descontos obtidos.", path: "Domínio: Movimentos > Outros Dados > PIS/COFINS > Demais Receitas" },
+        { id: "lr_13", cat: "3. Auditoria de Saídas, Receitas Financeiras e Integração Contábil (LALUR)", title: "Abater retenções sofridas nas notas de saída (PIS, COFINS, CSLL e IRRF retidos por clientes)", desc: "Aproveitar os créditos de impostos retidos na fonte pelos clientes.", path: "Domínio: Movimentos > Saídas / Baixa de Parcelas" },
+        { id: "lr_14", cat: "3. Auditoria de Saídas, Receitas Financeiras e Integração Contábil (LALUR)", title: "Validar conciliação Fiscal x Contábil (Balancete / LALUR / LACS) p/ apuração de IRPJ e CSLL", desc: "Alinhar com o Setor Contábil o lucro contábil, adições, exclusões e compensação de prejuízo fiscal.", path: "Domínio Contábil / LALUR" },
+        { id: "lr_15", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Processar Apuração (F6) e emitir Relatórios de Impostos (com Memória de Créditos PIS/COFINS)", desc: "Salvar PDFs de PIS/COFINS Não-Cumulativo, ICMS, IPI, ISS, Retenções, IRPJ e CSLL.", path: "Domínio: Movimentos > Apuração | Relatórios > Impostos" },
+        { id: "lr_16", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Emitir todos os Livros Fiscais em PDF (Entradas, Saídas, Apuração ICMS, IPI, ISS e Inventário)", desc: "Gerar livros oficiais do período para compor o fechamento.", path: "Domínio: Relatórios > Livros > Entradas / Saídas / ICMS / IPI / ISS / Inventário" },
+        { id: "lr_17", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Gerar e validar SPED Fiscal, EFD-Contribuições (Blocos F e M), EFD-Reinf, DCTFWeb/MIT e GIA/DAPI", desc: "Validar no PVA, conferir créditos no Bloco M e gerar todas as guias de pagamento.", path: "Domínio: Relatórios > Informativos > Federais e Estaduais" },
+        { id: "lr_18", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Salvar na rede, montar dossiê completo no App Fechamento e enviar p/ Revisão Técnica", desc: "Anexar Memória de Créditos, Relatórios Domínio, Relatório App Coletor, Livros, SPEDs e Guias.", path: "App Fechamento" },
+        { id: "lr_19", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "(Pós-Revisão) Liberar guias no Nibo/WhatsApp e travar período fiscal no Domínio", desc: "Enviar ao cliente após validação técnica e bloquear mês na Domínio.", path: "Domínio: Utilitários > Fechamento de Período" },
+        { id: "lr_20", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir Inscrição Estadual de Substituto Tributário (IE-ST) em outras UFs", desc: "Com IE-ST: recolhimento mensal Por Apuração (GIA-ST / DeSTDA / SPED Fiscal). Sem IE-ST: Por Operação via GNRE/DARE/DAE anexada à NF-e.", path: "Cadastro SEFAZ / Domínio: Controle > Parâmetros > Estaduais" },
+        { id: "lr_21", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Segregar e conferir ICMS-ST Por Operação vs. Por Apuração", desc: "Por Operação: guias nota a nota. Por Apuração: saldo mensal no Domínio (Relatórios > Impostos > ICMS ST).", path: "Domínio: Relatórios > Impostos > ICMS ST" },
+        { id: "lr_22", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir DIFAL (EC 87/2015 e Uso/Consumo/Ativo) Por Operação vs. Por Apuração", desc: "Por Operação: GNRE nota a nota. Por Apuração: inscrição na UF de destino ou conta gráfica/guia mensal.", path: "Domínio: Movimentos > Entradas/Saídas | Relatórios > Impostos" },
+        { id: "lr_23", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Validar FECP / FCP / FEM (próprio, ST e DIFAL) Por Operação e Por Apuração", desc: "Conferir guias separadas ou unificadas de FECP/FEM no fechamento mensal da Domínio.", path: "Domínio: Relatórios > Impostos > ICMS / FECP" }
+      ]
+    },
+    mei: {
+      title: "MEI (Microempreendedor Individual)",
+      items: [
+        { id: "mei_01", cat: "1. Coleta de Dados (SIEG, Portal Nacional, App Coletor e Cliente)", title: "Baixar XMLs de compras (Entradas) e vendas (Saídas) do MEI no SIEG Cofre XML", desc: "Capturar todas as NF-e emitidas contra o CNPJ do MEI e emitidas por ele.", path: "SIEG Cofre XML" },
+        { id: "mei_02", cat: "1. Coleta de Dados (SIEG, Portal Nacional, App Coletor e Cliente)", title: "Baixar NFS-e do Portal Nacional (Emissor Nacional) e rodar no App Coletor", desc: "Verificar pelo relatório do App Coletor se o MEI tomou serviços com retenção de ISS/INSS.", path: "Portal Nacional (gov.br/nfse) + App Coletor" },
+        { id: "mei_03", cat: "1. Coleta de Dados (SIEG, Portal Nacional, App Coletor e Cliente)", title: "Receber do cliente (via WhatsApp / Nibo) o faturamento sem nota do mês", desc: "Coletar controles de vendas em dinheiro, PIX e maquininha de cartão.", path: "WhatsApp / Nibo" },
+        { id: "mei_04", cat: "2. Auditoria de Limites do MEI (Regras SE / SENÃO)", title: "Conferir Faturamento Acumulado no Ano vs. Limite de R$ 81.000,00 (ou proporcional)", desc: "Se passou de R$ 81k até R$ 97,2k (20%) ou acima de R$ 97,2k: PARAR e avisar a coordenação/revisão técnica imediatamente!", path: "Planilha / Controle de Faturamento MEI" },
+        { id: "mei_05", cat: "2. Auditoria de Limites do MEI (Regras SE / SENÃO)", title: "Conferir Volume de Compras no SIEG vs. Limite de 80% das Receitas", desc: "Alertar a coordenação/revisão técnica se as compras do ano estiverem próximas ou acima de 80% do que o MEI vendeu.", path: "Relatório de Entradas SIEG" },
+        { id: "mei_06", cat: "2. Auditoria de Limites do MEI (Regras SE / SENÃO)", title: "Verificar se houve Compra Interestadual (CFOP 2.xxx) sujeita a DIFAL/ST ou ISS Tomador", desc: "Checar se alguma compra de fora do estado exige recolhimento estadual ou guia municipal de ISS retido.", path: "XMLs de Entrada + Relatório App Coletor" },
+        { id: "mei_07", cat: "3. Guia DAS-MEI, App Fechamento, Revisão e Entrega", title: "Emitir a guia DAS-MEI no portal PGMEI e preencher o Relatório Mensal de Receitas Brutas", desc: "Gerar documento de arrecadação do mês (vencimento dia 20).", path: "Portal Simples Nacional > Simei > PGMEI" },
+        { id: "mei_08", cat: "3. Guia DAS-MEI, App Fechamento, Revisão e Entrega", title: "Salvar arquivos na pasta da rede e subir no App Fechamento p/ Revisão Técnica", desc: "Anexar Guia DAS-MEI, Controle de Receitas/Compras e Relatório do App Coletor.", path: "App Fechamento" },
+        { id: "mei_09", cat: "3. Guia DAS-MEI, App Fechamento, Revisão e Entrega", title: "(Pós-Revisão) Enviar guia DAS-MEI ao cliente via Nibo / WhatsApp", desc: "Disponibilizar guia validada para pagamento do cliente.", path: "Nibo / WhatsApp" }
+      ]
+    }
+  };
+
+  const STORAGE_KEY = "nascel_fechamento_db_v3";
+  const LEGACY_KEYS = ["mari_fiscal_checklists_v2", "mari_fiscal_checklists_v1"];
+  const MAX_ATTACH_BYTES = 350 * 1024;
+
+  const CHECKLIST_TYPES = {
+    importacao: { title: "Importação" },
+    analise: { title: "Análise" },
+    obrigacoes: { title: "Obrigações Acessórias" },
+    fechamento: { title: "Fechamento e Entrega" }
+  };
+
+  const ITEM_TYPE_MAP = {
+    sn_01: "importacao", sn_02: "importacao", sn_03: "importacao", sn_04: "importacao",
+    sn_05: "analise", sn_06: "analise", sn_07: "analise", sn_08: "analise", sn_09: "analise",
+    sn_10: "analise", sn_11: "analise", sn_12: "analise", sn_13: "analise", sn_14: "analise",
+    sn_15: "analise", sn_16: "analise",
+    sn_25: "analise", sn_26: "analise", sn_27: "analise",
+    sn_18: "obrigacoes", sn_19: "obrigacoes", sn_20: "obrigacoes", sn_22: "obrigacoes", sn_28: "obrigacoes",
+    sn_17: "fechamento", sn_21: "fechamento", sn_23: "fechamento", sn_24: "fechamento",
+
+    lp_01: "importacao", lp_02: "importacao", lp_03: "importacao", lp_04: "importacao",
+    lp_05: "analise", lp_06: "analise", lp_07: "analise", lp_08: "analise",
+    lp_09: "analise", lp_10: "analise", lp_11: "analise", lp_12: "analise", lp_13: "analise",
+    lp_19: "analise", lp_20: "analise", lp_21: "analise",
+    lp_15: "obrigacoes", lp_16: "obrigacoes", lp_22: "obrigacoes",
+    lp_14: "fechamento", lp_17: "fechamento", lp_18: "fechamento",
+
+    lr_01: "importacao", lr_02: "importacao", lr_03: "importacao", lr_04: "importacao", lr_05: "importacao",
+    lr_06: "analise", lr_07: "analise", lr_08: "analise", lr_09: "analise",
+    lr_10: "analise", lr_11: "analise", lr_12: "analise", lr_13: "analise", lr_14: "analise",
+    lr_20: "analise", lr_21: "analise", lr_22: "analise",
+    lr_16: "obrigacoes", lr_17: "obrigacoes", lr_23: "obrigacoes",
+    lr_15: "fechamento", lr_18: "fechamento", lr_19: "fechamento",
+
+    mei_01: "importacao", mei_02: "importacao", mei_03: "importacao",
+    mei_04: "analise", mei_05: "analise", mei_06: "analise",
+    mei_07: "obrigacoes",
+    mei_08: "fechamento", mei_09: "fechamento"
+  };
+
+  const MONTH_NAMES = {
+    "01": "Janeiro", "02": "Fevereiro", "03": "Março", "04": "Abril",
+    "05": "Maio", "06": "Junho", "07": "Julho", "08": "Agosto",
+    "09": "Setembro", "10": "Outubro", "11": "Novembro", "12": "Dezembro"
+  };
+
+  let currentRegime = "simples";
+  let currentChecklistType = "importacao";
+  let skipAutoSave = false;
+  let appDb = loadDatabase();
+
+  function sanitizePersonName(value) {
+    const text = String(value || "").trim();
+    if (/mariana|clayton/i.test(text)) return "";
+    return text;
+  }
+
+  function nowParts() {
+    const d = new Date();
+    return {
+      year: String(d.getFullYear()),
+      month: String(d.getMonth() + 1).padStart(2, "0")
+    };
+  }
+
+  function emptyClientRecord() {
+    return {
+      header: { name: "", cnpj: "", operator: "", reviewer: "", ieSt: "nao_aplica" },
+      regime: "simples",
+      checklistType: "importacao",
+      flags: {},
+      obsLogs: {},
+      attachments: {},
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  function defaultDatabase() {
+    const n = nowParts();
+    return {
+      version: 3,
+      ui: { year: n.year, month: n.month, clientKey: "" },
+      db: {}
+    };
+  }
+
+  function ensureDbPath(year, month) {
+    if (!appDb.db[year]) appDb.db[year] = {};
+    if (!appDb.db[year][month]) appDb.db[year][month] = {};
+    return appDb.db[year][month];
+  }
+
+  function clientKeyFromName(name) {
+    return String(name || "").trim();
+  }
+
+  function loadDatabase() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.db) return parsed;
+      }
+      for (const key of LEGACY_KEYS) {
+        const legacyRaw = localStorage.getItem(key);
+        if (!legacyRaw) continue;
+        return migrateLegacyToV3(JSON.parse(legacyRaw));
+      }
+    } catch (e) {}
+    return defaultDatabase();
+  }
+
+  function migrateLegacyToV3(legacy) {
+    const next = defaultDatabase();
+    const header = legacy.header || {};
+    const name = clientKeyFromName(header.name || "Cliente legado");
+    let year = next.ui.year;
+    let month = next.ui.month;
+    if (header.comp && /^\d{4}-\d{2}$/.test(header.comp)) {
+      year = header.comp.slice(0, 4);
+      month = header.comp.slice(5, 7);
+    }
+    if (!next.db[year]) next.db[year] = {};
+    if (!next.db[year][month]) next.db[year][month] = {};
+    const obsLogs = legacy.obsLogs || {};
+    if (legacy.obs && !legacy.obsLogs) {
+      Object.keys(legacy.obs).forEach(itemId => {
+        const text = String(legacy.obs[itemId] || "").trim();
+        if (!text) return;
+        obsLogs[itemId] = {
+          current: text,
+          history: [{ text, at: new Date().toISOString(), by: header.operator || "Operador", flag: (legacy.flags || {})[itemId] || "" }]
+        };
+      });
+    }
+    next.db[year][month][name] = {
+      header: {
+        name,
+        cnpj: header.cnpj || "",
+        operator: sanitizePersonName(header.operator),
+        reviewer: sanitizePersonName(header.reviewer),
+        ieSt: "nao_aplica"
+      },
+      regime: "simples",
+      checklistType: "importacao",
+      flags: legacy.flags || {},
+      obsLogs,
+      attachments: {},
+      updatedAt: new Date().toISOString()
+    };
+    next.ui = { year, month, clientKey: name };
+    return next;
+  }
+
+  function saveDatabase() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(appDb));
+  }
+
+  function getSelectedYear() {
+    return document.getElementById("filterYear").value;
+  }
+
+  function getSelectedMonth() {
+    return document.getElementById("filterMonth").value;
+  }
+
+  function getClientsForSelection() {
+    const year = getSelectedYear();
+    const month = getSelectedMonth();
+    const bucket = (appDb.db[year] && appDb.db[year][month]) || {};
+    return Object.keys(bucket).sort((a, b) => a.localeCompare(b, "pt-BR"));
+  }
+
+  function getCurrentClientRecord() {
+    const year = getSelectedYear();
+    const month = getSelectedMonth();
+    const key = clientKeyFromName(document.getElementById("clientName").value);
+    if (!key) return null;
+    const bucket = (appDb.db[year] && appDb.db[year][month]) || {};
+    return bucket[key] || null;
+  }
+
+  function ensureWorkingRecord() {
+    const key = clientKeyFromName(document.getElementById("clientName").value);
+    if (!key) return null;
+    const year = getSelectedYear();
+    const month = getSelectedMonth();
+    const bucket = ensureDbPath(year, month);
+    if (!bucket[key]) {
+      bucket[key] = emptyClientRecord();
+      bucket[key].header.name = key;
+    }
+    return bucket[key];
+  }
+
+  function readFormIntoRecord(rec) {
+    rec.header = {
+      name: clientKeyFromName(document.getElementById("clientName").value),
+      cnpj: document.getElementById("clientCnpj").value,
+      operator: sanitizePersonName(document.getElementById("clientOperator").value),
+      reviewer: sanitizePersonName(document.getElementById("clientReviewer").value),
+      ieSt: document.getElementById("clientIeSt").value || "nao_aplica"
+    };
+    rec.regime = currentRegime;
+    rec.checklistType = currentChecklistType;
+    rec.updatedAt = new Date().toISOString();
+  }
+
+  function persistWorkingDraft() {
+    if (skipAutoSave) return;
+    const key = clientKeyFromName(document.getElementById("clientName").value);
+    if (!key) return;
+    const rec = ensureWorkingRecord();
+    if (!rec) return;
+    readFormIntoRecord(rec);
+    appDb.ui.year = getSelectedYear();
+    appDb.ui.month = getSelectedMonth();
+    appDb.ui.clientKey = key;
+    saveDatabase();
+    refreshClientSelect(key);
+  }
+
+  function fillYearOptions() {
+    const sel = document.getElementById("filterYear");
+    const currentYear = Number(nowParts().year);
+    const years = new Set();
+    Object.keys(appDb.db || {}).forEach(y => years.add(y));
+    for (let y = currentYear - 2; y <= currentYear + 2; y++) years.add(String(y));
+    const sorted = Array.from(years).sort();
+    sel.innerHTML = sorted.map(y => `<option value="${y}">${y}</option>`).join("");
+  }
+
+  function refreshClientSelect(selectedKey) {
+    const sel = document.getElementById("filterClient");
+    const clients = getClientsForSelection();
+    const current = selectedKey != null ? selectedKey : clientKeyFromName(document.getElementById("clientName").value);
+    sel.innerHTML = `<option value="">+ Novo cliente / digitar abaixo</option>` +
+      clients.map(name => `<option value="${escapeAttr(name)}">${escapeHtml(name)}</option>`).join("");
+    if (current && clients.includes(current)) sel.value = current;
+    else sel.value = "";
+  }
+
+  function applyRecordToForm(rec) {
+    skipAutoSave = true;
+    document.getElementById("clientName").value = (rec.header && rec.header.name) || "";
+    document.getElementById("clientCnpj").value = (rec.header && rec.header.cnpj) || "";
+    document.getElementById("clientOperator").value = sanitizePersonName(rec.header && rec.header.operator) || "";
+    document.getElementById("clientReviewer").value = sanitizePersonName(rec.header && rec.header.reviewer) || "";
+    document.getElementById("clientIeSt").value = (rec.header && rec.header.ieSt) || "nao_aplica";
+    currentRegime = rec.regime || "simples";
+    currentChecklistType = rec.checklistType || "importacao";
+    skipAutoSave = false;
+    switchRegime(currentRegime);
+  }
+
+  function clearFormForNewClient() {
+    skipAutoSave = true;
+    document.getElementById("clientName").value = "";
+    document.getElementById("clientCnpj").value = "";
+    document.getElementById("clientOperator").value = "";
+    document.getElementById("clientReviewer").value = "";
+    document.getElementById("clientIeSt").value = "nao_aplica";
+    currentRegime = "simples";
+    currentChecklistType = "importacao";
+    skipAutoSave = false;
+    switchRegime("simples");
+  }
+
+  function onYearMonthChange() {
+    appDb.ui.year = getSelectedYear();
+    appDb.ui.month = getSelectedMonth();
+    saveDatabase();
+    refreshClientSelect("");
+    clearFormForNewClient();
+  }
+
+  function onClientSelectChange() {
+    const key = document.getElementById("filterClient").value;
+    if (!key) {
+      clearFormForNewClient();
+      return;
+    }
+    const year = getSelectedYear();
+    const month = getSelectedMonth();
+    const rec = appDb.db[year] && appDb.db[year][month] && appDb.db[year][month][key];
+    if (!rec) return;
+    appDb.ui.clientKey = key;
+    saveDatabase();
+    applyRecordToForm(rec);
+  }
+
+  function onClientNameInput() {
+    persistWorkingDraft();
+  }
+
+  function saveCurrentClient() {
+    const key = clientKeyFromName(document.getElementById("clientName").value);
+    if (!key) {
+      alert("Informe o nome do cliente antes de salvar.");
+      return;
+    }
+    const rec = ensureWorkingRecord();
+    readFormIntoRecord(rec);
+    appDb.ui.clientKey = key;
+    saveDatabase();
+    refreshClientSelect(key);
+    alert("Cliente salvo em " + getSelectedYear() + " > " + MONTH_NAMES[getSelectedMonth()] + " > " + key);
+  }
+
+  function exportBackupJson() {
+    const blob = new Blob([JSON.stringify(appDb, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "backup-fechamento-nascel-" + nowParts().year + "-" + nowParts().month + ".json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function importBackupJson(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function () {
+      try {
+        const parsed = JSON.parse(reader.result);
+        if (!parsed || !parsed.db) throw new Error("JSON inválido");
+        if (!confirm("Importar este backup? Os dados atuais deste navegador serão substituídos.")) return;
+        appDb = parsed;
+        saveDatabase();
+        initApp();
+        alert("Backup importado com sucesso.");
+      } catch (e) {
+        alert("Não foi possível importar o JSON.");
+      }
+      event.target.value = "";
+    };
+    reader.readAsText(file);
+  }
+
+  function escapeAttr(text) {
+    return String(text || "")
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function escapeHtml(text) {
+    return String(text || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function formatDateTime(iso) {
+    try { return new Date(iso).toLocaleString("pt-BR"); }
+    catch (e) { return iso || ""; }
+  }
+
+  function getWorkingFlags() {
+    const rec = getCurrentClientRecord() || ensureWorkingRecord();
+    if (!rec) return {};
+    if (!rec.flags) rec.flags = {};
+    return rec.flags;
+  }
+
+  function getObsLog(itemId) {
+    const rec = ensureWorkingRecord();
+    if (!rec) return { current: "", history: [] };
+    if (!rec.obsLogs) rec.obsLogs = {};
+    if (!rec.obsLogs[itemId]) rec.obsLogs[itemId] = { current: "", history: [] };
+    if (!Array.isArray(rec.obsLogs[itemId].history)) rec.obsLogs[itemId].history = [];
+    if (typeof rec.obsLogs[itemId].current !== "string") rec.obsLogs[itemId].current = "";
+    return rec.obsLogs[itemId];
+  }
+
+  function getAttachments(itemId) {
+    const rec = ensureWorkingRecord();
+    if (!rec) return [];
+    if (!rec.attachments) rec.attachments = {};
+    if (!Array.isArray(rec.attachments[itemId])) rec.attachments[itemId] = [];
+    return rec.attachments[itemId];
+  }
+
+  function getRegimeItems() {
+    return (regimesData[currentRegime] && regimesData[currentRegime].items) || [];
+  }
+
+  function getItemType(itemId) {
+    return ITEM_TYPE_MAP[itemId] || "analise";
+  }
+
+  function getCurrentItems() {
+    return getRegimeItems().filter(item => getItemType(item.id) === currentChecklistType);
+  }
+
+  function initApp() {
+    fillYearOptions();
+    const n = nowParts();
+    document.getElementById("filterYear").value = appDb.ui.year || n.year;
+    document.getElementById("filterMonth").value = appDb.ui.month || n.month;
+    refreshClientSelect(appDb.ui.clientKey || "");
+    if (appDb.ui.clientKey) {
+      const year = getSelectedYear();
+      const month = getSelectedMonth();
+      const rec = appDb.db[year] && appDb.db[year][month] && appDb.db[year][month][appDb.ui.clientKey];
+      if (rec) applyRecordToForm(rec);
+      else {
+        document.getElementById("clientName").value = "";
+        switchRegime("simples");
+      }
+    } else {
+      switchRegime("simples");
+    }
+  }
+
+  function switchRegime(regimeKey) {
+    currentRegime = regimeKey;
+    document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+    const regimeBtn = document.getElementById("regime-" + regimeKey);
+    if (regimeBtn) regimeBtn.classList.add("active");
+    switchChecklistType(currentChecklistType);
+    persistWorkingDraft();
+  }
+
+  function switchChecklistType(typeKey) {
+    currentChecklistType = typeKey;
+    document.querySelectorAll(".type-pill").forEach(btn => btn.classList.remove("active"));
+    const tabBtn = document.getElementById("tab-" + typeKey);
+    if (tabBtn) tabBtn.classList.add("active");
+
+    const regimeTitle = regimesData[currentRegime].title;
+    const typeTitle = CHECKLIST_TYPES[typeKey].title;
+    document.getElementById("pageMainTitle").innerText = "Fechamento - " + typeTitle + " (" + regimeTitle + ")";
+    document.getElementById("regimeProgressLabel").innerText = "Progresso: " + typeTitle + " · " + regimeTitle;
+
+    renderChecklistTable();
+    updateCounters();
+    persistWorkingDraft();
+  }
+
+  function renderAttachCell(itemId) {
+    const files = getAttachments(itemId);
+    const list = files.length
+      ? `<ul class="attach-list">${files.map((f, idx) => `
+          <li>
+            <span title="${escapeAttr(f.name)}">${escapeHtml(f.name)} (${Math.round((f.size || 0) / 1024)} KB)</span>
+            <button type="button" onclick="removeAttachment('${itemId}', ${idx})">remover</button>
+          </li>`).join("")}</ul>`
+      : `<div class="obs-empty">Sem anexos</div>`;
+
+    return `
+      <div class="attach-box">
+        <div class="attach-row">
+          <button type="button" class="attach-btn" onclick="document.getElementById('file-${itemId}').click()">Anexar</button>
+          <input type="file" id="file-${itemId}" style="display:none" onchange="addAttachment('${itemId}', this)">
+        </div>
+        ${list}
+      </div>
+    `;
+  }
+
+  function renderObsCell(itemId) {
+    const log = getObsLog(itemId);
+    const current = log.current || "";
+    const history = (log.history || []).slice().reverse();
+    const older = history.filter((entry, idx) => !(idx === 0 && entry.text === current));
+    let historyHtml = older.length
+      ? `<ul class="obs-history">${older.map(entry => `
+          <li>
+            <span class="obs-meta">${escapeHtml(formatDateTime(entry.at))} · ${escapeHtml(entry.by || "Operador")}${entry.flag ? " · " + escapeHtml(String(entry.flag).toUpperCase()) : ""}</span><br>
+            ${escapeHtml(entry.text)}
+          </li>`).join("")}</ul>`
+      : `<div class="obs-empty">Sem histórico anterior</div>`;
+
+    return `
+      <div class="obs-box">
+        <div class="obs-row">
+          <input type="text" class="obs-input" placeholder="Anotar dúvida / motivo..." value="${escapeAttr(current)}" oninput="saveObsDraft('${itemId}', this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();registerObsLog('${itemId}');}">
+          <button type="button" class="obs-log-btn" onclick="registerObsLog('${itemId}')" title="Registrar no log">Log</button>
+        </div>
+        <div class="obs-current"><strong>Atual:</strong> ${current ? escapeHtml(current) : "<em style='color:#94a3b8'>sem observação</em>"}</div>
+        ${historyHtml}
+        ${renderAttachCell(itemId)}
+      </div>
+    `;
+  }
+
+  function renderChecklistTable() {
+    const container = document.getElementById("checklistContainer");
+    const items = getCurrentItems();
+    if (!clientKeyFromName(document.getElementById("clientName").value)) {
+      container.innerHTML = `<div class="category-header">Informe o cliente (Ano → Mês → Cliente) para iniciar o fechamento.</div>`;
+      return;
+    }
+    if (!items.length) {
+      container.innerHTML = `<div class="category-header">Nenhum item nesta etapa para o regime selecionado.</div>`;
+      return;
+    }
+
+    const flags = getWorkingFlags();
+    let html = "";
+    let lastCategory = "";
+
+    items.forEach((item, index) => {
+      if (item.cat !== lastCategory) {
+        if (lastCategory !== "") html += `</tbody></table>`;
+        lastCategory = item.cat;
+        html += `
+          <div class="category-header">${item.cat}</div>
+          <table class="checklist-table">
+            <thead>
+              <tr>
+                <th class="col-num">#</th>
+                <th class="col-check">✓</th>
+                <th>O que fazer / Onde clicar na Domínio e Sistemas</th>
+                <th class="col-flags">Flag Mensal</th>
+                <th class="col-obs">Observação / Log / Anexo</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+      }
+
+      const currentFlag = flags[item.id] || "";
+      const rowStatusClass = currentFlag ? `status-${currentFlag}` : "";
+      const isChecked = (currentFlag === "ok" || currentFlag === "na") ? "checked" : "";
+
+      html += `
+        <tr class="checklist-row ${rowStatusClass}" id="row-${item.id}">
+          <td class="col-num">${String(index + 1).padStart(2, "0")}</td>
+          <td class="col-check">
+            <input type="checkbox" class="main-checkbox" ${isChecked} onchange="toggleMainCheck('${item.id}', this.checked)">
+          </td>
+          <td>
+            <div class="task-title">${item.title}</div>
+            <div class="task-desc">${item.desc}</div>
+            <span class="dominio-badge">${item.path}</span>
+          </td>
+          <td class="col-flags">
+            <div class="flag-group">
+              <button type="button" class="flag-btn ${currentFlag === 'ok' ? 'active-ok' : ''}" onclick="setFlag('${item.id}', 'ok')">[ OK ]</button>
+              <button type="button" class="flag-btn ${currentFlag === 'na' ? 'active-na' : ''}" onclick="setFlag('${item.id}', 'na')">[ N/A ]</button>
+              <button type="button" class="flag-btn ${currentFlag === 'pend' ? 'active-pend' : ''}" onclick="setFlag('${item.id}', 'pend')">[ PEND ]</button>
+            </div>
+          </td>
+          <td class="col-obs">${renderObsCell(item.id)}</td>
+        </tr>
+      `;
+    });
+
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+  }
+
+  function setFlag(itemId, flagValue) {
+    const rec = ensureWorkingRecord();
+    if (!rec) { alert("Informe o cliente antes de marcar itens."); return; }
+    if (!rec.flags) rec.flags = {};
+    if (rec.flags[itemId] === flagValue) delete rec.flags[itemId];
+    else rec.flags[itemId] = flagValue;
+    persistWorkingDraft();
+    renderChecklistTable();
+    updateCounters();
+  }
+
+  function toggleMainCheck(itemId, checked) {
+    const rec = ensureWorkingRecord();
+    if (!rec) { alert("Informe o cliente antes de marcar itens."); return; }
+    if (!rec.flags) rec.flags = {};
+    if (checked) rec.flags[itemId] = "ok";
+    else delete rec.flags[itemId];
+    persistWorkingDraft();
+    renderChecklistTable();
+    updateCounters();
+  }
+
+  function saveObsDraft(itemId, text) {
+    if (!ensureWorkingRecord()) return;
+    const log = getObsLog(itemId);
+    log.current = text;
+    persistWorkingDraft();
+    const row = document.getElementById("row-" + itemId);
+    if (row) {
+      const currentBox = row.querySelector(".obs-current");
+      if (currentBox) {
+        currentBox.innerHTML = "<strong>Atual:</strong> " + (text.trim()
+          ? escapeHtml(text)
+          : "<em style='color:#94a3b8'>sem observação</em>");
+      }
+    }
+  }
+
+  function registerObsLog(itemId) {
+    if (!ensureWorkingRecord()) { alert("Informe o cliente antes."); return; }
+    const log = getObsLog(itemId);
+    const text = String(log.current || "").trim();
+    if (!text) { alert("Digite uma observação antes de registrar no log."); return; }
+    const last = log.history[log.history.length - 1];
+    if (last && last.text === text) { alert("Essa observação já está registrada no log."); return; }
+    const flags = getWorkingFlags();
+    log.history.push({
+      text,
+      at: new Date().toISOString(),
+      by: document.getElementById("clientOperator").value || "Operador",
+      flag: flags[itemId] || ""
+    });
+    persistWorkingDraft();
+    renderChecklistTable();
+  }
+
+  function addAttachment(itemId, inputEl) {
+    const file = inputEl.files && inputEl.files[0];
+    if (!file) return;
+    if (!ensureWorkingRecord()) { alert("Informe o cliente antes de anexar."); inputEl.value = ""; return; }
+    if (file.size > MAX_ATTACH_BYTES) {
+      alert("Anexo grande demais para o navegador (máx. ~350 KB). No futuro o arquivo irá direto para a pasta de rede do fechamento.");
+      inputEl.value = "";
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function () {
+      const list = getAttachments(itemId);
+      list.push({
+        name: file.name,
+        size: file.size,
+        type: file.type || "application/octet-stream",
+        dataUrl: reader.result,
+        addedAt: new Date().toISOString(),
+        pendingFolder: true
+      });
+      persistWorkingDraft();
+      renderChecklistTable();
+    };
+    reader.readAsDataURL(file);
+    inputEl.value = "";
+  }
+
+  function removeAttachment(itemId, index) {
+    const list = getAttachments(itemId);
+    list.splice(index, 1);
+    persistWorkingDraft();
+    renderChecklistTable();
+  }
+
+  function countFlagsForItems(items, flags) {
+    let okCount = 0, naCount = 0, pendCount = 0;
+    items.forEach(item => {
+      const f = flags[item.id];
+      if (f === "ok") okCount++;
+      if (f === "na") naCount++;
+      if (f === "pend") pendCount++;
+    });
+    return { okCount, naCount, pendCount, total: items.length };
+  }
+
+  function updateCounters() {
+    const items = getCurrentItems();
+    const flags = getWorkingFlags();
+    const counts = countFlagsForItems(items, flags);
+    const done = counts.okCount + counts.naCount;
+    const pct = counts.total > 0 ? Math.round((done / counts.total) * 100) : 0;
+    document.getElementById("countOk").innerText = counts.okCount;
+    document.getElementById("countNa").innerText = counts.naCount;
+    document.getElementById("countPend").innerText = counts.pendCount;
+    document.getElementById("regimeProgressPct").innerText = `${pct}% concluído (${done}/${counts.total})`;
+    document.getElementById("progressBarFill").style.width = `${pct}%`;
+  }
+
+  function markAllOk() {
+    const rec = ensureWorkingRecord();
+    if (!rec) { alert("Informe o cliente antes."); return; }
+    if (!rec.flags) rec.flags = {};
+    getCurrentItems().forEach(item => {
+      if (!rec.flags[item.id]) rec.flags[item.id] = "ok";
+    });
+    persistWorkingDraft();
+    renderChecklistTable();
+    updateCounters();
+  }
+
+  function resetCurrentRegime() {
+    if (!confirm("Deseja limpar as marcações e a observação atual desta etapa? Logs, anexos e outros clientes do mês serão mantidos.")) return;
+    const rec = ensureWorkingRecord();
+    if (!rec) return;
+    if (!rec.flags) rec.flags = {};
+    getCurrentItems().forEach(item => {
+      delete rec.flags[item.id];
+      if (rec.obsLogs && rec.obsLogs[item.id]) rec.obsLogs[item.id].current = "";
+    });
+    persistWorkingDraft();
+    renderChecklistTable();
+    updateCounters();
+  }
+
+  window.onload = initApp;
+
+</script>
+
+</body>
+</html>
