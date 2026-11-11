@@ -558,8 +558,11 @@
     }
 
     .col-flags {
-      width: 215px;
-      white-space: nowrap;
+      width: 320px;
+      white-space: normal;
+    }
+    .flag-group {
+      flex-wrap: wrap;
     }
 
     .flag-group {
@@ -735,11 +738,16 @@
         display: none !important;
       }
       body.print-mode-etapa .header-card,
-      body.print-mode-etapa .client-bar,
       body.print-mode-etapa .status-panel,
-      body.print-mode-etapa .checklist-card,
-      body.print-mode-etapa .Signoff-card {
+      body.print-mode-etapa .checklist-card {
         display: block !important;
+        box-shadow: none !important;
+        border: 1px solid #000 !important;
+        margin-bottom: 10px;
+        break-inside: avoid;
+      }
+      body.print-mode-etapa .client-bar,
+      body.print-mode-etapa .Signoff-card {
         box-shadow: none !important;
         border: 1px solid #000 !important;
         margin-bottom: 10px;
@@ -764,14 +772,36 @@
       }
       body.print-mode-etapa .flag-btn.active-ok,
       body.print-mode-etapa .flag-btn.active-na,
-      body.print-mode-etapa .flag-btn.active-pend {
+      body.print-mode-etapa .flag-btn.active-pend,
+      body.print-mode-etapa .flag-btn.active-nh,
+      body.print-mode-etapa .flag-btn.active-sc {
         background: #000 !important;
         color: #fff !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
       }
+      body.print-mode-etapa .task-desc,
+      body.print-mode-etapa .dominio-badge,
+      body.print-mode-etapa .obs-history,
+      body.print-mode-etapa .obs-row,
+      body.print-mode-etapa .attach-box,
+      body.print-mode-etapa .col-check,
+      body.print-mode-etapa .task-title:not(.print-short) {
+        display: none !important;
+      }
+      body.print-mode-etapa .task-title.print-short {
+        display: block !important;
+        font-size: 11px;
+        font-weight: 600;
+      }
 
-      body.print-mode-capa .container > *:not(.print-capa) {
+      body.print-mode-capa .home-screen {
+        display: none !important;
+      }
+      body.print-mode-capa .work-screen {
+        display: block !important;
+      }
+      body.print-mode-capa .work-screen > *:not(.print-capa) {
         display: none !important;
       }
       body.print-mode-capa .print-capa {
@@ -880,11 +910,192 @@
       }
     }
 
+    .home-screen, .work-screen { display: none; }
+    .home-screen.active, .work-screen.active { display: block; }
+
+    .home-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+      align-items: end;
+    }
+    .home-toolbar .field-group { min-width: 140px; flex: 1; }
+    .home-table-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: auto;
+      box-shadow: 0 2px 6px rgba(0,0,0,.03);
+    }
+    .home-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+    }
+    .home-table th, .home-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-size: 0.85rem;
+      vertical-align: middle;
+    }
+    .home-table th {
+      background: #f7f6f5;
+      color: var(--ink);
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      letter-spacing: .04em;
+    }
+    .home-table tr:hover td { background: #fcfcfd; cursor: pointer; }
+    .status-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border: 1px solid var(--border);
+    }
+    .st-em_execucao { background: #eef2ff; color: #3730a3; }
+    .st-aguardando_revisao { background: #fff7ed; color: #c2410c; }
+    .st-devolvido { background: #fff1f2; color: #be123c; }
+    .st-aprovado { background: #ecfdf5; color: #047857; }
+
+    .flag-btn.active-nh {
+      background: #64748b;
+      color: #fff;
+      border-color: #64748b;
+    }
+    .flag-btn.active-sc {
+      background: #0369a1;
+      color: #fff;
+      border-color: #0369a1;
+    }
+    .checklist-row.status-nh { background: #f8fafc; }
+    .checklist-row.status-sc { background: #f0f9ff; }
+
+    .sem-mov-box {
+      background: #fff8ed;
+      border: 1px dashed #f5d19a;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .total-status-bar {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .print-actions-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 14px;
+    }
+    .print-actions-bar .btn-print-mini {
+      border: 2px solid var(--ink);
+      background: #fff;
+      padding: 8px 14px;
+    }
+
+    @media print {
+      body.print-mode-etapa .client-bar {
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 4px 8px !important;
+        padding: 6px 8px !important;
+      }
+      body.print-mode-etapa .client-bar .field-group.span-2 {
+        grid-column: span 2 !important;
+      }
+      body.print-mode-etapa .client-bar .db-hint {
+        display: none !important;
+      }
+      body.print-mode-etapa .client-bar label {
+        font-size: 7px !important;
+        margin-bottom: 1px !important;
+      }
+      body.print-mode-etapa .client-bar input,
+      body.print-mode-etapa .client-bar select {
+        padding: 2px 4px !important;
+        font-size: 9px !important;
+        min-height: 0 !important;
+      }
+      body.print-mode-etapa .Signoff-card {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 16px !important;
+        padding: 10px !important;
+      }
+      body.print-mode-etapa .Signoff-card > div:first-child {
+        display: none !important;
+      }
+      body.print-mode-etapa .sign-box {
+        margin-top: 18px !important;
+      }
+      .home-screen, .print-actions-bar, .total-status-bar, .sem-mov-box {
+        display: none !important;
+      }
+    }
+
   </style>
 </head>
 <body>
 
 <div class="container">
+  <section class="home-screen active" id="homeScreen">
+    <header class="header-card">
+      <div class="header-brand">
+        <img class="header-logo" src="assets/nascel-logo.jpg" alt="Nascel Contabilidade">
+        <div class="header-title">
+          <h1>Central de Fechamentos Fiscais</h1>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-white" onclick="createNewClosing()">+ Novo Fechamento</button>
+      </div>
+    </header>
+    <div class="home-toolbar">
+      <div class="field-group"><label>Código</label><input type="text" id="filterCode" placeholder="000001" oninput="renderHomeTable()"></div>
+      <div class="field-group"><label>Cliente</label><input type="text" id="filterHomeClient" placeholder="Nome ou código" oninput="renderHomeTable()"></div>
+      <div class="field-group"><label>CNPJ</label><input type="text" id="filterHomeCnpj" placeholder="CNPJ" oninput="renderHomeTable()"></div>
+      <div class="field-group"><label>Apuração (MM/AAAA)</label><input type="text" id="filterHomeComp" placeholder="10/2026" oninput="renderHomeTable()"></div>
+      <div class="field-group"><label>Status</label>
+        <select id="filterHomeStatus" onchange="renderHomeTable()">
+          <option value="">Todos</option>
+          <option value="em_execucao">Em execução</option>
+          <option value="aguardando_revisao">Aguardando revisão</option>
+          <option value="devolvido">Devolvido ao executor</option>
+          <option value="aprovado">Aprovado</option>
+        </select>
+      </div>
+      <div class="field-group"><label>Executor</label><input type="text" id="filterHomeExecutor" oninput="renderHomeTable()"></div>
+      <div class="field-group"><label>Revisor</label><input type="text" id="filterHomeReviewer" oninput="renderHomeTable()"></div>
+    </div>
+    <div class="home-table-wrap">
+      <table class="home-table">
+        <thead>
+          <tr>
+            <th>Código</th><th>Cliente</th><th>CNPJ</th><th>Apuração</th><th>Regime</th><th>Status</th><th>Executor</th><th>Revisor</th>
+          </tr>
+        </thead>
+        <tbody id="homeTableBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="work-screen" id="workScreen">
   <header class="header-card">
     <div class="header-brand">
       <img class="header-logo" src="assets/nascel-logo.jpg" alt="Nascel Contabilidade">
@@ -893,7 +1104,8 @@
       </div>
     </div>
     <div class="header-actions">
-      <button class="btn btn-white" onclick="saveCurrentClient()">Salvar Cliente</button>
+      <button class="btn btn-outline" onclick="backToHome()">← Lista de fechamentos</button>
+      <button class="btn btn-white" onclick="saveCurrentClient()">Salvar Fechamento</button>
     </div>
   </header>
 
@@ -942,6 +1154,10 @@
       </select>
     </div>
     <div class="field-group">
+      <label>UFs com IE-ST ativa</label>
+      <input type="text" id="clientIeStUfs" placeholder="Ex: MG, RJ, PR" oninput="persistWorkingDraft()">
+    </div>
+    <div class="field-group">
       <label>Responsável Apuração</label>
       <input type="text" id="clientOperator" placeholder="Nome do Operador" oninput="persistWorkingDraft()">
     </div>
@@ -949,8 +1165,38 @@
       <label>Revisor Técnico</label>
       <input type="text" id="clientReviewer" placeholder="Nome do revisor" oninput="persistWorkingDraft()">
     </div>
-    <p class="db-hint">Os fechamentos ficam organizados por <strong>Ano → Mês → Cliente</strong>. Escolha Ano/Mês e um cliente já salvo para carregar; ou digite um novo e clique em <strong>Salvar Cliente</strong>. Anexos ficam vinculados ao item e, no futuro, irão para a pasta de rede do fechamento.</p>
+    <div class="field-group">
+      <label>Código do Fechamento</label>
+      <input type="text" id="closingCode" readonly placeholder="000001">
+    </div>
+    <p class="db-hint">Organize por <strong>Ano → Mês → Cliente</strong>. Cada fechamento tem um código de 6 dígitos. Anexos ficam no item (print com Ctrl+V). No futuro, irão à pasta de rede.</p>
   </section>
+
+  <div class="total-status-bar">
+    <div>
+      <strong>Status do fechamento:</strong>
+      <span class="status-badge" id="closingStatusBadge">Em execução</span>
+      <span id="closingTotalProgress" style="margin-left:8px;font-size:0.85rem;color:var(--muted);"></span>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button type="button" class="btn-print-mini" onclick="setClosingStatus('aguardando_revisao')">Enviar p/ revisão</button>
+      <button type="button" class="btn-print-mini" onclick="setClosingStatus('devolvido')">Devolver ao executor</button>
+      <button type="button" class="btn-print-mini" onclick="setClosingStatus('aprovado')">Aprovar revisão</button>
+      <button type="button" class="btn-print-mini" onclick="setClosingStatus('em_execucao')">Voltar p/ execução</button>
+    </div>
+  </div>
+
+  <div class="sem-mov-box">
+    <label style="display:flex;gap:8px;align-items:center;font-weight:700;color:var(--ink);">
+      <input type="checkbox" id="semMovimento" onchange="onSemMovimentoChange()"> Empresa SEM MOVIMENTO no período
+    </label>
+    <span style="font-size:0.8rem;color:var(--muted);">Nesse caso, no Fechamento fica obrigatória principalmente a declaração de faturamento.</span>
+  </div>
+
+  <div class="print-actions-bar">
+    <button type="button" class="btn-print-mini" id="btnPrintEtapaTop" onclick="printCurrentEtapa()">Imprimir esta etapa (lista)</button>
+    <button type="button" class="btn-print-mini" onclick="printFechamentoCapa()">Imprimir capa do fechamento</button>
+  </div>
 
   <nav class="tabs-bar">
     <button type="button" class="tab-btn active" id="regime-simples" onclick="switchRegime('simples')">Simples Nacional</button>
@@ -983,8 +1229,6 @@
       <div class="counter-pill pill-na">N/A: <span id="countNa">0</span></div>
       <div class="counter-pill pill-pend">PENDENTE: <span id="countPend">0</span></div>
       <button type="button" class="btn-clear-flags" onclick="resetCurrentRegime()">Limpar etapa</button>
-      <button type="button" class="btn-print-mini" id="btnPrintEtapa" onclick="printCurrentEtapa()">Imprimir esta etapa</button>
-      <button type="button" class="btn-print-mini" onclick="printFechamentoCapa()">Imprimir capa fechamento</button>
     </div>
   </section>
 
@@ -1002,6 +1246,7 @@
   </footer>
 
   <section class="print-capa" id="printCapaFechamento" aria-hidden="true"></section>
+  </section>
 </div>
 
 <script>
@@ -1033,10 +1278,10 @@
         { id: "sn_22", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Transmitir DeSTDA (SEDIF-SN) e encerrar escrituração no site da Prefeitura", desc: "Gerar DeSTDA para contribuintes com IE e fechar competência municipal de ISS.", path: "Domínio: Relatórios > Informativos > Estaduais > DeSTDA" },
         { id: "sn_23", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "(Pós-Revisão) Postar guias validadas para o cliente via Nibo / WhatsApp", desc: "Liberar para o cliente somente após o OK do revisor no App Fechamento.", path: "Nibo / WhatsApp" },
         { id: "sn_24", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Fechar / Travar o Período Fiscal no Domínio Sistemas", desc: "Bloquear o mês apurado para impedir alterações acidentais.", path: "Domínio: Utilitários > Fechamento de Período" },
-        { id: "sn_25", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir Inscrição Estadual de Substituto Tributário (IE-ST) em outras UFs", desc: "Se possui IE-ST ativa: recolhimento mensal Por Apuração (GIA-ST / DeSTDA / SPED Fiscal). Se não possui IE-ST: recolhimento Por Operação a cada NF-e (GNRE/DARE/DAE anexada).", path: "Cadastro SEFAZ / Domínio: Controle > Parâmetros > Estaduais" },
-        { id: "sn_26", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Segregar e conferir ICMS-ST Por Operação vs. Por Apuração", desc: "Por Operação: guias nota a nota (saída/entrada interestadual). Por Apuração: saldo mensal no Domínio (Relatórios > Impostos > ICMS ST).", path: "Domínio: Relatórios > Impostos > ICMS ST" },
-        { id: "sn_27", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir DIFAL (EC 87/2015 e Uso/Consumo/Ativo) Por Operação vs. Por Apuração", desc: "Por Operação: GNRE/DARE/DAE emitida nota a nota. Por Apuração: quando há inscrição/cadastro na UF de destino ou apuração em conta gráfica/guia mensal.", path: "Domínio: Movimentos > Entradas/Saídas | Relatórios > Impostos" },
-        { id: "sn_28", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Validar FECP / FCP / FEM (próprio, ST e DIFAL) Por Operação e Por Apuração", desc: "Conferir cálculo e emissão das guias separadas ou unificadas de FECP/FEM, validando o pago Por Operação e o gerado Por Apuração no fechamento mensal.", path: "Domínio: Relatórios > Impostos > ICMS / FECP" }
+        { id: "sn_25", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir Inscrição Estadual de Substituto Tributário (IE-ST) em outras UFs", desc: "Se possui IE-ST ativa: recolhimento mensal Por Apuração (GIA-ST / DeSTDA / SPED Fiscal). Se não possui IE-ST: recolhimento Por Operação a cada NF-e (GNRE/DARE/DAE anexada).", path: "Cadastro SEFAZ / Domínio: Controle > Parâmetros > Estaduais", shortPrint: "IE-ST outras UFs (Por Op. vs Por Ap.)" },
+        { id: "sn_26", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Segregar e conferir ICMS-ST Por Operação vs. Por Apuração", desc: "Por Operação: guias nota a nota (saída/entrada interestadual). Por Apuração: saldo mensal no Domínio (Relatórios > Impostos > ICMS ST).", path: "Domínio: Relatórios > Impostos > ICMS ST", shortPrint: "ICMS-ST Por Operação vs Por Apuração" },
+        { id: "sn_27", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir DIFAL (EC 87/2015 e Uso/Consumo/Ativo) Por Operação vs. Por Apuração", desc: "Por Operação: GNRE/DARE/DAE emitida nota a nota. Por Apuração: quando há inscrição/cadastro na UF de destino ou apuração em conta gráfica/guia mensal.", path: "Domínio: Movimentos > Entradas/Saídas | Relatórios > Impostos", shortPrint: "DIFAL Por Operação vs Por Apuração" },
+        { id: "sn_28", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Validar FECP / FCP / FEM (próprio, ST e DIFAL) Por Operação e Por Apuração", desc: "Conferir cálculo e emissão das guias separadas ou unificadas de FECP/FEM, validando o pago Por Operação e o gerado Por Apuração no fechamento mensal.", path: "Domínio: Relatórios > Impostos > ICMS / FECP", shortPrint: "FECP/FCP/FEM Por Op. vs Por Ap." }
       ]
     },
     presumido: {
@@ -1060,10 +1305,10 @@
         { id: "lp_16", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Gerar e validar SPED Fiscal, EFD-Contribuições, EFD-Reinf, DCTFWeb/MIT e GIA/DAPI", desc: "Validar arquivos nos PVAs, transmitir obrigações e gerar todos os DARFs, DARE/DAE e guias de ISS.", path: "Domínio: Relatórios > Informativos > Federais e Estaduais" },
         { id: "lp_17", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Salvar na rede, montar pacote completo no App Fechamento e enviar p/ Revisão Técnica", desc: "Subir no App Fechamento: Relatórios de Impostos, Relatório App Coletor, Livros Fiscais, Recibos SPED e Guias.", path: "App Fechamento" },
         { id: "lp_18", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "(Pós-Revisão) Enviar guias via Nibo/WhatsApp e travar período no Domínio", desc: "Liberar ao cliente após revisão e bloquear mês fiscal.", path: "Domínio: Utilitários > Fechamento de Período" },
-        { id: "lp_19", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir Inscrição Estadual de Substituto Tributário (IE-ST) em outras UFs", desc: "Com IE-ST: recolhimento mensal Por Apuração (GIA-ST / DeSTDA / SPED Fiscal). Sem IE-ST: Por Operação via GNRE/DARE/DAE anexada à NF-e.", path: "Cadastro SEFAZ / Domínio: Controle > Parâmetros > Estaduais" },
-        { id: "lp_20", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Segregar e conferir ICMS-ST Por Operação vs. Por Apuração", desc: "Por Operação: guias nota a nota. Por Apuração: saldo mensal no Domínio (Relatórios > Impostos > ICMS ST).", path: "Domínio: Relatórios > Impostos > ICMS ST" },
-        { id: "lp_21", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir DIFAL (EC 87/2015 e Uso/Consumo/Ativo) Por Operação vs. Por Apuração", desc: "Por Operação: GNRE nota a nota. Por Apuração: inscrição na UF de destino ou conta gráfica/guia mensal.", path: "Domínio: Movimentos > Entradas/Saídas | Relatórios > Impostos" },
-        { id: "lp_22", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Validar FECP / FCP / FEM (próprio, ST e DIFAL) Por Operação e Por Apuração", desc: "Conferir guias separadas ou unificadas de FECP/FEM no fechamento mensal da Domínio.", path: "Domínio: Relatórios > Impostos > ICMS / FECP" }
+        { id: "lp_19", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir Inscrição Estadual de Substituto Tributário (IE-ST) em outras UFs", desc: "Com IE-ST: recolhimento mensal Por Apuração (GIA-ST / DeSTDA / SPED Fiscal). Sem IE-ST: Por Operação via GNRE/DARE/DAE anexada à NF-e.", path: "Cadastro SEFAZ / Domínio: Controle > Parâmetros > Estaduais", shortPrint: "IE-ST outras UFs (Por Op. vs Por Ap.)" },
+        { id: "lp_20", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Segregar e conferir ICMS-ST Por Operação vs. Por Apuração", desc: "Por Operação: guias nota a nota. Por Apuração: saldo mensal no Domínio (Relatórios > Impostos > ICMS ST).", path: "Domínio: Relatórios > Impostos > ICMS ST", shortPrint: "ICMS-ST Por Operação vs Por Apuração" },
+        { id: "lp_21", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir DIFAL (EC 87/2015 e Uso/Consumo/Ativo) Por Operação vs. Por Apuração", desc: "Por Operação: GNRE nota a nota. Por Apuração: inscrição na UF de destino ou conta gráfica/guia mensal.", path: "Domínio: Movimentos > Entradas/Saídas | Relatórios > Impostos", shortPrint: "DIFAL Por Operação vs Por Apuração" },
+        { id: "lp_22", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Validar FECP / FCP / FEM (próprio, ST e DIFAL) Por Operação e Por Apuração", desc: "Conferir guias separadas ou unificadas de FECP/FEM no fechamento mensal da Domínio.", path: "Domínio: Relatórios > Impostos > ICMS / FECP", shortPrint: "FECP/FCP/FEM Por Op. vs Por Ap." }
       ]
     },
     real: {
@@ -1088,10 +1333,10 @@
         { id: "lr_17", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Gerar e validar SPED Fiscal, EFD-Contribuições (Blocos F e M), EFD-Reinf, DCTFWeb/MIT e GIA/DAPI", desc: "Validar no PVA, conferir créditos no Bloco M e gerar todas as guias de pagamento.", path: "Domínio: Relatórios > Informativos > Federais e Estaduais" },
         { id: "lr_18", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Salvar na rede, montar dossiê completo no App Fechamento e enviar p/ Revisão Técnica", desc: "Anexar Memória de Créditos, Relatórios Domínio, Relatório App Coletor, Livros, SPEDs e Guias.", path: "App Fechamento" },
         { id: "lr_19", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "(Pós-Revisão) Liberar guias no Nibo/WhatsApp e travar período fiscal no Domínio", desc: "Enviar ao cliente após validação técnica e bloquear mês na Domínio.", path: "Domínio: Utilitários > Fechamento de Período" },
-        { id: "lr_20", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir Inscrição Estadual de Substituto Tributário (IE-ST) em outras UFs", desc: "Com IE-ST: recolhimento mensal Por Apuração (GIA-ST / DeSTDA / SPED Fiscal). Sem IE-ST: Por Operação via GNRE/DARE/DAE anexada à NF-e.", path: "Cadastro SEFAZ / Domínio: Controle > Parâmetros > Estaduais" },
-        { id: "lr_21", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Segregar e conferir ICMS-ST Por Operação vs. Por Apuração", desc: "Por Operação: guias nota a nota. Por Apuração: saldo mensal no Domínio (Relatórios > Impostos > ICMS ST).", path: "Domínio: Relatórios > Impostos > ICMS ST" },
-        { id: "lr_22", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir DIFAL (EC 87/2015 e Uso/Consumo/Ativo) Por Operação vs. Por Apuração", desc: "Por Operação: GNRE nota a nota. Por Apuração: inscrição na UF de destino ou conta gráfica/guia mensal.", path: "Domínio: Movimentos > Entradas/Saídas | Relatórios > Impostos" },
-        { id: "lr_23", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Validar FECP / FCP / FEM (próprio, ST e DIFAL) Por Operação e Por Apuração", desc: "Conferir guias separadas ou unificadas de FECP/FEM no fechamento mensal da Domínio.", path: "Domínio: Relatórios > Impostos > ICMS / FECP" }
+        { id: "lr_20", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir Inscrição Estadual de Substituto Tributário (IE-ST) em outras UFs", desc: "Com IE-ST: recolhimento mensal Por Apuração (GIA-ST / DeSTDA / SPED Fiscal). Sem IE-ST: Por Operação via GNRE/DARE/DAE anexada à NF-e.", path: "Cadastro SEFAZ / Domínio: Controle > Parâmetros > Estaduais", shortPrint: "IE-ST outras UFs (Por Op. vs Por Ap.)" },
+        { id: "lr_21", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Segregar e conferir ICMS-ST Por Operação vs. Por Apuração", desc: "Por Operação: guias nota a nota. Por Apuração: saldo mensal no Domínio (Relatórios > Impostos > ICMS ST).", path: "Domínio: Relatórios > Impostos > ICMS ST", shortPrint: "ICMS-ST Por Operação vs Por Apuração" },
+        { id: "lr_22", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Conferir DIFAL (EC 87/2015 e Uso/Consumo/Ativo) Por Operação vs. Por Apuração", desc: "Por Operação: GNRE nota a nota. Por Apuração: inscrição na UF de destino ou conta gráfica/guia mensal.", path: "Domínio: Movimentos > Entradas/Saídas | Relatórios > Impostos", shortPrint: "DIFAL Por Operação vs Por Apuração" },
+        { id: "lr_23", cat: "5. IE-ST, ICMS-ST, DIFAL e FECP/FEM (Por Operação vs. Por Apuração)", title: "Validar FECP / FCP / FEM (próprio, ST e DIFAL) Por Operação e Por Apuração", desc: "Conferir guias separadas ou unificadas de FECP/FEM no fechamento mensal da Domínio.", path: "Domínio: Relatórios > Impostos > ICMS / FECP", shortPrint: "FECP/FCP/FEM Por Op. vs Por Ap." }
       ]
     },
     mei: {
@@ -1164,6 +1409,161 @@
     mei_08: "fechamento", mei_09: "fechamento"
   };
 
+  // Matriz de Obrigações Acessórias (mensais + setoriais/anuais)
+  const OBRIGACOES_EXTRA = {
+    mei: [
+      { id: "mei_oa_01", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "PGMEI — emitir DAS-MEI e conferir histórico de pagamentos", desc: "Emissão da guia DAS-MEI mensal e conferência de histórico de pagamentos.", path: "Portal Simples Nacional > Simei > PGMEI", shortPrint: "PGMEI / DAS-MEI" },
+      { id: "mei_oa_02", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "Relatório Mensal das Receitas Brutas (comércio/indústria/serviços)", desc: "Preenchimento do controle legal mensal segregando comércio, indústria e serviços (com e sem nota).", path: "Modelo Oficial CGSN / Controle Interno", shortPrint: "Relatório Mensal Receitas" },
+      { id: "mei_oa_03", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "EFD-Reinf / eSocial / DCTFWeb (se houver fato gerador)", desc: "Transmitir se houver empregado ou serviço tomado com retenção de INSS/IRRF/CSRF.", path: "Domínio: Relatórios > Informativos > Federais > EFD-Reinf + e-CAC", shortPrint: "Reinf/eSocial/DCTFWeb (se FG)" },
+      { id: "mei_oa_04", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "Encerramento municipal NFS-e / RANFS e ISS Tomador", desc: "Fechar competência na Prefeitura e emitir guia de ISS Tomador se houver retenção.", path: "Portal da Prefeitura Municipal", shortPrint: "Encerramento ISS / RANFS" },
+      { id: "mei_oa_05", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "DIFAL / Antecipação / ICMS-ST Por Operação (compras interestaduais)", desc: "Emitir DARE-SP / DAE-MG se houver compra de outra UF sujeita a diferencial ou ST.", path: "SEFAZ SP / SIARE MG", shortPrint: "DIFAL/ST Por Operação" },
+      { id: "mei_oa_06", cat: "Obrigações Acessórias Específicas, Setoriais e Anuais", title: "DASN-SIMEI (Declaração Anual do MEI — Maio)", desc: "Entregar declaração anual de receitas e avaliar desenquadramento.", path: "Portal Simples Nacional > Simei > Declaração Anual", shortPrint: "DASN-SIMEI (anual)" }
+    ],
+    simples: [
+      { id: "sn_oa_01", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "PGDAS-D — transmitir após bater centavos e baixar DAS/Recibo/Extrato", desc: "Transmissão mensal após bater com o Domínio e download de Guia DAS, Recibo e Extrato.", path: "Domínio: Relatórios > Impostos > Simples Nacional + Portal Simples", shortPrint: "PGDAS-D" },
+      { id: "sn_oa_02", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "DeSTDA / SEDIF-SN (ST, DIFAL e Antecipação — até dia 28)", desc: "Gerar/transmitir para empresas com IE em SP/MG/demais UFs (ST, DIFAL Uso/Ativo, Antecipação).", path: "Domínio: Relatórios > Informativos > Estaduais > DeSTDA", shortPrint: "DeSTDA/SEDIF-SN" },
+      { id: "sn_oa_03", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "GIA-ST Nacional (IE-ST ativa em outras UFs — até dia 10)", desc: "Transmitir GIA-ST por UF com IE-ST, declarando ICMS-ST e FECP/FEM por apuração.", path: "Domínio: Relatórios > Informativos > Estaduais > GIA-ST", shortPrint: "GIA-ST" },
+      { id: "sn_oa_04", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "SINTEGRA interestadual (quando exigido)", desc: "Gerar/transmitir Sintegra para operações interestaduais ou UFs com IE-ST.", path: "Domínio: Relatórios > Informativos > Estaduais > Sintegra", shortPrint: "SINTEGRA" },
+      { id: "sn_oa_05", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "SPED Fiscal EFD ICMS/IPI (sublimite/regime especial/UF)", desc: "Transmitir se sublimite estadual (>R$ 3,6 mi) ou obrigação por regime/UF, com 1601 e Bloco H quando couber.", path: "Domínio: Relatórios > Informativos > Federais > EFD ICMS/IPI", shortPrint: "EFD ICMS/IPI (se obrigado)" },
+      { id: "sn_oa_06", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "EFD-Reinf R-2000 e R-4000 (até dia 15)", desc: "INSS/CPRB (R-2000) e IRRF/CSRF 4,65% (R-4000) conferidos no App Coletor.", path: "Domínio: Relatórios > Informativos > Federais > EFD-Reinf", shortPrint: "EFD-Reinf" },
+      { id: "sn_oa_07", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "DCTFWeb — retenções e CPP Anexo IV", desc: "Transmitir no e-CAC e emitir DARF numerado de retenções e CPP 20% do Anexo IV.", path: "Portal e-CAC > DCTFWeb", shortPrint: "DCTFWeb" },
+      { id: "sn_oa_08", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "Encerramento ISS + RANFS/CPOM (notas tomadas de fora)", desc: "Fechar prefeitura, escriturar tomadas de fora e emitir ISS Tomador.", path: "Domínio: Relatórios > Livros > ISS + Portal da Prefeitura", shortPrint: "Encerramento ISS/RANFS" },
+      { id: "sn_oa_09", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "Cadastro de Obras / dedução de materiais (SERO/CNO)", desc: "Lançar materiais dedutíveis de ISS e aferir obras no SERO/DCTFWeb Obras quando aplicável.", path: "Portal da Prefeitura + e-CAC SERO", shortPrint: "Obras/SERO" },
+      { id: "sn_oa_10", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "Ressarcimento/Complemento ICMS-ST (CAT 42 SP / DRC-ST MG)", desc: "Apurar ST paga a maior ou complemento de ST nas regras estaduais.", path: "Domínio: Relatórios > Informativos > Estaduais > Portaria CAT 42 / Ressarcimento ST", shortPrint: "Ressarcimento/Compl. ST" },
+      { id: "sn_oa_11", cat: "Obrigações Acessórias Específicas, Setoriais e Anuais", title: "DME — operações em espécie ≥ R$ 30.000", desc: "Transmitir no e-CAC se houver recebimento em dinheiro vivo no mês ≥ R$ 30 mil.", path: "Portal e-CAC > DME", shortPrint: "DME" },
+      { id: "sn_oa_12", cat: "Obrigações Acessórias Específicas, Setoriais e Anuais", title: "DEFIS (anual — março)", desc: "Entregar DEFIS (estoque, caixa, despesas, sócios e rendimentos).", path: "Domínio: Relatórios > Informativos > Federais > DEFIS", shortPrint: "DEFIS (anual)" },
+      { id: "sn_oa_13", cat: "Obrigações Acessórias Específicas, Setoriais e Anuais", title: "DAMEF / VAF-MG (anual — empresas MG)", desc: "Validar Valor Adicionado Fiscal e movimento econômico no SIARE-MG.", path: "Domínio: Relatórios > Informativos > Estaduais > DAMEF + SIARE MG", shortPrint: "DAMEF/VAF-MG" },
+      { id: "sn_oa_14", cat: "Obrigações Acessórias Específicas, Setoriais e Anuais", title: "DIMOB (imobiliárias/construtoras — anual fev)", desc: "Obrigatória mesmo no Simples se houver intermediação de aluguéis/vendas/incorporações.", path: "Domínio: Relatórios > Informativos > Federais > DIMOB", shortPrint: "DIMOB" },
+      { id: "sn_oa_15", cat: "Obrigações Acessórias Específicas, Setoriais e Anuais", title: "DMED (saúde — anual fev)", desc: "Obrigatória para saúde com recebimentos de PF.", path: "Domínio: Relatórios > Informativos > Federais > DMED", shortPrint: "DMED" },
+      { id: "sn_oa_16", cat: "Obrigações Acessórias Específicas, Setoriais e Anuais", title: "Obrigações setoriais de estoque (SNGPC/LMC/RECOPI/IBAMA/Mapas)", desc: "Conferir se o CNAE exige obrigação setorial atrelada às notas do mês.", path: "Sistemas Setoriais / Domínio", shortPrint: "Setoriais estoque" }
+    ],
+    presumido: [
+      { id: "lp_oa_01", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "SPED Fiscal EFD ICMS/IPI + 1601 + 0221", desc: "Gerar/validar/transmitir com ICMS, IPI, ST, DIFAL, FECP, 0221 e 1601 (PIX/cartões).", path: "Domínio: Relatórios > Informativos > Federais > EFD ICMS/IPI", shortPrint: "EFD ICMS/IPI" },
+      { id: "lp_oa_02", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "SPED Fiscal — Blocos G/K/H e Registro 1300 (LMC)", desc: "CIAP 1/48 (G), estoque/produção (K), inventário (H) e LMC (postos).", path: "Domínio: Relatórios > Informativos > Federais > EFD ICMS/IPI", shortPrint: "EFD Blocos G/K/H/1300" },
+      { id: "lp_oa_03", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "GIA-SP e DIPAM-B (SP)", desc: "Transmitir GIA-SP ou validar dispensa no PFE-SP; preencher DIPAM-B quando couber.", path: "Domínio: Relatórios > Informativos > Estaduais > GIA", shortPrint: "GIA-SP/DIPAM-B" },
+      { id: "lp_oa_04", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "DAPI-MG (MG)", desc: "Transmitir DAPI com ICMS próprio, ST, DIFAL, Antecipação e FEM.", path: "Domínio: Relatórios > Informativos > Estaduais > DAPI", shortPrint: "DAPI-MG" },
+      { id: "lp_oa_05", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "GIA-ST Nacional e SINTEGRA (IE-ST)", desc: "Enviar GIA-ST (ST+FECP) e Sintegra para UFs com IE-ST.", path: "Domínio: Relatórios > Informativos > Estaduais > GIA-ST / Sintegra", shortPrint: "GIA-ST/Sintegra" },
+      { id: "lp_oa_06", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "E-CredAc / CAT 42 SP / DRC-ST MG", desc: "Arquivo digital de ressarcimento de ST ou crédito acumulado de ICMS.", path: "Domínio: Relatórios > Informativos > Estaduais > Portaria CAT 42 / E-CredAc", shortPrint: "E-CredAc/CAT42/DRC-ST" },
+      { id: "lp_oa_07", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "EFD-Contribuições cumulativo + Bloco P CPRB", desc: "PIS 0,65% / COFINS 3% com exclusão do ICMS e CPRB no Bloco P se desonerada.", path: "Domínio: Relatórios > Informativos > Federais > EFD-Contribuições", shortPrint: "EFD-Contribuições" },
+      { id: "lp_oa_08", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "EFD-Reinf R-2000 e R-4000 completo", desc: "INSS/CPRB/IRRF/CSRF + aluguéis PF e lucros/dividendos, cruzando App Coletor.", path: "Domínio: Relatórios > Informativos > Federais > EFD-Reinf", shortPrint: "EFD-Reinf" },
+      { id: "lp_oa_09", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "DCTFWeb + MIT", desc: "Integrar PIS/COFINS/IPI/CPRB e IRPJ/CSLL trimestral no MIT/DCTFWeb e emitir DARF unificado.", path: "Domínio: Relatórios > Informativos > Federais > DCTF / MIT + Portal e-CAC", shortPrint: "DCTFWeb/MIT" },
+      { id: "lp_oa_10", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "DIRBI (até dia 20)", desc: "Declarar benefícios/incentivos federais usufruídos (CPRB, PERSE, REIDI etc.).", path: "Portal e-CAC > DIRBI", shortPrint: "DIRBI" },
+      { id: "lp_oa_11", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "PER/DCOMP Web", desc: "Compensar retenções ou pagamentos a maior/indevidos.", path: "Portal e-CAC > PER/DCOMP Web", shortPrint: "PER/DCOMP" },
+      { id: "lp_oa_12", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "Encerramento ISS + RANFS/DES + dedução construção civil", desc: "Fechar prefeitura, notas de fora, materiais e guias de ISS próprio/tomador.", path: "Domínio: Relatórios > Impostos > ISS + Portal da Prefeitura", shortPrint: "Encerramento ISS" },
+      { id: "lp_oa_13", cat: "Obrigações Acessórias Específicas, Setoriais e Anuais", title: "ECD (maio) e ECF (julho)", desc: "Cruzar dados fiscais do ano para ECD/ECF.", path: "Domínio Contábil / ECF", shortPrint: "ECD/ECF" },
+      { id: "lp_oa_14", cat: "Obrigações Acessórias Específicas, Setoriais e Anuais", title: "DAMEF / VAF-MG (anual maio)", desc: "Entregar/validar VAF no SIARE-MG.", path: "Domínio: Relatórios > Informativos > Estaduais > DAMEF", shortPrint: "DAMEF/VAF-MG" },
+      { id: "lp_oa_15", cat: "Obrigações Acessórias Específicas, Setoriais e Anuais", title: "DIMOB, DMED, DME, DITR e SERO/Obras", desc: "Conferir entrega conforme atividade do cliente.", path: "Domínio / e-CAC", shortPrint: "DIMOB/DMED/DME/DITR/SERO" },
+      { id: "lp_oa_16", cat: "Obrigações Acessórias Específicas, Setoriais e Anuais", title: "Obrigações setoriais (SCANC/RECOPI/DIF/SNGPC/IBAMA/IBGE)", desc: "Verificar obrigações do CNAE do cliente.", path: "Sistemas Setoriais", shortPrint: "Setoriais/IBGE" }
+    ],
+    real: [
+      { id: "lr_oa_01", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "SPED Fiscal completo + 1601 + 0221 + Comércio Exterior (1100/1500)", desc: "Transmitir com créditos ICMS/IPI, ST, DIFAL, FECP, 0221, 1601 e DI/DUIMP/exportação.", path: "Domínio: Relatórios > Informativos > Federais > EFD ICMS/IPI", shortPrint: "EFD ICMS/IPI completo" },
+      { id: "lr_oa_02", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "SPED Fiscal — Bloco G/K/H e 1300 (LMC)", desc: "CIAP, Bloco K mensal e Bloco H (trimestral/anual conforme forma de apuração).", path: "Domínio: Relatórios > Informativos > Federais > EFD ICMS/IPI", shortPrint: "EFD G/K/H/1300" },
+      { id: "lr_oa_03", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "GIA-SP (DIPAM-B) e DAPI-MG", desc: "Transmitir GIA-SP/dispensa PFE e DAPI-MG com FEM/antecipações.", path: "Domínio: Relatórios > Informativos > Estaduais > GIA / DAPI", shortPrint: "GIA-SP/DAPI-MG" },
+      { id: "lr_oa_04", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "GIA-ST Nacional e SINTEGRA (IE-ST)", desc: "Apurar ST/FECP por UF com IE-ST e enviar Sintegra.", path: "Domínio: Relatórios > Informativos > Estaduais > GIA-ST / Sintegra", shortPrint: "GIA-ST/Sintegra" },
+      { id: "lr_oa_05", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "E-CredAc / CAT 42 SP / DRC-ST MG", desc: "Arquivos mensais de crédito acumulado e ressarcimento/complemento de ST.", path: "Domínio: Relatórios > Informativos > Estaduais > Portaria CAT 42 / E-CredAc", shortPrint: "E-CredAc/CAT42/DRC-ST" },
+      { id: "lr_oa_06", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "EFD-Contribuições não-cumulativa (A/C/D/F/M/P/1)", desc: "Créditos PIS/COFINS 9,25% em serviços, mercadorias, fretes, aluguéis, leasing, depreciação e Bloco M/1.", path: "Domínio: Relatórios > Informativos > Federais > EFD-Contribuições", shortPrint: "EFD-Contribuições NC" },
+      { id: "lr_oa_07", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "EFD-Reinf R-2000 e R-4000 completo", desc: "Retenções previdenciárias/federais + exterior/aluguéis/dividendos, cruzando App Coletor.", path: "Domínio: Relatórios > Informativos > Federais > EFD-Reinf", shortPrint: "EFD-Reinf" },
+      { id: "lr_oa_08", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "DCTFWeb + MIT", desc: "Integrar PIS/COFINS/IPI/CPRB/IRPJ/CSLL com retenções e emitir DARF unificado.", path: "Domínio: Relatórios > Informativos > Federais > DCTF / MIT + Portal e-CAC", shortPrint: "DCTFWeb/MIT" },
+      { id: "lr_oa_09", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "DIRBI (até dia 20)", desc: "Declarar incentivos/benefícios federais do mês.", path: "Portal e-CAC > DIRBI", shortPrint: "DIRBI" },
+      { id: "lr_oa_10", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "PER/DCOMP Web (créditos PIS/COFINS/IPI e saldo negativo IRPJ/CSLL)", desc: "Compensar/ressarcir saldos credores e retenções.", path: "Portal e-CAC > PER/DCOMP Web", shortPrint: "PER/DCOMP" },
+      { id: "lr_oa_11", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "LALUR / LACS (Parte A e B)", desc: "Conciliação fiscal x contábil de adições, exclusões e prejuízo (limite 30%).", path: "Domínio Contábil / Módulo LALUR", shortPrint: "LALUR/LACS" },
+      { id: "lr_oa_12", cat: "Obrigações Acessórias Mensais ( Federais / Estaduais / Municipais )", title: "Encerramento ISS + RANFS/DES + construção civil", desc: "Fechar prefeitura, obras/materiais e guias de ISS.", path: "Domínio: Relatórios > Impostos > ISS + Portal da Prefeitura", shortPrint: "Encerramento ISS" },
+      { id: "lr_oa_13", cat: "Obrigações Acessórias Específicas, Setoriais e Anuais", title: "ECD (maio) e ECF (julho)", desc: "Validar livros, BP, DRE, e-LALUR/e-LACS e blocos da ECF.", path: "Domínio Contábil / ECF", shortPrint: "ECD/ECF" },
+      { id: "lr_oa_14", cat: "Obrigações Acessórias Específicas, Setoriais e Anuais", title: "DAMEF / VAF-MG (anual maio)", desc: "Entregar/validar VAF no SIARE-MG.", path: "Domínio: Relatórios > Informativos > Estaduais > DAMEF", shortPrint: "DAMEF/VAF-MG" },
+      { id: "lr_oa_15", cat: "Obrigações Acessórias Específicas, Setoriais e Anuais", title: "DIMOB, DMED, DME, DITR, SERO e Censo BACEN", desc: "Conferir conforme atividade/estrutura societária.", path: "Domínio / e-CAC / BACEN", shortPrint: "DIMOB/DMED/DME/DITR/SERO/BACEN" },
+      { id: "lr_oa_16", cat: "Obrigações Acessórias Específicas, Setoriais e Anuais", title: "Obrigações setoriais e IBGE (SCANC/RECOPI/DIF/SNGPC/IBAMA/PAC/PAS/PIA/PAIC)", desc: "Verificação mensal/anual conforme CNAE.", path: "Sistemas Setoriais / IBGE", shortPrint: "Setoriais/IBGE" }
+    ]
+  };
+
+  const FECHAMENTO_DOSSIE = {
+    simples: [
+      { id: "sn_fc_01", cat: "1. Situação do período (dossiê do revisor)", title: "Declaração de faturamento do mês (obrigatória)", desc: "Anexar demonstrativo/declaração de faturamento. Se SEM MOVIMENTO, este é o documento principal do fechamento.", path: "Domínio: Relatórios > Impostos > Simples Nacional", shortPrint: "Declaração faturamento" },
+      { id: "sn_fc_02", cat: "1. Situação do período (dossiê do revisor)", title: "Totais de entradas e saídas conferidos", desc: "Evidenciar totais do período para o revisor cruzar com livros e guias.", path: "Domínio: Relatórios > Acompanhamento", shortPrint: "Totais entradas/saídas" },
+      { id: "sn_fc_03", cat: "2. Livros fiscais", title: "Livro de Entradas", desc: "Anexar PDF do livro. Se não houve, marcar NÃO HOUVE e justificar na observação.", path: "Domínio: Relatórios > Livros > Entradas", shortPrint: "Livro Entradas" },
+      { id: "sn_fc_04", cat: "2. Livros fiscais", title: "Livro de Saídas", desc: "Anexar PDF do livro. Se não houve, marcar NÃO HOUVE e justificar.", path: "Domínio: Relatórios > Livros > Saídas", shortPrint: "Livro Saídas" },
+      { id: "sn_fc_05", cat: "2. Livros fiscais", title: "Livro de ISS", desc: "Anexar PDF ou NÃO HOUVE com motivo.", path: "Domínio: Relatórios > Livros > ISS", shortPrint: "Livro ISS" },
+      { id: "sn_fc_06", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "Demonstrativo / Extrato PGDAS-D + Guia DAS", desc: "Anexar demonstrativo que justifica a guia e a própria guia/recibo.", path: "Portal Simples / Domínio", shortPrint: "PGDAS + DAS" },
+      { id: "sn_fc_07", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "Demonstrativo ICMS-ST + guias ST", desc: "Relatório que motiva a guia + guias Por Operação/Por Apuração. Use SALDO CREDOR ou NÃO HOUVE com motivo.", path: "Domínio: Relatórios > Impostos > ICMS ST", shortPrint: "Demo ST + guias" },
+      { id: "sn_fc_08", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "Demonstrativo DIFAL + guias DIFAL", desc: "Relatório + guias (GNRE/DARE/DAE). SALDO CREDOR / NÃO HOUVE exigem observação.", path: "Domínio: Relatórios > Impostos", shortPrint: "Demo DIFAL + guias" },
+      { id: "sn_fc_09", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "Demonstrativo FECP/FCP/FEM + guias", desc: "Relatório + guias. NÃO HOUVE/SALDO CREDOR com motivo obrigatório.", path: "Domínio: Relatórios > Impostos > ICMS / FCP", shortPrint: "Demo FECP + guias" },
+      { id: "sn_fc_10", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "Relatório App Coletor + guias de retenções/ISS tomador", desc: "Anexar relatório do coletor e guias decorrentes.", path: "App Coletor + Prefeitura/e-CAC", shortPrint: "Coletor + retenções" },
+      { id: "sn_fc_11", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "DeSTDA / recibos de obrigações do mês", desc: "Anexar recibos/protocolos das obrigações entregues na etapa de Obrigações.", path: "Domínio / Portais", shortPrint: "Recibos obrigações" },
+      { id: "sn_fc_12", cat: "4. Encerramento do dossiê", title: "Travar período no Domínio (após aprovação)", desc: "Somente após status APROVADO pelo revisor.", path: "Domínio: Utilitários > Fechamento de Período", shortPrint: "Travar período" },
+      { id: "sn_fc_13", cat: "4. Encerramento do dossiê", title: "Liberação das guias ao cliente (Nibo/WhatsApp)", desc: "Somente após aprovação da revisão.", path: "Nibo / WhatsApp", shortPrint: "Liberar guias cliente" }
+    ],
+    presumido: [
+      { id: "lp_fc_01", cat: "1. Situação do período (dossiê do revisor)", title: "Declaração de faturamento / receitas do mês (obrigatória)", desc: "Documento-base do fechamento. Se SEM MOVIMENTO, é o principal anexo.", path: "Domínio: Relatórios > Impostos", shortPrint: "Declaração faturamento" },
+      { id: "lp_fc_02", cat: "1. Situação do período (dossiê do revisor)", title: "Totais de entradas, saídas e serviços", desc: "Evidências de totais para cruzamento do revisor.", path: "Domínio: Relatórios > Acompanhamento", shortPrint: "Totais do período" },
+      { id: "lp_fc_03", cat: "2. Livros fiscais", title: "Livro de Entradas", desc: "PDF anexado ou NÃO HOUVE + motivo.", path: "Domínio: Relatórios > Livros > Entradas", shortPrint: "Livro Entradas" },
+      { id: "lp_fc_04", cat: "2. Livros fiscais", title: "Livro de Saídas", desc: "PDF anexado ou NÃO HOUVE + motivo.", path: "Domínio: Relatórios > Livros > Saídas", shortPrint: "Livro Saídas" },
+      { id: "lp_fc_05", cat: "2. Livros fiscais", title: "Livro de Apuração de ICMS", desc: "PDF ou NÃO HOUVE/SALDO CREDOR com motivo.", path: "Domínio: Relatórios > Livros > Apuração ICMS", shortPrint: "Livro ICMS" },
+      { id: "lp_fc_06", cat: "2. Livros fiscais", title: "Livro de IPI", desc: "PDF ou NÃO HOUVE com motivo obrigatório.", path: "Domínio: Relatórios > Livros > IPI", shortPrint: "Livro IPI" },
+      { id: "lp_fc_07", cat: "2. Livros fiscais", title: "Livro de ISS", desc: "PDF ou NÃO HOUVE com motivo.", path: "Domínio: Relatórios > Livros > ISS", shortPrint: "Livro ISS" },
+      { id: "lp_fc_08", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "Demonstrativos PIS/COFINS + DARFs", desc: "Relatório que justifica a guia + guia. SALDO CREDOR/NÃO HOUVE com obs.", path: "Domínio: Relatórios > Impostos > PIS/COFINS", shortPrint: "PIS/COFINS + guias" },
+      { id: "lp_fc_09", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "Demonstrativo ICMS-ST + guias ST", desc: "Relatório + guias Por Operação/Apuração.", path: "Domínio: Relatórios > Impostos > ICMS ST", shortPrint: "ST + guias" },
+      { id: "lp_fc_10", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "Demonstrativo DIFAL + guias DIFAL", desc: "Relatório + GNRE/DARE/DAE.", path: "Domínio: Relatórios > Impostos", shortPrint: "DIFAL + guias" },
+      { id: "lp_fc_11", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "Demonstrativo FECP/FEM + guias", desc: "Relatório + guias.", path: "Domínio: Relatórios > Impostos > ICMS / FCP", shortPrint: "FECP + guias" },
+      { id: "lp_fc_12", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "IRPJ/CSLL (quando trimestre) + DARFs", desc: "Se não for mês de trimestre, NÃO HOUVE com motivo.", path: "Domínio: Relatórios > Impostos > IRPJ/CSLL", shortPrint: "IRPJ/CSLL" },
+      { id: "lp_fc_13", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "Relatório App Coletor + retenções", desc: "Coletor + guias/DARFs de retenção.", path: "App Coletor", shortPrint: "Coletor + retenções" },
+      { id: "lp_fc_14", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "Recibos SPED / GIA / DAPI / obrigações do mês", desc: "Protocolos das obrigações entregues.", path: "Domínio / Portais", shortPrint: "Recibos obrigações" },
+      { id: "lp_fc_15", cat: "4. Encerramento do dossiê", title: "Travar período (após aprovação)", desc: "Somente com status APROVADO.", path: "Domínio: Utilitários > Fechamento de Período", shortPrint: "Travar período" },
+      { id: "lp_fc_16", cat: "4. Encerramento do dossiê", title: "Liberar guias ao cliente", desc: "Somente após aprovação.", path: "Nibo / WhatsApp", shortPrint: "Liberar guias" }
+    ],
+    real: [
+      { id: "lr_fc_01", cat: "1. Situação do período (dossiê do revisor)", title: "Declaração de faturamento / receitas (obrigatória)", desc: "Base do dossiê. Se SEM MOVIMENTO, documento principal.", path: "Domínio: Relatórios > Impostos", shortPrint: "Declaração faturamento" },
+      { id: "lr_fc_02", cat: "1. Situação do período (dossiê do revisor)", title: "Totais de entradas, saídas e créditos do período", desc: "Evidências para o revisor.", path: "Domínio: Relatórios > Acompanhamento", shortPrint: "Totais do período" },
+      { id: "lr_fc_03", cat: "2. Livros fiscais", title: "Livro de Entradas", desc: "PDF ou NÃO HOUVE + motivo.", path: "Domínio: Relatórios > Livros > Entradas", shortPrint: "Livro Entradas" },
+      { id: "lr_fc_04", cat: "2. Livros fiscais", title: "Livro de Saídas", desc: "PDF ou NÃO HOUVE + motivo.", path: "Domínio: Relatórios > Livros > Saídas", shortPrint: "Livro Saídas" },
+      { id: "lr_fc_05", cat: "2. Livros fiscais", title: "Livro de Apuração de ICMS", desc: "PDF / SALDO CREDOR / NÃO HOUVE com motivo.", path: "Domínio: Relatórios > Livros > ICMS", shortPrint: "Livro ICMS" },
+      { id: "lr_fc_06", cat: "2. Livros fiscais", title: "Livro de IPI", desc: "PDF ou NÃO HOUVE com motivo obrigatório.", path: "Domínio: Relatórios > Livros > IPI", shortPrint: "Livro IPI" },
+      { id: "lr_fc_07", cat: "2. Livros fiscais", title: "Livro de ISS", desc: "PDF ou NÃO HOUVE com motivo.", path: "Domínio: Relatórios > Livros > ISS", shortPrint: "Livro ISS" },
+      { id: "lr_fc_08", cat: "2. Livros fiscais", title: "Livro de Inventário (quando couber)", desc: "Anexar ou NÃO HOUVE com motivo.", path: "Domínio: Relatórios > Livros > Inventário", shortPrint: "Livro Inventário" },
+      { id: "lr_fc_09", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "Memória de créditos PIS/COFINS + DARFs", desc: "Relatório que justifica guia + guia. SALDO CREDOR permitido com obs.", path: "Domínio: Relatórios > Impostos > PIS/COFINS", shortPrint: "PIS/COFINS + guias" },
+      { id: "lr_fc_10", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "Demonstrativo ICMS-ST + guias", desc: "Relatório + guias.", path: "Domínio: Relatórios > Impostos > ICMS ST", shortPrint: "ST + guias" },
+      { id: "lr_fc_11", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "Demonstrativo DIFAL + guias", desc: "Relatório + guias.", path: "Domínio: Relatórios > Impostos", shortPrint: "DIFAL + guias" },
+      { id: "lr_fc_12", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "Demonstrativo FECP/FEM + guias", desc: "Relatório + guias.", path: "Domínio: Relatórios > Impostos > ICMS / FCP", shortPrint: "FECP + guias" },
+      { id: "lr_fc_13", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "IRPJ/CSLL (estimativa/trimestral) + DARFs", desc: "Se não houver, NÃO HOUVE com motivo.", path: "Domínio: Relatórios > Impostos > IRPJ/CSLL", shortPrint: "IRPJ/CSLL" },
+      { id: "lr_fc_14", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "Relatório App Coletor + retenções", desc: "Coletor + evidências de retenção.", path: "App Coletor", shortPrint: "Coletor + retenções" },
+      { id: "lr_fc_15", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "Recibos SPED / GIA / DAPI / Reinf / DCTFWeb", desc: "Protocolos das obrigações do mês.", path: "Domínio / Portais", shortPrint: "Recibos obrigações" },
+      { id: "lr_fc_16", cat: "4. Encerramento do dossiê", title: "Travar período (após aprovação)", desc: "Somente status APROVADO.", path: "Domínio: Utilitários > Fechamento de Período", shortPrint: "Travar período" },
+      { id: "lr_fc_17", cat: "4. Encerramento do dossiê", title: "Liberar guias ao cliente", desc: "Somente após aprovação.", path: "Nibo / WhatsApp", shortPrint: "Liberar guias" }
+    ],
+    mei: [
+      { id: "mei_fc_01", cat: "1. Situação do período (dossiê do revisor)", title: "Controle/Declaração de receitas do mês (obrigatória)", desc: "Documento-base. Se SEM MOVIMENTO, principal anexo.", path: "Controle de Receitas MEI", shortPrint: "Declaração receitas" },
+      { id: "mei_fc_02", cat: "1. Situação do período (dossiê do revisor)", title: "Conferência de compras vs limite 80%", desc: "Evidência de compras/receitas para o revisor.", path: "SIEG / Controle", shortPrint: "Compras x 80%" },
+      { id: "mei_fc_03", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "Guia DAS-MEI + comprovante/histórico", desc: "Guia e evidência. Se SEM MOVIMENTO, ainda assim anexar declaração/receitas.", path: "PGMEI", shortPrint: "DAS-MEI" },
+      { id: "mei_fc_04", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "Relatório App Coletor (se houver serviços tomados)", desc: "Anexar ou NÃO HOUVE com motivo.", path: "App Coletor", shortPrint: "Coletor" },
+      { id: "mei_fc_05", cat: "3. Demonstrativos e guias (motivo + evidência)", title: "Guias DIFAL/ST/ISS Tomador (se houver)", desc: "Anexar ou NÃO HOUVE com motivo.", path: "SEFAZ / Prefeitura", shortPrint: "Guias extras" },
+      { id: "mei_fc_06", cat: "4. Encerramento do dossiê", title: "Liberar guia ao cliente (após aprovação)", desc: "Somente status APROVADO.", path: "Nibo / WhatsApp", shortPrint: "Liberar guia" }
+    ]
+  };
+
+  (function injectExtraItems() {
+    Object.keys(OBRIGACOES_EXTRA).forEach(regime => {
+      const list = OBRIGACOES_EXTRA[regime] || [];
+      list.forEach(item => {
+        if (!regimesData[regime].items.find(x => x.id === item.id)) {
+          regimesData[regime].items.push(item);
+        }
+        ITEM_TYPE_MAP[item.id] = "obrigacoes";
+      });
+    });
+    Object.keys(FECHAMENTO_DOSSIE).forEach(regime => {
+      const list = FECHAMENTO_DOSSIE[regime] || [];
+      list.forEach(item => {
+        if (!regimesData[regime].items.find(x => x.id === item.id)) {
+          regimesData[regime].items.push(item);
+        }
+        ITEM_TYPE_MAP[item.id] = "fechamento";
+      });
+    });
+    // Itens antigos de "emitir livros / app fechamento" saem da etapa Fechamento
+    ["sn_20","sn_21","sn_23","sn_24","lp_14","lp_15","lp_17","lp_18","lr_15","lr_16","lr_18","lr_19","mei_08","mei_09"].forEach(id => {
+      if (ITEM_TYPE_MAP[id] === "fechamento") ITEM_TYPE_MAP[id] = "conferencia_legacy_hidden";
+    });
+  })();
+
+
   const MONTH_NAMES = {
     "01": "Janeiro", "02": "Fevereiro", "03": "Março", "04": "Abril",
     "05": "Maio", "06": "Junho", "07": "Julho", "08": "Agosto",
@@ -1191,23 +1591,76 @@
 
   function emptyClientRecord() {
     return {
-      header: { name: "", cnpj: "", operator: "", reviewer: "", ieSt: "nao_aplica" },
+      code: "",
+      status: "em_execucao",
+      semMovimento: false,
+      header: { name: "", cnpj: "", operator: "", reviewer: "", ieSt: "nao_aplica", ieStUfs: "" },
       regime: "simples",
       checklistType: "importacao",
       flags: {},
       obsLogs: {},
       attachments: {},
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString()
     };
   }
 
   function defaultDatabase() {
     const n = nowParts();
     return {
-      version: 3,
-      ui: { year: n.year, month: n.month, clientKey: "" },
+      version: 4,
+      nextCode: 1,
+      ui: { year: n.year, month: n.month, clientKey: "", code: "" },
       db: {}
     };
+  }
+
+  function padClosingCode(num) {
+    return String(num).padStart(6, "0");
+  }
+
+  function allocateClosingCode() {
+    if (!appDb.nextCode || appDb.nextCode < 1) appDb.nextCode = 1;
+    const code = padClosingCode(appDb.nextCode);
+    appDb.nextCode += 1;
+    return code;
+  }
+
+  function statusLabel(status) {
+    return ({
+      em_execucao: "Em execução",
+      aguardando_revisao: "Aguardando revisão",
+      devolvido: "Devolvido ao executor",
+      aprovado: "Aprovado"
+    })[status] || status || "Em execução";
+  }
+
+  function listAllClosings() {
+    const rows = [];
+    Object.keys(appDb.db || {}).forEach(year => {
+      Object.keys(appDb.db[year] || {}).forEach(month => {
+        Object.keys(appDb.db[year][month] || {}).forEach(clientKey => {
+          const rec = appDb.db[year][month][clientKey];
+          if (!rec) return;
+          if (!rec.code) {
+            rec.code = allocateClosingCode();
+          }
+          rows.push({
+            year, month, clientKey, rec,
+            code: rec.code,
+            name: (rec.header && rec.header.name) || clientKey,
+            cnpj: (rec.header && rec.header.cnpj) || "",
+            status: rec.status || "em_execucao",
+            operator: (rec.header && rec.header.operator) || "",
+            reviewer: (rec.header && rec.header.reviewer) || "",
+            regime: rec.regime || "simples",
+            comp: month + "/" + year
+          });
+        });
+      });
+    });
+    saveDatabase();
+    return rows.sort((a, b) => String(b.code).localeCompare(String(a.code)));
   }
 
   function ensureDbPath(year, month) {
@@ -1315,6 +1768,9 @@
     if (!bucket[key]) {
       bucket[key] = emptyClientRecord();
       bucket[key].header.name = key;
+      bucket[key].code = allocateClosingCode();
+    } else if (!bucket[key].code) {
+      bucket[key].code = allocateClosingCode();
     }
     return bucket[key];
   }
@@ -1325,11 +1781,17 @@
       cnpj: document.getElementById("clientCnpj").value,
       operator: sanitizePersonName(document.getElementById("clientOperator").value),
       reviewer: sanitizePersonName(document.getElementById("clientReviewer").value),
-      ieSt: document.getElementById("clientIeSt").value || "nao_aplica"
+      ieSt: document.getElementById("clientIeSt").value || "nao_aplica",
+      ieStUfs: document.getElementById("clientIeStUfs").value || ""
     };
+    rec.semMovimento = !!(document.getElementById("semMovimento") && document.getElementById("semMovimento").checked);
+    if (!rec.status) rec.status = "em_execucao";
+    if (!rec.code) rec.code = allocateClosingCode();
     rec.regime = currentRegime;
     rec.checklistType = currentChecklistType;
     rec.updatedAt = new Date().toISOString();
+    const codeEl = document.getElementById("closingCode");
+    if (codeEl) codeEl.value = rec.code;
   }
 
   function persistWorkingDraft() {
@@ -1373,10 +1835,14 @@
     document.getElementById("clientOperator").value = sanitizePersonName(rec.header && rec.header.operator) || "";
     document.getElementById("clientReviewer").value = sanitizePersonName(rec.header && rec.header.reviewer) || "";
     document.getElementById("clientIeSt").value = (rec.header && rec.header.ieSt) || "nao_aplica";
+    document.getElementById("clientIeStUfs").value = (rec.header && rec.header.ieStUfs) || "";
+    document.getElementById("closingCode").value = rec.code || "";
+    document.getElementById("semMovimento").checked = !!rec.semMovimento;
     currentRegime = rec.regime || "simples";
     currentChecklistType = rec.checklistType || "importacao";
     skipAutoSave = false;
     switchRegime(currentRegime);
+    updateClosingStatusUI();
   }
 
   function clearFormForNewClient() {
@@ -1386,10 +1852,14 @@
     document.getElementById("clientOperator").value = "";
     document.getElementById("clientReviewer").value = "";
     document.getElementById("clientIeSt").value = "nao_aplica";
+    document.getElementById("clientIeStUfs").value = "";
+    document.getElementById("closingCode").value = "";
+    document.getElementById("semMovimento").checked = false;
     currentRegime = "simples";
     currentChecklistType = "importacao";
     skipAutoSave = false;
     switchRegime("simples");
+    updateClosingStatusUI();
   }
 
   function onYearMonthChange() {
@@ -1428,9 +1898,11 @@
     const rec = ensureWorkingRecord();
     readFormIntoRecord(rec);
     appDb.ui.clientKey = key;
+    appDb.ui.code = rec.code;
     saveDatabase();
     refreshClientSelect(key);
-    alert("Cliente salvo em " + getSelectedYear() + " > " + MONTH_NAMES[getSelectedMonth()] + " > " + key);
+    updateClosingStatusUI();
+    alert("Fechamento " + rec.code + " salvo em " + getSelectedYear() + " > " + MONTH_NAMES[getSelectedMonth()] + " > " + key);
   }
 
   function exportBackupJson() {
@@ -1517,27 +1989,174 @@
   }
 
   function getCurrentItems() {
-    return getRegimeItems().filter(item => getItemType(item.id) === currentChecklistType);
+    let items = getRegimeItems().filter(item => getItemType(item.id) === currentChecklistType);
+    const semMov = document.getElementById("semMovimento") && document.getElementById("semMovimento").checked;
+    if (currentChecklistType === "fechamento" && semMov) {
+      items = items.filter(item => /faturamento|receitas do mês|receitas \(obrigatória\)/i.test(item.title) || /Declaração de faturamento|Controle\/Declaração de receitas/i.test(item.title));
+    }
+    return items;
+  }
+
+  function showHome() {
+    document.getElementById("homeScreen").classList.add("active");
+    document.getElementById("workScreen").classList.remove("active");
+    renderHomeTable();
+  }
+
+  function showWork() {
+    document.getElementById("homeScreen").classList.remove("active");
+    document.getElementById("workScreen").classList.add("active");
+  }
+
+  function backToHome() {
+    persistWorkingDraft();
+    showHome();
+  }
+
+  function renderHomeTable() {
+    const body = document.getElementById("homeTableBody");
+    if (!body) return;
+    const fCode = (document.getElementById("filterCode").value || "").trim();
+    const fClient = (document.getElementById("filterHomeClient").value || "").trim().toLowerCase();
+    const fCnpj = (document.getElementById("filterHomeCnpj").value || "").replace(/\D/g, "");
+    const fComp = (document.getElementById("filterHomeComp").value || "").trim();
+    const fStatus = document.getElementById("filterHomeStatus").value || "";
+    const fExec = (document.getElementById("filterHomeExecutor").value || "").trim().toLowerCase();
+    const fRev = (document.getElementById("filterHomeReviewer").value || "").trim().toLowerCase();
+
+    const rows = listAllClosings().filter(r => {
+      if (fCode && !String(r.code).includes(fCode)) return false;
+      if (fClient && !(r.name.toLowerCase().includes(fClient))) return false;
+      if (fCnpj && !(String(r.cnpj).replace(/\D/g, "").includes(fCnpj))) return false;
+      if (fComp && r.comp !== fComp && !(MONTH_NAMES[r.month] + "/" + r.year).toLowerCase().includes(fComp.toLowerCase())) return false;
+      if (fStatus && r.status !== fStatus) return false;
+      if (fExec && !r.operator.toLowerCase().includes(fExec)) return false;
+      if (fRev && !r.reviewer.toLowerCase().includes(fRev)) return false;
+      return true;
+    });
+
+    if (!rows.length) {
+      body.innerHTML = `<tr><td colspan="8">Nenhum fechamento encontrado. Clique em “+ Novo Fechamento”.</td></tr>`;
+      return;
+    }
+
+    body.innerHTML = rows.map(r => `
+      <tr onclick="openClosing('${r.year}','${r.month}','${escapeAttr(r.clientKey)}')">
+        <td><strong>${escapeHtml(r.code)}</strong></td>
+        <td>${escapeHtml(r.name)}</td>
+        <td>${escapeHtml(r.cnpj || "-")}</td>
+        <td>${escapeHtml(r.comp)}</td>
+        <td>${escapeHtml((regimesData[r.regime] && regimesData[r.regime].title) || r.regime)}</td>
+        <td><span class="status-badge st-${escapeAttr(r.status)}">${escapeHtml(statusLabel(r.status))}</span></td>
+        <td>${escapeHtml(r.operator || "-")}</td>
+        <td>${escapeHtml(r.reviewer || "-")}</td>
+      </tr>
+    `).join("");
+  }
+
+  function createNewClosing() {
+    const n = nowParts();
+    fillYearOptions();
+    skipAutoSave = true;
+    document.getElementById("filterYear").value = n.year;
+    document.getElementById("filterMonth").value = n.month;
+    document.getElementById("clientName").value = "";
+    document.getElementById("clientCnpj").value = "";
+    document.getElementById("clientOperator").value = "";
+    document.getElementById("clientReviewer").value = "";
+    document.getElementById("clientIeSt").value = "nao_aplica";
+    document.getElementById("clientIeStUfs").value = "";
+    document.getElementById("closingCode").value = "";
+    document.getElementById("semMovimento").checked = false;
+    currentRegime = "simples";
+    currentChecklistType = "importacao";
+    appDb.ui = { year: n.year, month: n.month, clientKey: "", code: "" };
+    skipAutoSave = false;
+    showWork();
+    refreshClientSelect("");
+    switchRegime("simples");
+    updateClosingStatusUI();
+  }
+
+  function openClosing(year, month, clientKey) {
+    skipAutoSave = true;
+    document.getElementById("filterYear").value = year;
+    document.getElementById("filterMonth").value = month;
+    const rec = appDb.db[year] && appDb.db[year][month] && appDb.db[year][month][clientKey];
+    skipAutoSave = false;
+    if (!rec) return;
+    showWork();
+    refreshClientSelect(clientKey);
+    applyRecordToForm(rec);
+    updateClosingStatusUI();
+  }
+
+  function updateClosingStatusUI() {
+    const rec = getCurrentClientRecord();
+    const badge = document.getElementById("closingStatusBadge");
+    const prog = document.getElementById("closingTotalProgress");
+    const status = (rec && rec.status) || "em_execucao";
+    if (badge) {
+      badge.className = "status-badge st-" + status;
+      badge.innerText = statusLabel(status);
+    }
+    if (prog) {
+      const all = getRegimeItems().filter(i => ["importacao","analise","obrigacoes","fechamento"].includes(getItemType(i.id)));
+      const flags = (rec && rec.flags) || {};
+      const counts = countFlagsForItems(all, flags);
+      const done = counts.okCount + counts.naCount + (counts.nhCount || 0) + (counts.scCount || 0);
+      prog.innerText = "Progresso total: " + done + "/" + counts.total + " · PEND " + counts.pendCount;
+    }
+    const codeEl = document.getElementById("closingCode");
+    if (codeEl) codeEl.value = (rec && rec.code) || "";
+  }
+
+  function setClosingStatus(nextStatus) {
+    const rec = ensureWorkingRecord();
+    if (!rec) { alert("Informe e salve o cliente/fechamento antes."); return; }
+    if (nextStatus === "aguardando_revisao") {
+      const err = validateFechamentoDossie(rec);
+      if (err) { alert(err); return; }
+    }
+    rec.status = nextStatus;
+    persistWorkingDraft();
+    updateClosingStatusUI();
+    alert("Status atualizado para: " + statusLabel(nextStatus));
+  }
+
+  function validateFechamentoDossie(rec) {
+    const items = getRegimeItems().filter(i => getItemType(i.id) === "fechamento");
+    const semMov = !!rec.semMovimento;
+    const required = semMov
+      ? items.filter(i => /faturamento|receitas/i.test(i.title))
+      : items;
+    for (const item of required) {
+      const flag = rec.flags[item.id];
+      if (!flag) return "Fechamento incompleto: marque todos os itens obrigatórios (" + item.title + ").";
+      if ((flag === "na" || flag === "nh" || flag === "sc" || flag === "pend") && !(rec.obsLogs[item.id] && String(rec.obsLogs[item.id].current || "").trim())) {
+        return "No item “" + item.title + "” a flag " + flag.toUpperCase() + " exige observação/motivo.";
+      }
+    }
+    return "";
+  }
+
+  function onSemMovimentoChange() {
+    const rec = ensureWorkingRecord();
+    if (rec) rec.semMovimento = document.getElementById("semMovimento").checked;
+    persistWorkingDraft();
+    if (currentChecklistType === "fechamento") {
+      renderChecklistTable();
+      updateCounters();
+    }
   }
 
   function initApp() {
+    if (!appDb.nextCode) appDb.nextCode = 1;
     fillYearOptions();
     const n = nowParts();
     document.getElementById("filterYear").value = appDb.ui.year || n.year;
     document.getElementById("filterMonth").value = appDb.ui.month || n.month;
-    refreshClientSelect(appDb.ui.clientKey || "");
-    if (appDb.ui.clientKey) {
-      const year = getSelectedYear();
-      const month = getSelectedMonth();
-      const rec = appDb.db[year] && appDb.db[year][month] && appDb.db[year][month][appDb.ui.clientKey];
-      if (rec) applyRecordToForm(rec);
-      else {
-        document.getElementById("clientName").value = "";
-        switchRegime("simples");
-      }
-    } else {
-      switchRegime("simples");
-    }
+    showHome();
   }
 
   function switchRegime(regimeKey) {
@@ -1561,11 +2180,12 @@
     document.getElementById("regimeProgressLabel").innerText = "Progresso: " + typeTitle + " · " + regimeTitle;
     const hintEl = document.getElementById("typeHintText");
     if (hintEl) hintEl.innerText = CHECKLIST_TYPES[typeKey].hint;
-    const btnEtapa = document.getElementById("btnPrintEtapa");
-    if (btnEtapa) btnEtapa.innerText = "Imprimir " + typeTitle;
+    const btnEtapa = document.getElementById("btnPrintEtapaTop");
+    if (btnEtapa) btnEtapa.innerText = "Imprimir etapa: " + typeTitle + " (lista)";
 
     renderChecklistTable();
     updateCounters();
+    updateClosingStatusUI();
     persistWorkingDraft();
   }
 
@@ -1579,7 +2199,7 @@
     const items = getRegimeItems().filter(item => getItemType(item.id) === typeKey);
     const flags = getWorkingFlags();
     const counts = countFlagsForItems(items, flags);
-    const done = counts.okCount + counts.naCount;
+    const done = counts.okCount + counts.naCount + counts.nhCount + counts.scCount;
     return {
       title: CHECKLIST_TYPES[typeKey].title,
       done,
@@ -1597,28 +2217,51 @@
     const operator = document.getElementById("clientOperator").value || "-";
     const reviewer = document.getElementById("clientReviewer").value || "-";
     const ieSt = ieStLabel(document.getElementById("clientIeSt").value);
+    const ieStUfs = document.getElementById("clientIeStUfs").value || "-";
+    const code = document.getElementById("closingCode").value || "-";
+    const semMov = document.getElementById("semMovimento").checked;
+    const rec = getCurrentClientRecord();
+    const statusTxt = statusLabel((rec && rec.status) || "em_execucao");
     const regimeTitle = regimesData[currentRegime].title;
     const flags = getWorkingFlags();
-    const fechamentoItems = getRegimeItems().filter(item => getItemType(item.id) === "fechamento");
+    let fechamentoItems = getRegimeItems().filter(item => getItemType(item.id) === "fechamento");
+    if (semMov) {
+      fechamentoItems = fechamentoItems.filter(item => /faturamento|receitas/i.test(item.title));
+    }
     const etapaRows = Object.keys(CHECKLIST_TYPES).map(key => {
       const s = summarizeType(key);
       return `<tr><td>${escapeHtml(s.title)}</td><td>${s.done}/${s.total}</td><td>${s.pend}</td><td>${s.pct}%</td></tr>`;
     }).join("");
 
-    const docRows = (fechamentoItems.length ? fechamentoItems : getCurrentItems()).map((item, idx) => {
-      const flag = (flags[item.id] || "").toUpperCase() || "-";
-      const obs = (getObsLog(item.id).current || "").trim();
-      return `<tr>
-        <td>${String(idx + 1).padStart(2, "0")}</td>
-        <td>${escapeHtml(item.title)}</td>
-        <td>${escapeHtml(flag)}</td>
-        <td>${escapeHtml(obs || "-")}</td>
-      </tr>`;
+    const byCat = {};
+    fechamentoItems.forEach(item => {
+      const cat = item.cat || "Dossiê";
+      if (!byCat[cat]) byCat[cat] = [];
+      byCat[cat].push(item);
+    });
+
+    const sectionsHtml = Object.keys(byCat).map(cat => {
+      const rows = byCat[cat].map((item, idx) => {
+        const flag = (flags[item.id] || "").toUpperCase() || "-";
+        const obs = (getObsLog(item.id).current || "").trim();
+        const attachCount = (getAttachments(item.id) || []).length;
+        return `<tr>
+          <td>${String(idx + 1).padStart(2, "0")}</td>
+          <td><strong>${escapeHtml(item.shortPrint || item.title)}</strong><br><span style="font-size:10px">${escapeHtml(item.title)}</span></td>
+          <td>${escapeHtml(flag)}</td>
+          <td>${escapeHtml(obs || "-")}${attachCount ? " · " + attachCount + " anexo(s)" : ""}</td>
+        </tr>`;
+      }).join("");
+      return `<strong style="display:block;margin-top:12px;">${escapeHtml(cat)}</strong>
+        <table class="print-capa-table">
+          <thead><tr><th>#</th><th>Documento / Relatório + Guia</th><th>Flag</th><th>Observação</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>`;
     }).join("");
 
     return `
       <div class="print-capa-title">Fechamento</div>
-      <div class="print-capa-regime">${escapeHtml(regimeTitle)}</div>
+      <div class="print-capa-regime">${escapeHtml(regimeTitle)} · Código ${escapeHtml(code)} · ${escapeHtml(statusTxt)}${semMov ? " · SEM MOVIMENTO" : ""}</div>
       <div class="print-capa-box">
         <div class="print-capa-row"><div class="lbl">Razão Social:</div><div class="val">${escapeHtml(name)}</div></div>
         <div class="print-capa-row"><div class="lbl">CNPJ:</div><div class="val">${escapeHtml(cnpj)}</div></div>
@@ -1626,9 +2269,9 @@
           <div class="lbl">Mês/Ano apuração:</div>
           <div class="val">
             <div class="print-capa-grid3">
-              <div>${escapeHtml(MONTH_NAMES[month] || month)}</div>
-              <div>${escapeHtml(year)}</div>
+              <div>${escapeHtml(MONTH_NAMES[month] || month)}/${escapeHtml(year)}</div>
               <div>IE-ST: ${escapeHtml(ieSt)}</div>
+              <div>UFs IE-ST: ${escapeHtml(ieStUfs)}</div>
             </div>
           </div>
         </div>
@@ -1636,15 +2279,11 @@
 
       <strong>Resumo das etapas</strong>
       <table class="print-capa-table">
-        <thead><tr><th>Etapa</th><th>OK/N/A</th><th>PEND</th><th>%</th></tr></thead>
+        <thead><tr><th>Etapa</th><th>Concluídos</th><th>PEND</th><th>%</th></tr></thead>
         <tbody>${etapaRows}</tbody>
       </table>
 
-      <strong style="display:block;margin-top:12px;">Dossiê / itens de Fechamento</strong>
-      <table class="print-capa-table">
-        <thead><tr><th>#</th><th>Documento / Item</th><th>Flag</th><th>Observação</th></tr></thead>
-        <tbody>${docRows || `<tr><td colspan="4">Sem itens de fechamento cadastrados nesta visão.</td></tr>`}</tbody>
-      </table>
+      ${sectionsHtml || `<p style="margin-top:12px;">Sem itens de fechamento nesta visão.</p>`}
 
       <div class="print-sign-grid">
         <div class="print-sign-box">
@@ -1658,7 +2297,7 @@
           Assinatura:
         </div>
       </div>
-      <div class="print-obs"><strong>Observação:</strong></div>
+      <div class="print-obs"><strong>Observação geral:</strong></div>
     `;
   }
 
@@ -1793,6 +2432,7 @@
           </td>
           <td>
             <div class="task-title">${item.title}</div>
+            <div class="task-title print-short" style="display:none">${escapeHtml(item.shortPrint || item.title)}</div>
             <div class="task-desc">${item.desc}</div>
             <span class="dominio-badge">${item.path}</span>
           </td>
@@ -1800,6 +2440,8 @@
             <div class="flag-group">
               <button type="button" class="flag-btn ${currentFlag === 'ok' ? 'active-ok' : ''}" onclick="setFlag('${item.id}', 'ok')">[ OK ]</button>
               <button type="button" class="flag-btn ${currentFlag === 'na' ? 'active-na' : ''}" onclick="setFlag('${item.id}', 'na')">[ N/A ]</button>
+              <button type="button" class="flag-btn ${currentFlag === 'nh' ? 'active-nh' : ''}" onclick="setFlag('${item.id}', 'nh')">[ NÃO HOUVE ]</button>
+              <button type="button" class="flag-btn ${currentFlag === 'sc' ? 'active-sc' : ''}" onclick="setFlag('${item.id}', 'sc')">[ SALDO CREDOR ]</button>
               <button type="button" class="flag-btn ${currentFlag === 'pend' ? 'active-pend' : ''}" onclick="setFlag('${item.id}', 'pend')">[ PEND ]</button>
             </div>
           </td>
@@ -1818,9 +2460,16 @@
     if (!rec.flags) rec.flags = {};
     if (rec.flags[itemId] === flagValue) delete rec.flags[itemId];
     else rec.flags[itemId] = flagValue;
+    if (currentChecklistType === "fechamento" && (flagValue === "nh" || flagValue === "sc" || flagValue === "na" || flagValue === "pend")) {
+      const obs = (rec.obsLogs[itemId] && rec.obsLogs[itemId].current) || "";
+      if (!String(obs).trim()) {
+        alert("Para NÃO HOUVE / SALDO CREDOR / N/A / PEND no Fechamento, descreva o motivo na observação.");
+      }
+    }
     persistWorkingDraft();
     renderChecklistTable();
     updateCounters();
+    updateClosingStatusUI();
   }
 
   function toggleMainCheck(itemId, checked) {
@@ -1980,27 +2629,30 @@
   }, true);
 
   function countFlagsForItems(items, flags) {
-    let okCount = 0, naCount = 0, pendCount = 0;
+    let okCount = 0, naCount = 0, pendCount = 0, nhCount = 0, scCount = 0;
     items.forEach(item => {
       const f = flags[item.id];
       if (f === "ok") okCount++;
       if (f === "na") naCount++;
       if (f === "pend") pendCount++;
+      if (f === "nh") nhCount++;
+      if (f === "sc") scCount++;
     });
-    return { okCount, naCount, pendCount, total: items.length };
+    return { okCount, naCount, pendCount, nhCount, scCount, total: items.length };
   }
 
   function updateCounters() {
     const items = getCurrentItems();
     const flags = getWorkingFlags();
     const counts = countFlagsForItems(items, flags);
-    const done = counts.okCount + counts.naCount;
+    const done = counts.okCount + counts.naCount + counts.nhCount + counts.scCount;
     const pct = counts.total > 0 ? Math.round((done / counts.total) * 100) : 0;
     document.getElementById("countOk").innerText = counts.okCount;
-    document.getElementById("countNa").innerText = counts.naCount;
+    document.getElementById("countNa").innerText = counts.naCount + counts.nhCount + counts.scCount;
     document.getElementById("countPend").innerText = counts.pendCount;
     document.getElementById("regimeProgressPct").innerText = `${pct}% concluído (${done}/${counts.total})`;
     document.getElementById("progressBarFill").style.width = `${pct}%`;
+    updateClosingStatusUI();
   }
 
   function markAllOk() {
