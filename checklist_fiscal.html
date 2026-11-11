@@ -1132,13 +1132,7 @@
       </select>
     </div>
     <div class="field-group span-2">
-      <label>Abrir cliente já salvo neste Ano/Mês</label>
-      <select id="filterClient" onchange="onClientSelectChange()">
-        <option value="">+ Novo — digite o nome no campo ao lado</option>
-      </select>
-    </div>
-    <div class="field-group span-2">
-      <label>Nome do cliente (Código Domínio + Razão Social)</label>
+      <label>Cliente (Código Domínio + Razão Social)</label>
       <input type="text" id="clientName" placeholder="Ex: 0145 - Empresa Exemplo LTDA" oninput="onClientNameInput()">
     </div>
     <div class="field-group">
@@ -1817,14 +1811,8 @@
     sel.innerHTML = sorted.map(y => `<option value="${y}">${y}</option>`).join("");
   }
 
-  function refreshClientSelect(selectedKey) {
-    const sel = document.getElementById("filterClient");
-    const clients = getClientsForSelection();
-    const current = selectedKey != null ? selectedKey : clientKeyFromName(document.getElementById("clientName").value);
-    sel.innerHTML = `<option value="">+ Novo cliente / digitar abaixo</option>` +
-      clients.map(name => `<option value="${escapeAttr(name)}">${escapeHtml(name)}</option>`).join("");
-    if (current && clients.includes(current)) sel.value = current;
-    else sel.value = "";
+  function refreshClientSelect() {
+    /* Lista de clientes fica na tela inicial; aqui só edita o nome do fechamento aberto. */
   }
 
   function applyRecordToForm(rec) {
@@ -1871,21 +1859,6 @@
     saveDatabase();
     refreshClientSelect("");
     clearFormForNewClient();
-  }
-
-  function onClientSelectChange() {
-    const key = document.getElementById("filterClient").value;
-    if (!key) {
-      clearFormForNewClient();
-      return;
-    }
-    const year = getSelectedYear();
-    const month = getSelectedMonth();
-    const rec = appDb.db[year] && appDb.db[year][month] && appDb.db[year][month][key];
-    if (!rec) return;
-    appDb.ui.clientKey = key;
-    saveDatabase();
-    applyRecordToForm(rec);
   }
 
   function onClientNameInput() {
