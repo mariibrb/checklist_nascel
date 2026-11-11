@@ -1132,30 +1132,29 @@
       </select>
     </div>
     <div class="field-group span-2">
-      <label>Cliente salvo neste Ano/Mês</label>
+      <label>Abrir cliente já salvo neste Ano/Mês</label>
       <select id="filterClient" onchange="onClientSelectChange()">
-        <option value="">+ Novo cliente / digitar abaixo</option>
+        <option value="">+ Novo — digite o nome no campo ao lado</option>
       </select>
     </div>
     <div class="field-group span-2">
-      <label>Empresa / Cliente (Código Domínio + Razão Social)</label>
+      <label>Nome do cliente (Código Domínio + Razão Social)</label>
       <input type="text" id="clientName" placeholder="Ex: 0145 - Empresa Exemplo LTDA" oninput="onClientNameInput()">
     </div>
     <div class="field-group">
       <label>CNPJ / UF</label>
       <input type="text" id="clientCnpj" placeholder="00.000.000/0001-00 (SP/MG)" oninput="persistWorkingDraft()">
     </div>
-    <div class="field-group">
-      <label>IE-ST / Modo de Recolhimento</label>
-      <select id="clientIeSt" onchange="persistWorkingDraft()">
-        <option value="nao_aplica">Não se aplica</option>
-        <option value="por_operacao">Sem IE-ST → Por Operação (GNRE/DARE/DAE)</option>
-        <option value="por_apuracao">Com IE-ST → Por Apuração (GIA-ST/DeSTDA/SPED)</option>
-      </select>
-    </div>
-    <div class="field-group">
-      <label>UFs com IE-ST ativa</label>
-      <input type="text" id="clientIeStUfs" placeholder="Ex: MG, RJ, PR" oninput="persistWorkingDraft()">
+    <div class="field-group span-2">
+      <label>IE-ST (modo de recolhimento + UFs ativas, se houver)</label>
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:8px;">
+        <select id="clientIeSt" onchange="onIeStModeChange()">
+          <option value="nao_aplica">Não se aplica</option>
+          <option value="por_operacao">Sem IE-ST → Por Operação (GNRE/DARE/DAE)</option>
+          <option value="por_apuracao">Com IE-ST → Por Apuração (GIA-ST/DeSTDA/SPED)</option>
+        </select>
+        <input type="text" id="clientIeStUfs" placeholder="UFs com IE-ST (ex: MG, RJ)" oninput="persistWorkingDraft()" title="Preencha só se houver IE-ST em outras UFs">
+      </div>
     </div>
     <div class="field-group">
       <label>Responsável Apuração</label>
@@ -1190,7 +1189,7 @@
     <label style="display:flex;gap:8px;align-items:center;font-weight:700;color:var(--ink);">
       <input type="checkbox" id="semMovimento" onchange="onSemMovimentoChange()"> Empresa SEM MOVIMENTO no período
     </label>
-    <span style="font-size:0.8rem;color:var(--muted);">Nesse caso, no Fechamento fica obrigatória principalmente a declaração de faturamento.</span>
+    <span style="font-size:0.8rem;color:var(--muted);">Nesse caso, no Fechamento fica obrigatória a declaração de faturamento.</span>
   </div>
 
   <div class="print-actions-bar">
@@ -1226,7 +1225,7 @@
     </div>
     <div class="counters">
       <div class="counter-pill pill-ok">OK: <span id="countOk">0</span></div>
-      <div class="counter-pill pill-na">N/A: <span id="countNa">0</span></div>
+      <div class="counter-pill pill-na">NH/SC: <span id="countNhSc">0</span></div>
       <div class="counter-pill pill-pend">PENDENTE: <span id="countPend">0</span></div>
       <button type="button" class="btn-clear-flags" onclick="resetCurrentRegime()">Limpar etapa</button>
     </div>
@@ -1238,7 +1237,7 @@
     <div>
       <strong>Status para revisão:</strong>
       <p style="font-size: 0.8rem; color: var(--muted); margin-top: 4px;">
-        Só envie para revisão técnica após todos os itens estarem marcados com <strong>OK</strong> ou <strong>N/A</strong> (ou com a dúvida descrita na coluna Observação se marcado <strong>PEND</strong>).
+        Só envie para revisão técnica após todos os itens estarem marcados com <strong>OK</strong>, <strong>NÃO HOUVE</strong> ou <strong>SALDO CREDOR</strong> (com motivo na observação quando NÃO HOUVE / SALDO CREDOR / PEND).
       </p>
     </div>
     <div class="sign-box">Assinatura / Visto - Operador Fiscal</div>
@@ -1842,6 +1841,8 @@
     currentChecklistType = rec.checklistType || "importacao";
     skipAutoSave = false;
     switchRegime(currentRegime);
+    onIeStModeChange();
+    applySemMovimentoUI();
     updateClosingStatusUI();
   }
 
@@ -1859,6 +1860,8 @@
     currentChecklistType = "importacao";
     skipAutoSave = false;
     switchRegime("simples");
+    onIeStModeChange();
+    applySemMovimentoUI();
     updateClosingStatusUI();
   }
 
@@ -2075,6 +2078,8 @@
     showWork();
     refreshClientSelect("");
     switchRegime("simples");
+    onIeStModeChange();
+    applySemMovimentoUI();
     updateClosingStatusUI();
   }
 
@@ -2101,11 +2106,13 @@
       badge.innerText = statusLabel(status);
     }
     if (prog) {
-      const all = getRegimeItems().filter(i => ["importacao","analise","obrigacoes","fechamento"].includes(getItemType(i.id)));
+      const semMov = !!(rec && rec.semMovimento);
+      let all = getRegimeItems().filter(i => ["importacao","analise","obrigacoes","fechamento"].includes(getItemType(i.id)));
+      if (semMov) all = all.filter(i => getItemType(i.id) === "fechamento" && /faturamento|receitas/i.test(i.title));
       const flags = (rec && rec.flags) || {};
       const counts = countFlagsForItems(all, flags);
-      const done = counts.okCount + counts.naCount + (counts.nhCount || 0) + (counts.scCount || 0);
-      prog.innerText = "Progresso total: " + done + "/" + counts.total + " · PEND " + counts.pendCount;
+      const done = counts.okCount + counts.nhCount + counts.scCount;
+      prog.innerText = (semMov ? "SEM MOVIMENTO · " : "") + "Progresso: " + done + "/" + counts.total + " · PEND " + counts.pendCount;
     }
     const codeEl = document.getElementById("closingCode");
     if (codeEl) codeEl.value = (rec && rec.code) || "";
@@ -2133,21 +2140,49 @@
     for (const item of required) {
       const flag = rec.flags[item.id];
       if (!flag) return "Fechamento incompleto: marque todos os itens obrigatórios (" + item.title + ").";
-      if ((flag === "na" || flag === "nh" || flag === "sc" || flag === "pend") && !(rec.obsLogs[item.id] && String(rec.obsLogs[item.id].current || "").trim())) {
-        return "No item “" + item.title + "” a flag " + flag.toUpperCase() + " exige observação/motivo.";
+      if ((flag === "nh" || flag === "sc" || flag === "pend") && !(rec.obsLogs[item.id] && String(rec.obsLogs[item.id].current || "").trim())) {
+        return "No item “" + item.title + "” a flag " + String(flag).toUpperCase() + " exige observação/motivo.";
       }
     }
     return "";
+  }
+
+  function applySemMovimentoUI() {
+    const semMov = !!(document.getElementById("semMovimento") && document.getElementById("semMovimento").checked);
+    ["importacao", "analise", "obrigacoes"].forEach(key => {
+      const btn = document.getElementById("tab-" + key);
+      if (btn) btn.style.display = semMov ? "none" : "";
+    });
+    const hint = document.getElementById("typeHintText");
+    if (semMov) {
+      if (currentChecklistType !== "fechamento") switchChecklistType("fechamento");
+      else {
+        renderChecklistTable();
+        updateCounters();
+      }
+      if (hint) hint.innerText = "SEM MOVIMENTO: só a etapa Fechamento fica ativa — declaração de faturamento obrigatória.";
+    } else if (hint && CHECKLIST_TYPES[currentChecklistType]) {
+      hint.innerText = CHECKLIST_TYPES[currentChecklistType].hint;
+    }
   }
 
   function onSemMovimentoChange() {
     const rec = ensureWorkingRecord();
     if (rec) rec.semMovimento = document.getElementById("semMovimento").checked;
     persistWorkingDraft();
-    if (currentChecklistType === "fechamento") {
-      renderChecklistTable();
-      updateCounters();
+    applySemMovimentoUI();
+  }
+
+  function onIeStModeChange() {
+    const mode = document.getElementById("clientIeSt").value;
+    const ufs = document.getElementById("clientIeStUfs");
+    if (ufs) {
+      ufs.disabled = mode === "nao_aplica";
+      if (mode === "nao_aplica") ufs.placeholder = "UFs só se houver IE-ST";
+      else if (mode === "por_operacao") ufs.placeholder = "Opcional (sem IE-ST → Por Operação)";
+      else ufs.placeholder = "UFs com IE-ST ativa (ex: MG, RJ, PR)";
     }
+    persistWorkingDraft();
   }
 
   function initApp() {
@@ -2169,6 +2204,8 @@
   }
 
   function switchChecklistType(typeKey) {
+    const semMov = !!(document.getElementById("semMovimento") && document.getElementById("semMovimento").checked);
+    if (semMov && typeKey !== "fechamento") typeKey = "fechamento";
     currentChecklistType = typeKey;
     document.querySelectorAll(".type-pill").forEach(btn => btn.classList.remove("active"));
     const tabBtn = document.getElementById("tab-" + typeKey);
@@ -2179,7 +2216,11 @@
     document.getElementById("pageMainTitle").innerText = "Fechamento - (" + regimeTitle + ")";
     document.getElementById("regimeProgressLabel").innerText = "Progresso: " + typeTitle + " · " + regimeTitle;
     const hintEl = document.getElementById("typeHintText");
-    if (hintEl) hintEl.innerText = CHECKLIST_TYPES[typeKey].hint;
+    if (hintEl) {
+      hintEl.innerText = semMov
+        ? "SEM MOVIMENTO: só a etapa Fechamento fica ativa — declaração de faturamento obrigatória."
+        : CHECKLIST_TYPES[typeKey].hint;
+    }
     const btnEtapa = document.getElementById("btnPrintEtapaTop");
     if (btnEtapa) btnEtapa.innerText = "Imprimir etapa: " + typeTitle + " (lista)";
 
@@ -2199,7 +2240,7 @@
     const items = getRegimeItems().filter(item => getItemType(item.id) === typeKey);
     const flags = getWorkingFlags();
     const counts = countFlagsForItems(items, flags);
-    const done = counts.okCount + counts.naCount + counts.nhCount + counts.scCount;
+    const done = counts.okCount + counts.nhCount + counts.scCount;
     return {
       title: CHECKLIST_TYPES[typeKey].title,
       done,
@@ -2422,7 +2463,7 @@
 
       const currentFlag = flags[item.id] || "";
       const rowStatusClass = currentFlag ? `status-${currentFlag}` : "";
-      const isChecked = (currentFlag === "ok" || currentFlag === "na") ? "checked" : "";
+      const isChecked = currentFlag === "ok" ? "checked" : "";
 
       html += `
         <tr class="checklist-row ${rowStatusClass}" id="row-${item.id}">
@@ -2439,7 +2480,6 @@
           <td class="col-flags">
             <div class="flag-group">
               <button type="button" class="flag-btn ${currentFlag === 'ok' ? 'active-ok' : ''}" onclick="setFlag('${item.id}', 'ok')">[ OK ]</button>
-              <button type="button" class="flag-btn ${currentFlag === 'na' ? 'active-na' : ''}" onclick="setFlag('${item.id}', 'na')">[ N/A ]</button>
               <button type="button" class="flag-btn ${currentFlag === 'nh' ? 'active-nh' : ''}" onclick="setFlag('${item.id}', 'nh')">[ NÃO HOUVE ]</button>
               <button type="button" class="flag-btn ${currentFlag === 'sc' ? 'active-sc' : ''}" onclick="setFlag('${item.id}', 'sc')">[ SALDO CREDOR ]</button>
               <button type="button" class="flag-btn ${currentFlag === 'pend' ? 'active-pend' : ''}" onclick="setFlag('${item.id}', 'pend')">[ PEND ]</button>
@@ -2460,10 +2500,10 @@
     if (!rec.flags) rec.flags = {};
     if (rec.flags[itemId] === flagValue) delete rec.flags[itemId];
     else rec.flags[itemId] = flagValue;
-    if (currentChecklistType === "fechamento" && (flagValue === "nh" || flagValue === "sc" || flagValue === "na" || flagValue === "pend")) {
+    if (currentChecklistType === "fechamento" && (flagValue === "nh" || flagValue === "sc" || flagValue === "pend")) {
       const obs = (rec.obsLogs[itemId] && rec.obsLogs[itemId].current) || "";
       if (!String(obs).trim()) {
-        alert("Para NÃO HOUVE / SALDO CREDOR / N/A / PEND no Fechamento, descreva o motivo na observação.");
+        alert("Para NÃO HOUVE / SALDO CREDOR / PEND no Fechamento, descreva o motivo na observação.");
       }
     }
     persistWorkingDraft();
@@ -2629,26 +2669,25 @@
   }, true);
 
   function countFlagsForItems(items, flags) {
-    let okCount = 0, naCount = 0, pendCount = 0, nhCount = 0, scCount = 0;
+    let okCount = 0, pendCount = 0, nhCount = 0, scCount = 0;
     items.forEach(item => {
       const f = flags[item.id];
       if (f === "ok") okCount++;
-      if (f === "na") naCount++;
       if (f === "pend") pendCount++;
       if (f === "nh") nhCount++;
       if (f === "sc") scCount++;
     });
-    return { okCount, naCount, pendCount, nhCount, scCount, total: items.length };
+    return { okCount, pendCount, nhCount, scCount, total: items.length };
   }
 
   function updateCounters() {
     const items = getCurrentItems();
     const flags = getWorkingFlags();
     const counts = countFlagsForItems(items, flags);
-    const done = counts.okCount + counts.naCount + counts.nhCount + counts.scCount;
+    const done = counts.okCount + counts.nhCount + counts.scCount;
     const pct = counts.total > 0 ? Math.round((done / counts.total) * 100) : 0;
     document.getElementById("countOk").innerText = counts.okCount;
-    document.getElementById("countNa").innerText = counts.naCount + counts.nhCount + counts.scCount;
+    document.getElementById("countNhSc").innerText = counts.nhCount + counts.scCount;
     document.getElementById("countPend").innerText = counts.pendCount;
     document.getElementById("regimeProgressPct").innerText = `${pct}% concluído (${done}/${counts.total})`;
     document.getElementById("progressBarFill").style.width = `${pct}%`;
