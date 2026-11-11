@@ -809,68 +809,98 @@
       }
 
       .print-capa {
-        font-family: Helvetica, Arial, sans-serif;
+        font-family: inherit;
         color: #000;
       }
-      .print-capa-title {
-        text-align: center;
-        font-size: 24px;
-        font-weight: 700;
-        margin: 8px 0 4px;
+      .print-capa-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: 2px solid #000;
+        padding: 8px 10px;
+        margin-bottom: 8px;
       }
-      .print-capa-regime {
-        text-align: center;
-        font-size: 13px;
-        margin-bottom: 14px;
+      .print-capa-brand img {
+        height: 42px;
+        width: auto;
       }
-      .print-capa-box {
-        border: 1px solid #000;
-        margin-bottom: 10px;
+      .print-capa-brand h1 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 800;
       }
-      .print-capa-row {
+      .print-capa-brand p {
+        margin: 2px 0 0;
+        font-size: 10px;
+      }
+      .print-capa-client {
         display: grid;
-        grid-template-columns: 140px 1fr;
-        border-bottom: 1px solid #000;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4px 8px;
+        border: 1px solid #000;
+        padding: 6px 8px;
+        margin-bottom: 8px;
       }
-      .print-capa-row:last-child {
+      .print-capa-client .fg label {
+        display: block;
+        font-size: 7px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        margin-bottom: 1px;
+      }
+      .print-capa-client .fg .v {
+        font-size: 9px;
+        font-weight: 600;
+        border: 1px solid #999;
+        padding: 2px 4px;
+        min-height: 14px;
+      }
+      .print-capa-client .span-2 { grid-column: span 2; }
+      .print-capa .category-header {
+        margin-top: 8px;
+        margin-bottom: 0;
+        border: 1px solid #000;
         border-bottom: none;
-      }
-      .print-capa-row .lbl {
-        padding: 7px 8px;
-        font-weight: 700;
-        border-right: 1px solid #000;
+        padding: 4px 6px;
+        font-size: 10px;
+        font-weight: 800;
         background: #f3f3f3;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
       }
-      .print-capa-row .val {
-        padding: 7px 8px;
-      }
-      .print-capa-grid3 {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-      }
-      .print-capa-grid3 > div {
-        border-right: 1px solid #000;
-        padding: 7px 8px;
-      }
-      .print-capa-grid3 > div:last-child {
-        border-right: none;
-      }
       .print-capa-table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 8px;
+        margin: 0 0 6px;
       }
       .print-capa-table th,
       .print-capa-table td {
-        border: 1px solid #000;
+        border: 1px solid #999;
+        border-top-color: #000;
         padding: 5px 6px;
         text-align: left;
         font-size: 10px;
+        vertical-align: top;
       }
       .print-capa-table th {
-        background: #f3f3f3;
+        background: #f8f8f8;
+        font-size: 9px;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .print-capa-table .col-num { width: 28px; text-align: center; }
+      .print-capa-table .col-flags { width: 120px; white-space: nowrap; }
+      .print-capa .flag-chip {
+        display: inline-block;
+        border: 1px solid #000;
+        padding: 1px 5px;
+        font-size: 8px;
+        font-weight: 700;
+        margin: 1px 0;
+      }
+      .print-capa .flag-chip.on {
+        background: #000;
+        color: #fff;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
       }
@@ -878,19 +908,24 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 18px;
-        margin-top: 28px;
+        margin-top: 16px;
+        border: 1px solid #000;
+        padding: 10px;
       }
       .print-sign-box {
         border-top: 1px solid #000;
         padding-top: 6px;
-        min-height: 54px;
+        margin-top: 18px;
+        min-height: 48px;
         font-size: 10px;
+        text-align: center;
       }
       .print-obs {
-        margin-top: 16px;
+        margin-top: 10px;
         border: 1px solid #000;
-        min-height: 70px;
-        padding: 8px;
+        min-height: 48px;
+        padding: 6px 8px;
+        font-size: 10px;
       }
     }
 
@@ -2110,6 +2145,14 @@
     updateClosingStatusUI();
   }
 
+  function readSemMovimentoFlag() {
+    const box = document.getElementById("semMovimento");
+    const checked = !!(box && box.checked);
+    const rec = getCurrentClientRecord();
+    if (rec) rec.semMovimento = checked;
+    return checked;
+  }
+
   function updateClosingStatusUI() {
     const rec = getCurrentClientRecord();
     const badge = document.getElementById("closingStatusBadge");
@@ -2120,13 +2163,19 @@
       badge.innerText = statusLabel(status);
     }
     if (prog) {
-      const semMov = !!(rec && rec.semMovimento);
-      let all = getRegimeItems().filter(i => ["importacao","analise","obrigacoes","fechamento"].includes(getItemType(i.id)));
-      if (semMov) all = all.filter(i => getItemType(i.id) === "fechamento" && /faturamento|receitas/i.test(i.title));
-      const flags = (rec && rec.flags) || {};
-      const counts = countFlagsForItems(all, flags);
-      const done = counts.okCount + counts.nhCount + counts.scCount;
-      prog.innerText = (semMov ? "SEM MOVIMENTO · " : "") + "Progresso: " + done + "/" + counts.total + " · PEND " + counts.pendCount;
+      if (!rec) {
+        prog.innerText = "";
+      } else {
+        const semMov = readSemMovimentoFlag();
+        let all = getRegimeItems().filter(i => ["importacao","analise","obrigacoes","fechamento"].includes(getItemType(i.id)));
+        if (semMov) {
+          all = all.filter(i => getItemType(i.id) === "fechamento" && /faturamento|receitas/i.test(i.title));
+        }
+        const flags = rec.flags || {};
+        const counts = countFlagsForItems(all, flags);
+        const done = counts.okCount + counts.nhCount + counts.scCount;
+        prog.innerText = (semMov ? "SEM MOVIMENTO · " : "") + "Progresso: " + done + "/" + counts.total + " · PEND " + counts.pendCount;
+      }
     }
     const codeEl = document.getElementById("closingCode");
     if (codeEl) codeEl.value = (rec && rec.code) || "";
@@ -2162,7 +2211,7 @@
   }
 
   function applySemMovimentoUI() {
-    const semMov = !!(document.getElementById("semMovimento") && document.getElementById("semMovimento").checked);
+    const semMov = readSemMovimentoFlag();
     ["importacao", "analise", "obrigacoes"].forEach(key => {
       const btn = document.getElementById("tab-" + key);
       if (btn) btn.style.display = semMov ? "none" : "";
@@ -2182,9 +2231,11 @@
 
   function onSemMovimentoChange() {
     const rec = ensureWorkingRecord();
-    if (rec) rec.semMovimento = document.getElementById("semMovimento").checked;
+    const checked = !!(document.getElementById("semMovimento") && document.getElementById("semMovimento").checked);
+    if (rec) rec.semMovimento = checked;
     persistWorkingDraft();
     applySemMovimentoUI();
+    updateClosingStatusUI();
   }
 
   function onIeStModeChange() {
@@ -2275,6 +2326,11 @@
     };
   }
 
+  function flagChipHtml(current, value, label) {
+    const on = current === value ? " on" : "";
+    return `<span class="flag-chip${on}">[ ${label} ]</span>`;
+  }
+
   function buildFechamentoCapaHtml() {
     const year = getSelectedYear();
     const month = getSelectedMonth();
@@ -2285,7 +2341,7 @@
     const ieSt = ieStLabel(document.getElementById("clientIeSt").value);
     const ieStUfs = document.getElementById("clientIeStUfs").value || "-";
     const code = document.getElementById("closingCode").value || "-";
-    const semMov = document.getElementById("semMovimento").checked;
+    const semMov = readSemMovimentoFlag();
     const rec = getCurrentClientRecord();
     const statusTxt = statusLabel((rec && rec.status) || "em_execucao");
     const regimeTitle = regimesData[currentRegime].title;
@@ -2294,10 +2350,6 @@
     if (semMov) {
       fechamentoItems = fechamentoItems.filter(item => /faturamento|receitas/i.test(item.title));
     }
-    const etapaRows = Object.keys(CHECKLIST_TYPES).map(key => {
-      const s = summarizeType(key);
-      return `<tr><td>${escapeHtml(s.title)}</td><td>${s.done}/${s.total}</td><td>${s.pend}</td><td>${s.pct}%</td></tr>`;
-    }).join("");
 
     const byCat = {};
     fechamentoItems.forEach(item => {
@@ -2306,62 +2358,51 @@
       byCat[cat].push(item);
     });
 
+    let num = 0;
     const sectionsHtml = Object.keys(byCat).map(cat => {
-      const rows = byCat[cat].map((item, idx) => {
-        const flag = (flags[item.id] || "").toUpperCase() || "-";
+      const rows = byCat[cat].map(item => {
+        num += 1;
+        const current = flags[item.id] || "";
         const obs = (getObsLog(item.id).current || "").trim();
-        const attachCount = (getAttachments(item.id) || []).length;
         return `<tr>
-          <td>${String(idx + 1).padStart(2, "0")}</td>
-          <td><strong>${escapeHtml(item.shortPrint || item.title)}</strong><br><span style="font-size:10px">${escapeHtml(item.title)}</span></td>
-          <td>${escapeHtml(flag)}</td>
-          <td>${escapeHtml(obs || "-")}${attachCount ? " · " + attachCount + " anexo(s)" : ""}</td>
+          <td class="col-num">${String(num).padStart(2, "0")}</td>
+          <td>${escapeHtml(item.shortPrint || item.title)}</td>
+          <td class="col-flags">
+            ${flagChipHtml(current, "ok", "OK")}
+            ${flagChipHtml(current, "nh", "NÃO HOUVE")}
+            ${flagChipHtml(current, "sc", "SALDO CREDOR")}
+            ${flagChipHtml(current, "pend", "PEND")}
+          </td>
+          <td>${escapeHtml(obs || "")}</td>
         </tr>`;
       }).join("");
-      return `<strong style="display:block;margin-top:12px;">${escapeHtml(cat)}</strong>
+      return `<div class="category-header">${escapeHtml(cat)}</div>
         <table class="print-capa-table">
-          <thead><tr><th>#</th><th>Documento / Relatório + Guia</th><th>Flag</th><th>Observação</th></tr></thead>
+          <thead><tr><th class="col-num">#</th><th>Item / relatório + guia</th><th class="col-flags">Flag</th><th>Observação</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>`;
     }).join("");
 
     return `
-      <div class="print-capa-title">Fechamento</div>
-      <div class="print-capa-regime">${escapeHtml(regimeTitle)} · Código ${escapeHtml(code)} · ${escapeHtml(statusTxt)}${semMov ? " · SEM MOVIMENTO" : ""}</div>
-      <div class="print-capa-box">
-        <div class="print-capa-row"><div class="lbl">Razão Social:</div><div class="val">${escapeHtml(name)}</div></div>
-        <div class="print-capa-row"><div class="lbl">CNPJ:</div><div class="val">${escapeHtml(cnpj)}</div></div>
-        <div class="print-capa-row">
-          <div class="lbl">Mês/Ano apuração:</div>
-          <div class="val">
-            <div class="print-capa-grid3">
-              <div>${escapeHtml(MONTH_NAMES[month] || month)}/${escapeHtml(year)}</div>
-              <div>IE-ST: ${escapeHtml(ieSt)}</div>
-              <div>UFs IE-ST: ${escapeHtml(ieStUfs)}</div>
-            </div>
-          </div>
+      <div class="print-capa-brand">
+        <img src="assets/nascel-logo.jpg" alt="Nascel">
+        <div>
+          <h1>Fechamento - (${escapeHtml(regimeTitle)})</h1>
+          <p>Código ${escapeHtml(code)} · ${escapeHtml(statusTxt)}${semMov ? " · SEM MOVIMENTO" : ""} · ${escapeHtml(MONTH_NAMES[month] || month)}/${escapeHtml(year)}</p>
         </div>
       </div>
-
-      <strong>Resumo das etapas</strong>
-      <table class="print-capa-table">
-        <thead><tr><th>Etapa</th><th>Concluídos</th><th>PEND</th><th>%</th></tr></thead>
-        <tbody>${etapaRows}</tbody>
-      </table>
-
-      ${sectionsHtml || `<p style="margin-top:12px;">Sem itens de fechamento nesta visão.</p>`}
-
+      <div class="print-capa-client">
+        <div class="fg span-2"><label>Cliente</label><div class="v">${escapeHtml(name)}</div></div>
+        <div class="fg"><label>CNPJ / UF</label><div class="v">${escapeHtml(cnpj)}</div></div>
+        <div class="fg"><label>Código</label><div class="v">${escapeHtml(code)}</div></div>
+        <div class="fg span-2"><label>IE-ST</label><div class="v">${escapeHtml(ieSt)}${ieStUfs && ieStUfs !== "-" ? " · " + escapeHtml(ieStUfs) : ""}</div></div>
+        <div class="fg"><label>Responsável</label><div class="v">${escapeHtml(operator)}</div></div>
+        <div class="fg"><label>Revisor</label><div class="v">${escapeHtml(reviewer)}</div></div>
+      </div>
+      ${sectionsHtml || `<p>Sem itens de fechamento nesta visão.</p>`}
       <div class="print-sign-grid">
-        <div class="print-sign-box">
-          Produzido por: ${escapeHtml(operator)}<br>
-          Data: ____/____/________<br><br>
-          Assinatura:
-        </div>
-        <div class="print-sign-box">
-          Revisado por: ${escapeHtml(reviewer)}<br>
-          Data: ____/____/________<br><br>
-          Assinatura:
-        </div>
+        <div class="print-sign-box">Assinatura / Visto - Operador Fiscal<br>${escapeHtml(operator)}<br>____/____/________</div>
+        <div class="print-sign-box">Aprovação - Revisão Técnica<br>${escapeHtml(reviewer)}<br>____/____/________</div>
       </div>
       <div class="print-obs"><strong>Observação geral:</strong></div>
     `;
