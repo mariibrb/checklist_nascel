@@ -1972,20 +1972,56 @@
     return items;
   }
 
+  function isWorkScreenActive() {
+    const work = document.getElementById("workScreen");
+    return !!(work && work.classList.contains("active"));
+  }
+
   function showHome() {
     document.getElementById("homeScreen").classList.add("active");
     document.getElementById("workScreen").classList.remove("active");
+    if (!appDb.ui) appDb.ui = {};
+    appDb.ui.screen = "home";
+    saveDatabase();
     renderHomeTable();
   }
 
   function showWork() {
     document.getElementById("homeScreen").classList.remove("active");
     document.getElementById("workScreen").classList.add("active");
+    if (!appDb.ui) appDb.ui = {};
+    appDb.ui.screen = "work";
+    appDb.ui.year = getSelectedYear();
+    appDb.ui.month = getSelectedMonth();
+    appDb.ui.clientKey = clientKeyFromName(document.getElementById("clientName").value) || appDb.ui.clientKey || "";
+    saveDatabase();
   }
 
   function backToHome() {
+    if (!confirmLeaveWork("Deseja salvar e voltar à lista de fechamentos?\n\nOK = salvar e voltar\nCancelar = continuar neste fechamento")) return;
     persistWorkingDraft();
     showHome();
+  }
+
+  function restoreLastSession() {
+    const ui = appDb.ui || {};
+    if (ui.screen !== "work") return false;
+    const year = ui.year;
+    const month = ui.month;
+    const key = ui.clientKey;
+    if (!year || !month || !key) return false;
+    const rec = appDb.db[year] && appDb.db[year][month] && appDb.db[year][month][key];
+    if (!rec) return false;
+    openClosing(year, month, key);
+    return true;
+  }
+
+  function confirmLeaveWork(message) {
+    if (!isWorkScreenActive()) return true;
+    const name = clientKeyFromName(document.getElementById("clientName").value);
+    if (!name) return true;
+    persistWorkingDraft();
+    return window.confirm(message || "Deseja salvar o fechamento antes de sair?\n\nOK = salvar e continuar\nCancelar = permanecer nesta tela");
   }
 
   function renderHomeTable() {
@@ -2062,6 +2098,12 @@
     const rec = appDb.db[year] && appDb.db[year][month] && appDb.db[year][month][clientKey];
     skipAutoSave = false;
     if (!rec) return;
+    if (!appDb.ui) appDb.ui = {};
+    appDb.ui.year = year;
+    appDb.ui.month = month;
+    appDb.ui.clientKey = clientKey;
+    appDb.ui.code = rec.code || "";
+    appDb.ui.screen = "work";
     showWork();
     refreshClientSelect(clientKey);
     applyRecordToForm(rec);
@@ -2159,12 +2201,23 @@
 
   function initApp() {
     if (!appDb.nextCode) appDb.nextCode = 1;
+    if (!appDb.ui) appDb.ui = defaultDatabase().ui;
     fillYearOptions();
     const n = nowParts();
     document.getElementById("filterYear").value = appDb.ui.year || n.year;
     document.getElementById("filterMonth").value = appDb.ui.month || n.month;
-    showHome();
+    if (!restoreLastSession()) showHome();
   }
+
+  window.addEventListener("beforeunload", function (event) {
+    if (!isWorkScreenActive()) return;
+    const name = clientKeyFromName(document.getElementById("clientName").value);
+    if (!name) return;
+    try { persistWorkingDraft(); } catch (e) {}
+    event.preventDefault();
+    event.returnValue = "Há um fechamento aberto. Salve antes de atualizar ou sair da página.";
+    return event.returnValue;
+  });
 
   function switchRegime(regimeKey) {
     currentRegime = regimeKey;
