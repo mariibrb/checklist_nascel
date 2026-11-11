@@ -1122,7 +1122,7 @@
       <table class="home-table">
         <thead>
           <tr>
-            <th>Código</th><th>Cliente</th><th>CNPJ</th><th>Apuração</th><th>Regime</th><th>Status</th><th>Executor</th><th>Revisor</th>
+            <th>Código</th><th>Origem</th><th>Cliente</th><th>CNPJ</th><th>Apuração</th><th>Regime</th><th>Status</th><th>Executor</th><th>Revisor</th><th></th>
           </tr>
         </thead>
         <tbody id="homeTableBody"></tbody>
@@ -1197,6 +1197,10 @@
       <label>Código do Fechamento</label>
       <input type="text" id="closingCode" readonly placeholder="000001">
     </div>
+    <div class="field-group span-2" id="retificacaoInfoWrap" style="display:none;">
+      <label>Retificação de</label>
+      <input type="text" id="closingRetificaDe" readonly placeholder="-">
+    </div>
   </section>
 
   <div class="total-status-bar">
@@ -1210,6 +1214,7 @@
       <button type="button" class="btn-print-mini" onclick="setClosingStatus('devolvido')">Devolver ao executor</button>
       <button type="button" class="btn-print-mini" onclick="setClosingStatus('aprovado')">Aprovar revisão</button>
       <button type="button" class="btn-print-mini" onclick="setClosingStatus('em_execucao')">Voltar p/ execução</button>
+      <button type="button" class="btn-print-mini" id="btnCriarRetificacao" style="display:none;" onclick="criarRetificacaoAtual()">Criar retificação (RT)</button>
     </div>
   </div>
 
@@ -1600,6 +1605,7 @@
   let currentRegime = "simples";
   let currentChecklistType = "importacao";
   let skipAutoSave = false;
+  let currentStorageKey = "";
   let appDb = loadDatabase();
 
   function sanitizePersonName(value) {
@@ -1621,6 +1627,8 @@
       code: "",
       status: "em_execucao",
       semMovimento: false,
+      isRetificacao: false,
+      retificaDe: "",
       header: { name: "", cnpj: "", operator: "", reviewer: "", ieSt: "nao_aplica", ieStUfs: "" },
       regime: "simples",
       checklistType: "importacao",
@@ -1637,7 +1645,8 @@
     return {
       version: 4,
       nextCode: 1,
-      ui: { year: n.year, month: n.month, clientKey: "", code: "" },
+      nextRectCode: 1,
+      ui: { year: n.year, month: n.month, clientKey: "", code: "", screen: "home" },
       db: {}
     };
   }
@@ -1651,6 +1660,18 @@
     const code = padClosingCode(appDb.nextCode);
     appDb.nextCode += 1;
     return code;
+  }
+
+  function allocateRectificationCode() {
+    if (!appDb.nextRectCode || appDb.nextRectCode < 1) appDb.nextRectCode = 1;
+    const code = "RT" + padClosingCode(appDb.nextRectCode);
+    appDb.nextRectCode += 1;
+    return code;
+  }
+
+  function getActiveStorageKey() {
+    if (currentStorageKey) return currentStorageKey;
+    return clientKeyFromName(document.getElementById("clientName").value);
   }
 
   function statusLabel(status) {
@@ -1675,6 +1696,8 @@
           rows.push({
             year, month, clientKey, rec,
             code: rec.code,
+            retificaDe: rec.retificaDe || "",
+            isRetificacao: !!rec.isRetificacao || /^RT\d{6}$/i.test(String(rec.code || "")),
             name: (rec.header && rec.header.name) || clientKey,
             cnpj: (rec.header && rec.header.cnpj) || "",
             status: rec.status || "em_execucao",
@@ -1780,31 +1803,37 @@
   function getCurrentClientRecord() {
     const year = getSelectedYear();
     const month = getSelectedMonth();
-    const key = clientKeyFromName(document.getElementById("clientName").value);
+    const key = getActiveStorageKey();
     if (!key) return null;
     const bucket = (appDb.db[year] && appDb.db[year][month]) || {};
     return bucket[key] || null;
   }
 
   function ensureWorkingRecord() {
-    const key = clientKeyFromName(document.getElementById("clientName").value);
-    if (!key) return null;
+    let key = getActiveStorageKey();
+    const displayName = clientKeyFromName(document.getElementById("clientName").value);
+    if (!key) {
+      if (!displayName) return null;
+      key = displayName;
+      currentStorageKey = key;
+    }
     const year = getSelectedYear();
     const month = getSelectedMonth();
     const bucket = ensureDbPath(year, month);
     if (!bucket[key]) {
       bucket[key] = emptyClientRecord();
-      bucket[key].header.name = key;
+      bucket[key].header.name = displayName || key;
       bucket[key].code = allocateClosingCode();
     } else if (!bucket[key].code) {
-      bucket[key].code = allocateClosingCode();
+      bucket[key].code = bucket[key].isRetificacao ? allocateRectificationCode() : allocateClosingCode();
     }
     return bucket[key];
   }
 
   function readFormIntoRecord(rec) {
+    const displayName = clientKeyFromName(document.getElementById("clientName").value);
     rec.header = {
-      name: clientKeyFromName(document.getElementById("clientName").value),
+      name: displayName || (rec.header && rec.header.name) || getActiveStorageKey(),
       cnpj: document.getElementById("clientCnpj").value,
       operator: sanitizePersonName(document.getElementById("clientOperator").value),
       reviewer: sanitizePersonName(document.getElementById("clientReviewer").value),
@@ -1813,26 +1842,33 @@
     };
     rec.semMovimento = !!(document.getElementById("semMovimento") && document.getElementById("semMovimento").checked);
     if (!rec.status) rec.status = "em_execucao";
-    if (!rec.code) rec.code = allocateClosingCode();
+    if (!rec.code) {
+      rec.code = rec.isRetificacao ? allocateRectificationCode() : allocateClosingCode();
+    }
     rec.regime = currentRegime;
     rec.checklistType = currentChecklistType;
     rec.updatedAt = new Date().toISOString();
     const codeEl = document.getElementById("closingCode");
     if (codeEl) codeEl.value = rec.code;
+    const retEl = document.getElementById("closingRetificaDe");
+    if (retEl) retEl.value = rec.retificaDe || "";
   }
 
   function persistWorkingDraft() {
     if (skipAutoSave) return;
-    const key = clientKeyFromName(document.getElementById("clientName").value);
+    const key = getActiveStorageKey() || clientKeyFromName(document.getElementById("clientName").value);
     if (!key) return;
+    if (!currentStorageKey) currentStorageKey = key;
     const rec = ensureWorkingRecord();
     if (!rec) return;
     readFormIntoRecord(rec);
     appDb.ui.year = getSelectedYear();
     appDb.ui.month = getSelectedMonth();
-    appDb.ui.clientKey = key;
+    appDb.ui.clientKey = currentStorageKey;
+    appDb.ui.code = rec.code || "";
+    appDb.ui.screen = "work";
     saveDatabase();
-    refreshClientSelect(key);
+    refreshClientSelect();
   }
 
   function fillYearOptions() {
@@ -1858,6 +1894,8 @@
     document.getElementById("clientIeSt").value = (rec.header && rec.header.ieSt) || "nao_aplica";
     document.getElementById("clientIeStUfs").value = (rec.header && rec.header.ieStUfs) || "";
     document.getElementById("closingCode").value = rec.code || "";
+    document.getElementById("closingRetificaDe").value = rec.retificaDe || "";
+    document.getElementById("retificacaoInfoWrap").style.display = (rec.isRetificacao || rec.retificaDe) ? "" : "none";
     document.getElementById("semMovimento").checked = !!rec.semMovimento;
     currentRegime = rec.regime || "simples";
     currentChecklistType = rec.checklistType || "importacao";
@@ -1870,6 +1908,7 @@
 
   function clearFormForNewClient() {
     skipAutoSave = true;
+    currentStorageKey = "";
     document.getElementById("clientName").value = "";
     document.getElementById("clientCnpj").value = "";
     document.getElementById("clientOperator").value = "";
@@ -1877,6 +1916,8 @@
     document.getElementById("clientIeSt").value = "nao_aplica";
     document.getElementById("clientIeStUfs").value = "";
     document.getElementById("closingCode").value = "";
+    document.getElementById("closingRetificaDe").value = "";
+    document.getElementById("retificacaoInfoWrap").style.display = "none";
     document.getElementById("semMovimento").checked = false;
     currentRegime = "simples";
     currentChecklistType = "importacao";
@@ -1891,7 +1932,7 @@
     appDb.ui.year = getSelectedYear();
     appDb.ui.month = getSelectedMonth();
     saveDatabase();
-    refreshClientSelect("");
+    refreshClientSelect();
     clearFormForNewClient();
   }
 
@@ -1900,19 +1941,22 @@
   }
 
   function saveCurrentClient() {
-    const key = clientKeyFromName(document.getElementById("clientName").value);
+    const key = getActiveStorageKey() || clientKeyFromName(document.getElementById("clientName").value);
     if (!key) {
       alert("Informe o nome do cliente antes de salvar.");
       return;
     }
+    if (!currentStorageKey) currentStorageKey = key;
     const rec = ensureWorkingRecord();
     readFormIntoRecord(rec);
-    appDb.ui.clientKey = key;
+    appDb.ui.clientKey = currentStorageKey;
     appDb.ui.code = rec.code;
+    appDb.ui.screen = "work";
     saveDatabase();
-    refreshClientSelect(key);
+    refreshClientSelect();
     updateClosingStatusUI();
-    alert("Fechamento " + rec.code + " salvo em " + getSelectedYear() + " > " + MONTH_NAMES[getSelectedMonth()] + " > " + key);
+    const origem = rec.retificaDe ? " (retifica " + rec.retificaDe + ")" : "";
+    alert("Fechamento " + rec.code + origem + " salvo.");
   }
 
   function exportBackupJson() {
@@ -2082,13 +2126,14 @@
     });
 
     if (!rows.length) {
-      body.innerHTML = `<tr><td colspan="8">Nenhum fechamento encontrado. Clique em “+ Novo Fechamento”.</td></tr>`;
+      body.innerHTML = `<tr><td colspan="10">Nenhum fechamento encontrado. Clique em “+ Novo Fechamento”.</td></tr>`;
       return;
     }
 
     body.innerHTML = rows.map(r => `
       <tr onclick="openClosing('${r.year}','${r.month}','${escapeAttr(r.clientKey)}')">
-        <td><strong>${escapeHtml(r.code)}</strong></td>
+        <td><strong>${escapeHtml(r.code)}</strong>${r.isRetificacao ? '<div style="font-size:0.72rem;color:#9f1239;">Retificação</div>' : ""}</td>
+        <td>${escapeHtml(r.retificaDe || "-")}</td>
         <td>${escapeHtml(r.name)}</td>
         <td>${escapeHtml(r.cnpj || "-")}</td>
         <td>${escapeHtml(r.comp)}</td>
@@ -2096,14 +2141,69 @@
         <td><span class="status-badge st-${escapeAttr(r.status)}">${escapeHtml(statusLabel(r.status))}</span></td>
         <td>${escapeHtml(r.operator || "-")}</td>
         <td>${escapeHtml(r.reviewer || "-")}</td>
+        <td>${r.status === "aprovado" ? `<button type="button" class="btn-print-mini" style="padding:4px 8px;font-size:0.75rem;" onclick="event.stopPropagation();criarRetificacao('${r.year}','${r.month}','${escapeAttr(r.clientKey)}')">Retificar</button>` : ""}</td>
       </tr>
     `).join("");
+  }
+
+  function deepClone(obj) {
+    return JSON.parse(JSON.stringify(obj || {}));
+  }
+
+  function criarRetificacao(year, month, sourceKey) {
+    const source = appDb.db[year] && appDb.db[year][month] && appDb.db[year][month][sourceKey];
+    if (!source) {
+      alert("Fechamento de origem não encontrado.");
+      return;
+    }
+    if ((source.status || "") !== "aprovado") {
+      alert("Só é possível criar retificação de um fechamento com status Aprovado.");
+      return;
+    }
+    if (!confirm("Criar uma cópia de retificação deste fechamento?\n\nO novo código será no formato RT000001 e fará referência ao " + (source.code || "original") + ".")) {
+      return;
+    }
+    const rtCode = allocateRectificationCode();
+    const copy = deepClone(source);
+    copy.code = rtCode;
+    copy.isRetificacao = true;
+    copy.retificaDe = source.code || "";
+    copy.status = "em_execucao";
+    copy.createdAt = new Date().toISOString();
+    copy.updatedAt = copy.createdAt;
+    copy.checklistType = "importacao";
+    if (!copy.header) copy.header = {};
+    const baseName = copy.header.name || sourceKey;
+    copy.header.name = baseName;
+    const newKey = baseName + " · " + rtCode;
+    const bucket = ensureDbPath(year, month);
+    if (bucket[newKey]) {
+      alert("Já existe uma retificação com esta chave. Abra pela lista.");
+      openClosing(year, month, newKey);
+      return;
+    }
+    bucket[newKey] = copy;
+    saveDatabase();
+    openClosing(year, month, newKey);
+    alert("Retificação " + rtCode + " criada a partir do fechamento " + (source.code || "") + ".");
+  }
+
+  function criarRetificacaoAtual() {
+    const year = getSelectedYear();
+    const month = getSelectedMonth();
+    const key = getActiveStorageKey();
+    if (!key) {
+      alert("Abra um fechamento aprovado para retificar.");
+      return;
+    }
+    criarRetificacao(year, month, key);
   }
 
   function createNewClosing() {
     const n = nowParts();
     fillYearOptions();
     skipAutoSave = true;
+    currentStorageKey = "";
     document.getElementById("filterYear").value = n.year;
     document.getElementById("filterMonth").value = n.month;
     document.getElementById("clientName").value = "";
@@ -2113,13 +2213,15 @@
     document.getElementById("clientIeSt").value = "nao_aplica";
     document.getElementById("clientIeStUfs").value = "";
     document.getElementById("closingCode").value = "";
+    document.getElementById("closingRetificaDe").value = "";
+    document.getElementById("retificacaoInfoWrap").style.display = "none";
     document.getElementById("semMovimento").checked = false;
     currentRegime = "simples";
     currentChecklistType = "importacao";
-    appDb.ui = { year: n.year, month: n.month, clientKey: "", code: "" };
+    appDb.ui = { year: n.year, month: n.month, clientKey: "", code: "", screen: "work" };
     skipAutoSave = false;
     showWork();
-    refreshClientSelect("");
+    refreshClientSelect();
     switchRegime("simples");
     onIeStModeChange();
     applySemMovimentoUI();
@@ -2128,6 +2230,7 @@
 
   function openClosing(year, month, clientKey) {
     skipAutoSave = true;
+    currentStorageKey = clientKey;
     document.getElementById("filterYear").value = year;
     document.getElementById("filterMonth").value = month;
     const rec = appDb.db[year] && appDb.db[year][month] && appDb.db[year][month][clientKey];
@@ -2140,7 +2243,7 @@
     appDb.ui.code = rec.code || "";
     appDb.ui.screen = "work";
     showWork();
-    refreshClientSelect(clientKey);
+    refreshClientSelect();
     applyRecordToForm(rec);
     updateClosingStatusUI();
   }
@@ -2179,6 +2282,18 @@
     }
     const codeEl = document.getElementById("closingCode");
     if (codeEl) codeEl.value = (rec && rec.code) || "";
+    const retWrap = document.getElementById("retificacaoInfoWrap");
+    const retEl = document.getElementById("closingRetificaDe");
+    if (retWrap && retEl) {
+      const showRet = !!(rec && (rec.isRetificacao || rec.retificaDe));
+      retWrap.style.display = showRet ? "" : "none";
+      retEl.value = (rec && rec.retificaDe) || "";
+    }
+    const btnRt = document.getElementById("btnCriarRetificacao");
+    if (btnRt) btnRt.style.display = (rec && rec.status === "aprovado") ? "" : "none";
+    if (prog && rec && (rec.isRetificacao || rec.retificaDe)) {
+      prog.innerText = (prog.innerText ? prog.innerText + " · " : "") + "Retifica " + (rec.retificaDe || "");
+    }
   }
 
   function setClosingStatus(nextStatus) {
@@ -2252,6 +2367,7 @@
 
   function initApp() {
     if (!appDb.nextCode) appDb.nextCode = 1;
+    if (!appDb.nextRectCode) appDb.nextRectCode = 1;
     if (!appDb.ui) appDb.ui = defaultDatabase().ui;
     fillYearOptions();
     const n = nowParts();
@@ -2388,7 +2504,7 @@
         <img src="assets/nascel-logo.jpg" alt="Nascel">
         <div>
           <h1>Fechamento - (${escapeHtml(regimeTitle)})</h1>
-          <p>Código ${escapeHtml(code)} · ${escapeHtml(statusTxt)}${semMov ? " · SEM MOVIMENTO" : ""} · ${escapeHtml(MONTH_NAMES[month] || month)}/${escapeHtml(year)}</p>
+          <p>Código ${escapeHtml(code)}${(rec && rec.retificaDe) ? " · Retifica " + escapeHtml(rec.retificaDe) : ""} · ${escapeHtml(statusTxt)}${semMov ? " · SEM MOVIMENTO" : ""} · ${escapeHtml(MONTH_NAMES[month] || month)}/${escapeHtml(year)}</p>
         </div>
       </div>
       <div class="print-capa-client">
