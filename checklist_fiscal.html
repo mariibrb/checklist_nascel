@@ -1454,8 +1454,7 @@
     return `
       <div class="attach-box attach-drop" data-item-id="${itemId}" tabindex="0"
            onclick="setAttachTarget('${itemId}', this)"
-           onfocus="setAttachTarget('${itemId}', this)"
-           onpaste="handleItemPaste(event, '${itemId}')">
+           onfocus="setAttachTarget('${itemId}', this)">
         <div class="attach-row">
           <button type="button" class="attach-btn" onclick="event.stopPropagation(); setAttachTarget('${itemId}'); document.getElementById('file-${itemId}').click()">Anexar</button>
           <span class="attach-paste-hint">ou Ctrl+V (print de tela)</span>
@@ -1673,14 +1672,6 @@
     inputEl.value = "";
   }
 
-  function handleItemPaste(event, itemId) {
-    const imageFile = extractClipboardImage(event.clipboardData);
-    if (!imageFile) return;
-    event.preventDefault();
-    setAttachTarget(itemId);
-    pushAttachmentFile(itemId, imageFile);
-  }
-
   function extractClipboardImage(clipboardData) {
     if (!clipboardData) return null;
     const items = clipboardData.items ? Array.from(clipboardData.items) : [];
@@ -1713,6 +1704,7 @@
   }
 
   document.addEventListener("paste", function (event) {
+    if (event.defaultPrevented) return;
     const imageFile = extractClipboardImage(event.clipboardData);
     if (!imageFile) return;
 
@@ -1728,9 +1720,10 @@
     if (!itemId) return;
 
     event.preventDefault();
+    event.stopPropagation();
     setAttachTarget(itemId);
     pushAttachmentFile(itemId, imageFile);
-  });
+  }, true);
 
   function countFlagsForItems(items, flags) {
     let okCount = 0, naCount = 0, pendCount = 0;
