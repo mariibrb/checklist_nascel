@@ -497,10 +497,24 @@
     }
 
     .col-obs {
-      width: 250px;
+      width: 290px;
+      min-width: 240px;
+    }
+
+    .obs-box {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .obs-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
     }
 
     .obs-input {
+      flex: 1;
       width: 100%;
       padding: 6px 9px;
       border: 1px solid var(--border);
@@ -511,7 +525,134 @@
 
     .obs-input:focus {
       outline: none;
-      border-color: var(--primary-light);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(252, 164, 34, 0.15);
+    }
+
+    .obs-log-btn {
+      border: 1px solid var(--primary);
+      background: var(--primary-soft);
+      color: var(--ink);
+      border-radius: 6px;
+      padding: 6px 8px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .obs-log-btn:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .obs-current {
+      font-size: 0.78rem;
+      color: var(--text);
+      background: #fff8ed;
+      border: 1px solid #f5d19a;
+      border-radius: 6px;
+      padding: 6px 8px;
+      line-height: 1.35;
+    }
+
+    .obs-current strong {
+      color: var(--ink);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .obs-history {
+      margin: 0;
+      padding-left: 14px;
+      max-height: 72px;
+      overflow-y: auto;
+    }
+
+    .obs-history li {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+
+    .obs-history .obs-meta {
+      font-weight: 600;
+      color: #8a7f7e;
+    }
+
+    .obs-empty {
+      font-size: 0.72rem;
+      color: #94a3b8;
+    }
+
+    .closings-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-top: 20px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    }
+
+    .closings-box h3 {
+      font-size: 0.85rem;
+      color: var(--ink);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
+    }
+
+    .closings-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .closing-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fafafa;
+    }
+
+    .closing-item strong {
+      color: var(--text);
+      font-size: 0.88rem;
+    }
+
+    .closing-item span {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .closing-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .closing-actions button {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .closing-actions button:hover {
+      border-color: var(--primary);
+      background: var(--primary-soft);
     }
 
     .Signoff-card {
@@ -608,7 +749,8 @@
       </div>
     </div>
     <div class="header-actions">
-      <button class="btn btn-white" onclick="window.print()">Imprimir Checklist (A4)</button>
+      <button class="btn btn-white" onclick="saveClosingSnapshot()">Salvar Fechamento</button>
+      <button class="btn btn-outline" onclick="window.print()">Imprimir Checklist (A4)</button>
       <button class="btn btn-outline" onclick="markAllOk()">Marcar Tudo OK</button>
       <button class="btn btn-outline" onclick="resetCurrentRegime()">Limpar Aba Atual</button>
     </div>
@@ -707,6 +849,13 @@
   </section>
 
   <main class="checklist-card" id="checklistContainer"></main>
+
+  <section class="closings-box">
+    <h3>Histórico de Fechamentos Salvos (neste navegador)</h3>
+    <div class="closings-list" id="closingsList">
+      <div class="obs-empty">Nenhum fechamento salvo ainda. Use “Salvar Fechamento” no topo.</div>
+    </div>
+  </section>
 
   <footer class="Signoff-card">
     <div>
@@ -814,18 +963,91 @@
     }
   };
 
+  const STORAGE_KEY = "mari_fiscal_checklists_v2";
+  const LEGACY_KEY = "mari_fiscal_checklists_v1";
+
   let currentRegime = "simples";
-  let savedState = JSON.parse(localStorage.getItem("mari_fiscal_checklists_v1")) || {
-    header: { name: "", cnpj: "", comp: "2026-11", operator: "", reviewer: "Mariana / Clayton" },
-    paths: {
-      simples: { xml: "", close: "" },
-      presumido: { xml: "", close: "" },
-      real: { xml: "", close: "" },
-      mei: { xml: "", close: "" }
-    },
-    flags: {},
-    obs: {}
-  };
+  let savedState = loadState();
+
+  function defaultState() {
+    return {
+      header: { name: "", cnpj: "", comp: "2026-11", operator: "", reviewer: "Mariana / Clayton" },
+      paths: {
+        simples: { xml: "", close: "" },
+        presumido: { xml: "", close: "" },
+        real: { xml: "", close: "" },
+        mei: { xml: "", close: "" }
+      },
+      flags: {},
+      obsLogs: {},
+      closings: []
+    };
+  }
+
+  function loadState() {
+    try {
+      const rawV2 = localStorage.getItem(STORAGE_KEY);
+      if (rawV2) {
+        const parsed = JSON.parse(rawV2);
+        return normalizeState(parsed);
+      }
+      const rawV1 = localStorage.getItem(LEGACY_KEY);
+      if (rawV1) {
+        return migrateLegacyState(JSON.parse(rawV1));
+      }
+    } catch (e) {}
+    return defaultState();
+  }
+
+  function migrateLegacyState(legacy) {
+    const next = defaultState();
+    next.header = legacy.header || next.header;
+    next.paths = legacy.paths || next.paths;
+    next.flags = legacy.flags || {};
+    next.obsLogs = {};
+    Object.keys(legacy.obs || {}).forEach(itemId => {
+      const text = String(legacy.obs[itemId] || "").trim();
+      if (!text) return;
+      next.obsLogs[itemId] = {
+        current: text,
+        history: [{
+          text,
+          at: new Date().toISOString(),
+          by: (legacy.header && legacy.header.operator) || "Operador",
+          flag: (legacy.flags && legacy.flags[itemId]) || ""
+        }]
+      };
+    });
+    next.closings = [];
+    return next;
+  }
+
+  function normalizeState(state) {
+    const base = defaultState();
+    const merged = Object.assign(base, state || {});
+    merged.header = Object.assign(base.header, (state && state.header) || {});
+    merged.paths = Object.assign(base.paths, (state && state.paths) || {});
+    merged.flags = (state && state.flags) || {};
+    merged.obsLogs = (state && state.obsLogs) || {};
+    merged.closings = Array.isArray(state && state.closings) ? state.closings : [];
+
+    if (state && state.obs && !state.obsLogs) {
+      Object.keys(state.obs).forEach(itemId => {
+        const text = String(state.obs[itemId] || "").trim();
+        if (!text) return;
+        merged.obsLogs[itemId] = {
+          current: text,
+          history: [{
+            text,
+            at: new Date().toISOString(),
+            by: merged.header.operator || "Operador",
+            flag: merged.flags[itemId] || ""
+          }]
+        };
+      });
+    }
+    return merged;
+  }
 
   function escapeAttr(text) {
     return String(text || "")
@@ -835,6 +1057,34 @@
       .replace(/>/g, "&gt;");
   }
 
+  function escapeHtml(text) {
+    return String(text || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function formatDateTime(iso) {
+    try {
+      return new Date(iso).toLocaleString("pt-BR");
+    } catch (e) {
+      return iso || "";
+    }
+  }
+
+  function getObsLog(itemId) {
+    if (!savedState.obsLogs[itemId]) {
+      savedState.obsLogs[itemId] = { current: "", history: [] };
+    }
+    if (!Array.isArray(savedState.obsLogs[itemId].history)) {
+      savedState.obsLogs[itemId].history = [];
+    }
+    if (typeof savedState.obsLogs[itemId].current !== "string") {
+      savedState.obsLogs[itemId].current = "";
+    }
+    return savedState.obsLogs[itemId];
+  }
+
   function initApp() {
     document.getElementById("clientName").value = savedState.header.name || "";
     document.getElementById("clientCnpj").value = savedState.header.cnpj || "";
@@ -842,10 +1092,11 @@
     document.getElementById("clientOperator").value = savedState.header.operator || "";
     document.getElementById("clientReviewer").value = savedState.header.reviewer || "Mariana / Clayton";
     switchRegime("simples");
+    renderClosingsList();
   }
 
   function saveToStorage() {
-    localStorage.setItem("mari_fiscal_checklists_v1", JSON.stringify(savedState));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedState));
   }
 
   function saveHeaderData() {
@@ -884,6 +1135,35 @@
     updateCounters();
   }
 
+  function renderObsCell(itemId) {
+    const log = getObsLog(itemId);
+    const current = log.current || "";
+    const history = (log.history || []).slice().reverse();
+    const older = history.filter((entry, idx) => !(idx === 0 && entry.text === current));
+
+    let historyHtml = "";
+    if (older.length) {
+      historyHtml = `<ul class="obs-history">${older.map(entry => `
+        <li>
+          <span class="obs-meta">${escapeHtml(formatDateTime(entry.at))} · ${escapeHtml(entry.by || "Operador")}${entry.flag ? " · " + escapeHtml(String(entry.flag).toUpperCase()) : ""}</span><br>
+          ${escapeHtml(entry.text)}
+        </li>`).join("")}</ul>`;
+    } else {
+      historyHtml = `<div class="obs-empty">Sem histórico anterior</div>`;
+    }
+
+    return `
+      <div class="obs-box">
+        <div class="obs-row">
+          <input type="text" class="obs-input" placeholder="Anotar dúvida / motivo..." value="${escapeAttr(current)}" oninput="saveObsDraft('${itemId}', this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();registerObsLog('${itemId}');}">
+          <button type="button" class="obs-log-btn" onclick="registerObsLog('${itemId}')" title="Registrar no log e manter a atual visível">Log</button>
+        </div>
+        <div class="obs-current"><strong>Atual:</strong> ${current ? escapeHtml(current) : "<em style='color:#94a3b8'>sem observação</em>"}</div>
+        ${historyHtml}
+      </div>
+    `;
+  }
+
   function renderChecklistTable() {
     const container = document.getElementById("checklistContainer");
     const items = regimesData[currentRegime].items;
@@ -906,7 +1186,7 @@
                 <th class="col-check">✓</th>
                 <th>O que fazer / Onde clicar na Domínio e Sistemas</th>
                 <th class="col-flags">Flag Mensal</th>
-                <th class="col-obs">Observação / Pendência</th>
+                <th class="col-obs">Observação / Log</th>
               </tr>
             </thead>
             <tbody>
@@ -914,7 +1194,6 @@
       }
 
       const currentFlag = savedState.flags[item.id] || "";
-      const currentObs = savedState.obs[item.id] || "";
       const rowStatusClass = currentFlag ? `status-${currentFlag}` : "";
       const isChecked = (currentFlag === "ok" || currentFlag === "na") ? "checked" : "";
 
@@ -937,7 +1216,7 @@
             </div>
           </td>
           <td class="col-obs">
-            <input type="text" class="obs-input" placeholder="Anotar dúvida / motivo..." value="${escapeAttr(currentObs)}" oninput="saveObs('${item.id}', this.value)">
+            ${renderObsCell(item.id)}
           </td>
         </tr>
       `;
@@ -969,32 +1248,68 @@
     updateCounters();
   }
 
-  function saveObs(itemId, text) {
-    savedState.obs[itemId] = text;
+  function saveObsDraft(itemId, text) {
+    const log = getObsLog(itemId);
+    log.current = text;
     saveToStorage();
+    const row = document.getElementById("row-" + itemId);
+    if (row) {
+      const currentBox = row.querySelector(".obs-current");
+      if (currentBox) {
+        currentBox.innerHTML = "<strong>Atual:</strong> " + (text.trim()
+          ? escapeHtml(text)
+          : "<em style='color:#94a3b8'>sem observação</em>");
+      }
+    }
   }
 
-  function updateCounters() {
-    const items = regimesData[currentRegime].items;
+  function registerObsLog(itemId) {
+    const log = getObsLog(itemId);
+    const text = String(log.current || "").trim();
+    if (!text) {
+      alert("Digite uma observação antes de registrar no log.");
+      return;
+    }
+
+    const last = log.history[log.history.length - 1];
+    if (last && last.text === text) {
+      alert("Essa observação já está registrada no log.");
+      return;
+    }
+
+    log.history.push({
+      text,
+      at: new Date().toISOString(),
+      by: savedState.header.operator || "Operador",
+      flag: savedState.flags[itemId] || ""
+    });
+    saveToStorage();
+    renderChecklistTable();
+  }
+
+  function countFlagsForItems(items, flags) {
     let okCount = 0;
     let naCount = 0;
     let pendCount = 0;
-
     items.forEach(item => {
-      const f = savedState.flags[item.id];
+      const f = flags[item.id];
       if (f === "ok") okCount++;
       if (f === "na") naCount++;
       if (f === "pend") pendCount++;
     });
+    return { okCount, naCount, pendCount, total: items.length };
+  }
 
-    const total = items.length;
-    const done = okCount + naCount;
-    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  function updateCounters() {
+    const items = regimesData[currentRegime].items;
+    const counts = countFlagsForItems(items, savedState.flags);
+    const done = counts.okCount + counts.naCount;
+    const pct = counts.total > 0 ? Math.round((done / counts.total) * 100) : 0;
 
-    document.getElementById("countOk").innerText = okCount;
-    document.getElementById("countNa").innerText = naCount;
-    document.getElementById("countPend").innerText = pendCount;
-    document.getElementById("regimeProgressPct").innerText = `${pct}% concluído (${done}/${total})`;
+    document.getElementById("countOk").innerText = counts.okCount;
+    document.getElementById("countNa").innerText = counts.naCount;
+    document.getElementById("countPend").innerText = counts.pendCount;
+    document.getElementById("regimeProgressPct").innerText = `${pct}% concluído (${done}/${counts.total})`;
     document.getElementById("progressBarFill").style.width = `${pct}%`;
   }
 
@@ -1011,15 +1326,125 @@
   }
 
   function resetCurrentRegime() {
-    if (!confirm("Deseja limpar todas as marcações e observações desta aba para começar outra empresa?")) return;
+    if (!confirm("Deseja limpar as marcações e a observação atual desta aba? O histórico de logs e os fechamentos salvos serão mantidos.")) return;
     const items = regimesData[currentRegime].items;
     items.forEach(item => {
       delete savedState.flags[item.id];
-      delete savedState.obs[item.id];
+      if (savedState.obsLogs[item.id]) {
+        savedState.obsLogs[item.id].current = "";
+      }
     });
     saveToStorage();
     renderChecklistTable();
     updateCounters();
+  }
+
+  function saveClosingSnapshot() {
+    saveHeaderData();
+    savePathsData();
+
+    const company = (savedState.header.name || "").trim();
+    if (!company) {
+      alert("Preencha a Empresa / Cliente antes de salvar o fechamento.");
+      return;
+    }
+
+    const items = regimesData[currentRegime].items;
+    items.forEach(item => {
+      const log = getObsLog(item.id);
+      const text = String(log.current || "").trim();
+      if (!text) return;
+      const last = log.history[log.history.length - 1];
+      if (!last || last.text !== text) {
+        log.history.push({
+          text,
+          at: new Date().toISOString(),
+          by: savedState.header.operator || "Operador",
+          flag: savedState.flags[item.id] || "",
+          note: "snapshot"
+        });
+      }
+    });
+
+    const summary = countFlagsForItems(items, savedState.flags);
+    const snapshot = {
+      id: "close_" + Date.now(),
+      savedAt: new Date().toISOString(),
+      regime: currentRegime,
+      regimeTitle: regimesData[currentRegime].title,
+      header: Object.assign({}, savedState.header),
+      paths: Object.assign({}, savedState.paths[currentRegime] || {}),
+      flags: Object.assign({}, savedState.flags),
+      obsLogs: JSON.parse(JSON.stringify(savedState.obsLogs)),
+      summary
+    };
+
+    savedState.closings.unshift(snapshot);
+    if (savedState.closings.length > 40) {
+      savedState.closings = savedState.closings.slice(0, 40);
+    }
+    saveToStorage();
+    renderClosingsList();
+    alert("Fechamento salvo no histórico deste navegador.");
+  }
+
+  function renderClosingsList() {
+    const box = document.getElementById("closingsList");
+    if (!box) return;
+
+    const list = savedState.closings || [];
+    if (!list.length) {
+      box.innerHTML = `<div class="obs-empty">Nenhum fechamento salvo ainda. Use “Salvar Fechamento” no topo.</div>`;
+      return;
+    }
+
+    box.innerHTML = list.map(item => {
+      const done = (item.summary && (item.summary.okCount + item.summary.naCount)) || 0;
+      const total = (item.summary && item.summary.total) || 0;
+      const pend = (item.summary && item.summary.pendCount) || 0;
+      return `
+        <div class="closing-item">
+          <div>
+            <strong>${escapeHtml(item.header && item.header.name ? item.header.name : "Empresa sem nome")}</strong>
+            <span>${escapeHtml(formatDateTime(item.savedAt))} · ${escapeHtml(item.regimeTitle || item.regime)} · Comp. ${escapeHtml((item.header && item.header.comp) || "-")} · ${done}/${total} OK/N/A · ${pend} PEND</span>
+          </div>
+          <div class="closing-actions">
+            <button type="button" onclick="loadClosingSnapshot('${item.id}')">Carregar</button>
+            <button type="button" onclick="deleteClosingSnapshot('${item.id}')">Excluir</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function loadClosingSnapshot(closingId) {
+    const snap = (savedState.closings || []).find(c => c.id === closingId);
+    if (!snap) return;
+    if (!confirm("Carregar este fechamento? A tela atual será substituída pelos dados salvos.")) return;
+
+    savedState.header = Object.assign({}, snap.header || {});
+    savedState.flags = Object.assign({}, snap.flags || {});
+    savedState.obsLogs = JSON.parse(JSON.stringify(snap.obsLogs || {}));
+    if (snap.regime && snap.paths) {
+      savedState.paths[snap.regime] = Object.assign({}, snap.paths);
+    }
+
+    document.getElementById("clientName").value = savedState.header.name || "";
+    document.getElementById("clientCnpj").value = savedState.header.cnpj || "";
+    document.getElementById("clientComp").value = savedState.header.comp || "2026-11";
+    document.getElementById("clientOperator").value = savedState.header.operator || "";
+    document.getElementById("clientReviewer").value = savedState.header.reviewer || "Mariana / Clayton";
+
+    saveToStorage();
+    switchRegime(snap.regime || "simples");
+    renderClosingsList();
+  }
+
+  function deleteClosingSnapshot(closingId) {
+    if (!confirm("Excluir este fechamento do histórico?")) return;
+    savedState.closings = (savedState.closings || []).filter(c => c.id !== closingId);
+    saveToStorage();
+    renderClosingsList();
   }
 
   window.onload = initApp;
