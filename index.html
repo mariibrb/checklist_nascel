@@ -344,6 +344,25 @@
       background: var(--primary-soft);
     }
 
+    .attach-paste-hint {
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    .attach-drop {
+      border: 1px dashed #f5d19a;
+      background: #fffdf8;
+      border-radius: 6px;
+      padding: 6px 8px;
+      outline: none;
+    }
+
+    .attach-drop:focus,
+    .attach-drop.paste-ready {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(252, 164, 34, 0.18);
+    }
+
     .attach-list {
       list-style: none;
       padding: 0;
@@ -354,9 +373,10 @@
       font-size: 0.72rem;
       color: var(--muted);
       display: flex;
+      align-items: center;
       justify-content: space-between;
       gap: 8px;
-      padding: 2px 0;
+      padding: 4px 0;
     }
 
     .attach-list button {
@@ -366,6 +386,16 @@
       cursor: pointer;
       font-size: 0.7rem;
       font-weight: 700;
+    }
+
+    .attach-thumb {
+      width: 42px;
+      height: 42px;
+      object-fit: cover;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: #fff;
+      cursor: zoom-in;
     }
 
     .db-hint {
@@ -950,7 +980,8 @@
 
   const STORAGE_KEY = "nascel_fechamento_db_v3";
   const LEGACY_KEYS = ["mari_fiscal_checklists_v2", "mari_fiscal_checklists_v1"];
-  const MAX_ATTACH_BYTES = 350 * 1024;
+  const MAX_ATTACH_BYTES = 2.5 * 1024 * 1024;
+  let lastAttachItemId = "";
 
   const CHECKLIST_TYPES = {
     importacao: {
@@ -1407,18 +1438,28 @@
   function renderAttachCell(itemId) {
     const files = getAttachments(itemId);
     const list = files.length
-      ? `<ul class="attach-list">${files.map((f, idx) => `
+      ? `<ul class="attach-list">${files.map((f, idx) => {
+          const isImg = String(f.type || "").startsWith("image/") && f.dataUrl;
+          return `
           <li>
-            <span title="${escapeAttr(f.name)}">${escapeHtml(f.name)} (${Math.round((f.size || 0) / 1024)} KB)</span>
+            <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+              ${isImg ? `<img class="attach-thumb" src="${f.dataUrl}" alt="${escapeAttr(f.name)}" onclick="previewAttachment('${itemId}', ${idx})">` : ""}
+              <span title="${escapeAttr(f.name)}">${escapeHtml(f.name)} (${Math.round((f.size || 0) / 1024)} KB)</span>
+            </div>
             <button type="button" onclick="removeAttachment('${itemId}', ${idx})">remover</button>
-          </li>`).join("")}</ul>`
-      : `<div class="obs-empty">Sem anexos</div>`;
+          </li>`;
+        }).join("")}</ul>`
+      : `<div class="obs-empty">Sem anexos — use Anexar ou Ctrl+V (print)</div>`;
 
     return `
-      <div class="attach-box">
+      <div class="attach-box attach-drop" data-item-id="${itemId}" tabindex="0"
+           onclick="setAttachTarget('${itemId}', this)"
+           onfocus="setAttachTarget('${itemId}', this)"
+           onpaste="handleItemPaste(event, '${itemId}')">
         <div class="attach-row">
-          <button type="button" class="attach-btn" onclick="document.getElementById('file-${itemId}').click()">Anexar</button>
-          <input type="file" id="file-${itemId}" style="display:none" onchange="addAttachment('${itemId}', this)">
+          <button type="button" class="attach-btn" onclick="event.stopPropagation(); setAttachTarget('${itemId}'); document.getElementById('file-${itemId}').click()">Anexar</button>
+          <span class="attach-paste-hint">ou Ctrl+V (print de tela)</span>
+          <input type="file" id="file-${itemId}" accept="image/*,.pdf,.png,.jpg,.jpeg,.webp,.xlsx,.xls,.csv" style="display:none" onchange="addAttachment('${itemId}', this)">
         </div>
         ${list}
       </div>
@@ -1439,9 +1480,9 @@
       : `<div class="obs-empty">Sem histórico anterior</div>`;
 
     return `
-      <div class="obs-box">
+      <div class="obs-box" data-item-id="${itemId}" onclick="setAttachTarget('${itemId}')">
         <div class="obs-row">
-          <input type="text" class="obs-input" placeholder="Anotar dúvida / motivo..." value="${escapeAttr(current)}" oninput="saveObsDraft('${itemId}', this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();registerObsLog('${itemId}');}">
+          <input type="text" class="obs-input" placeholder="Anotar dúvida / motivo..." value="${escapeAttr(current)}" onfocus="setAttachTarget('${itemId}')" oninput="saveObsDraft('${itemId}', this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();registerObsLog('${itemId}');}">
           <button type="button" class="obs-log-btn" onclick="registerObsLog('${itemId}')" title="Registrar no log">Log</button>
         </div>
         <div class="obs-current"><strong>Atual:</strong> ${current ? escapeHtml(current) : "<em style='color:#94a3b8'>sem observação</em>"}</div>
@@ -1574,31 +1615,94 @@
     renderChecklistTable();
   }
 
-  function addAttachment(itemId, inputEl) {
-    const file = inputEl.files && inputEl.files[0];
+  function setAttachTarget(itemId, el) {
+    lastAttachItemId = itemId;
+    document.querySelectorAll(".attach-drop").forEach(node => node.classList.remove("paste-ready"));
+    if (el) el.classList.add("paste-ready");
+  }
+
+  function makePrintFileName(file) {
+    const d = new Date();
+    const stamp = d.getFullYear()
+      + String(d.getMonth() + 1).padStart(2, "0")
+      + String(d.getDate()).padStart(2, "0")
+      + "-"
+      + String(d.getHours()).padStart(2, "0")
+      + String(d.getMinutes()).padStart(2, "0")
+      + String(d.getSeconds()).padStart(2, "0");
+    const ext = (file && file.type === "image/jpeg") ? "jpg"
+      : (file && file.type === "image/webp") ? "webp"
+      : "png";
+    if (file && file.name && !/^image\.(png|jpe?g|webp)$/i.test(file.name)) return file.name;
+    return "print-" + stamp + "." + ext;
+  }
+
+  function pushAttachmentFile(itemId, file) {
     if (!file) return;
-    if (!ensureWorkingRecord()) { alert("Informe o cliente antes de anexar."); inputEl.value = ""; return; }
+    if (!ensureWorkingRecord()) {
+      alert("Informe o cliente antes de anexar.");
+      return;
+    }
     if (file.size > MAX_ATTACH_BYTES) {
-      alert("Anexo grande demais para o navegador (máx. ~350 KB). No futuro o arquivo irá direto para a pasta de rede do fechamento.");
-      inputEl.value = "";
+      alert("Anexo grande demais para o navegador (máx. ~2,5 MB). No futuro o arquivo irá direto para a pasta de rede do fechamento.");
       return;
     }
     const reader = new FileReader();
     reader.onload = function () {
       const list = getAttachments(itemId);
       list.push({
-        name: file.name,
+        name: makePrintFileName(file),
         size: file.size,
         type: file.type || "application/octet-stream",
         dataUrl: reader.result,
         addedAt: new Date().toISOString(),
-        pendingFolder: true
+        pendingFolder: true,
+        fromPaste: !!(file.name && /^image\./i.test(file.name))
       });
       persistWorkingDraft();
       renderChecklistTable();
     };
     reader.readAsDataURL(file);
+  }
+
+  function addAttachment(itemId, inputEl) {
+    const file = inputEl.files && inputEl.files[0];
+    if (!file) return;
+    setAttachTarget(itemId);
+    pushAttachmentFile(itemId, file);
     inputEl.value = "";
+  }
+
+  function handleItemPaste(event, itemId) {
+    const imageFile = extractClipboardImage(event.clipboardData);
+    if (!imageFile) return;
+    event.preventDefault();
+    setAttachTarget(itemId);
+    pushAttachmentFile(itemId, imageFile);
+  }
+
+  function extractClipboardImage(clipboardData) {
+    if (!clipboardData) return null;
+    const items = clipboardData.items ? Array.from(clipboardData.items) : [];
+    for (const item of items) {
+      if (item.type && item.type.indexOf("image") === 0) {
+        return item.getAsFile();
+      }
+    }
+    const files = clipboardData.files ? Array.from(clipboardData.files) : [];
+    for (const file of files) {
+      if (file.type && file.type.indexOf("image") === 0) return file;
+    }
+    return null;
+  }
+
+  function previewAttachment(itemId, index) {
+    const list = getAttachments(itemId);
+    const file = list[index];
+    if (!file || !file.dataUrl) return;
+    const w = window.open("");
+    if (!w) return;
+    w.document.write('<title>' + escapeHtml(file.name) + '</title><img src="' + file.dataUrl + '" style="max-width:100%;height:auto;">');
   }
 
   function removeAttachment(itemId, index) {
@@ -1607,6 +1711,26 @@
     persistWorkingDraft();
     renderChecklistTable();
   }
+
+  document.addEventListener("paste", function (event) {
+    const imageFile = extractClipboardImage(event.clipboardData);
+    if (!imageFile) return;
+
+    const path = event.composedPath ? event.composedPath() : [];
+    let itemId = "";
+    for (const node of path) {
+      if (node && node.dataset && node.dataset.itemId) {
+        itemId = node.dataset.itemId;
+        break;
+      }
+    }
+    if (!itemId) itemId = lastAttachItemId;
+    if (!itemId) return;
+
+    event.preventDefault();
+    setAttachTarget(itemId);
+    pushAttachmentFile(itemId, imageFile);
+  });
 
   function countFlagsForItems(items, flags) {
     let okCount = 0, naCount = 0, pendCount = 0;
