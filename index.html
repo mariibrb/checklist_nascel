@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Central de Checklists Fiscais - Fechamento Mensal</title>
+  <title>Central de Fechamentos Fiscais - Mensal</title>
   <style>
     :root {
       --primary: #fca422;
@@ -764,13 +764,13 @@
     <div class="header-brand">
       <img class="header-logo" src="assets/nascel-logo.jpg" alt="Nascel Contabilidade">
       <div class="header-title">
-        <h1 id="pageMainTitle">Checklist Operacional de Apuração Fiscal</h1>
+        <h1 id="pageMainTitle">Fechamento Operacional de Apuração Fiscal</h1>
         <p>Fluxo Padrão: SIEG • Portal Nacional • App Coletor • Domínio Sistemas • App Fechamento • Nibo</p>
       </div>
     </div>
     <div class="header-actions">
       <button class="btn btn-white" onclick="saveClosingSnapshot()">Salvar Fechamento</button>
-      <button class="btn btn-outline" onclick="window.print()">Imprimir Checklist (A4)</button>
+      <button class="btn btn-outline" onclick="window.print()">Imprimir Fechamento (A4)</button>
       <button class="btn btn-outline" onclick="markAllOk()">Marcar Tudo OK</button>
       <button class="btn btn-outline" onclick="resetCurrentRegime()">Limpar Aba Atual</button>
     </div>
@@ -807,7 +807,7 @@
   </nav>
 
   <div class="type-bar">
-    <span class="type-bar-label">Checklist:</span>
+    <span class="type-bar-label">Etapa:</span>
     <button type="button" class="type-pill active" id="tab-importacao" onclick="switchChecklistType('importacao')">Importação</button>
     <button type="button" class="type-pill" id="tab-analise" onclick="switchChecklistType('analise')">Análise</button>
     <button type="button" class="type-pill" id="tab-obrigacoes" onclick="switchChecklistType('obrigacoes')">Obrigações Acessórias</button>
@@ -1192,7 +1192,7 @@
 
     const regimeTitle = regimesData[currentRegime].title;
     const typeTitle = CHECKLIST_TYPES[typeKey].title;
-    document.getElementById("pageMainTitle").innerText = "Checklist - " + typeTitle + " (" + regimeTitle + ")";
+    document.getElementById("pageMainTitle").innerText = "Fechamento - " + typeTitle + " (" + regimeTitle + ")";
     document.getElementById("regimeProgressLabel").innerText = "Progresso: " + typeTitle + " · " + regimeTitle;
 
     renderChecklistTable();
@@ -1233,7 +1233,7 @@
     const items = getCurrentItems();
 
     if (!items.length) {
-      container.innerHTML = `<div class="category-header">Nenhum item neste checklist para o regime selecionado.</div>`;
+      container.innerHTML = `<div class="category-header">Nenhum item nesta etapa para o regime selecionado.</div>`;
       return;
     }
 
@@ -1395,7 +1395,7 @@
   }
 
   function resetCurrentRegime() {
-    if (!confirm("Deseja limpar as marcações e a observação atual deste checklist? O histórico de logs e os fechamentos salvos serão mantidos.")) return;
+    if (!confirm("Deseja limpar as marcações e a observação atual desta etapa? O histórico de logs e os fechamentos salvos serão mantidos.")) return;
     const items = getCurrentItems();
     items.forEach(item => {
       delete savedState.flags[item.id];
