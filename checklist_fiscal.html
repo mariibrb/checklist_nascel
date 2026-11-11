@@ -316,6 +316,26 @@
       filter: brightness(0.97);
     }
 
+    .btn-print-mini {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--ink);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-print-mini:hover {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+    }
+
+    .print-capa {
+      display: none;
+    }
+
     .counter-pill {
       padding: 6px 14px;
       border-radius: 8px;
@@ -695,55 +715,152 @@
     @media print {
       body {
         background: #fff;
-        padding: 0;
+        padding: 12mm;
         font-size: 11px;
+        color: #000;
       }
+      .no-print,
       .header-actions,
       .tabs-bar,
-      .type-bar {
+      .type-bar,
+      .db-hint,
+      .attach-box,
+      .btn-clear-flags,
+      .btn-print-mini,
+      .progress-bar-bg {
         display: none !important;
       }
-      .header-card {
-        background: #fff !important;
-        color: #000 !important;
-        border: 2px solid #000;
-        padding: 12px;
-        box-shadow: none;
-        margin-bottom: 12px;
+
+      body.print-mode-etapa .print-capa {
+        display: none !important;
       }
-      .header-logo {
-        height: 42px;
-      }
-      .client-bar,
-      .status-panel,
-      .checklist-card,
-      .Signoff-card {
+      body.print-mode-etapa .header-card,
+      body.print-mode-etapa .client-bar,
+      body.print-mode-etapa .status-panel,
+      body.print-mode-etapa .checklist-card,
+      body.print-mode-etapa .Signoff-card {
+        display: block !important;
         box-shadow: none !important;
         border: 1px solid #000 !important;
         margin-bottom: 10px;
         break-inside: avoid;
       }
-      .attach-box {
-        display: none !important;
+      body.print-mode-etapa .header-card {
+        border: 2px solid #000 !important;
       }
-      .checklist-table th,
-      .checklist-table td {
-        padding: 6px 8px;
+      body.print-mode-etapa .header-logo {
+        height: 42px;
+      }
+      body.print-mode-etapa .checklist-table th,
+      body.print-mode-etapa .checklist-table td {
+        padding: 5px 6px;
         border-bottom: 1px solid #999;
       }
-      .flag-btn {
+      body.print-mode-etapa .flag-btn {
         border: 1px solid #000 !important;
         color: #000 !important;
         padding: 2px 6px;
         font-size: 9px;
       }
-      .flag-btn.active-ok,
-      .flag-btn.active-na,
-      .flag-btn.active-pend {
+      body.print-mode-etapa .flag-btn.active-ok,
+      body.print-mode-etapa .flag-btn.active-na,
+      body.print-mode-etapa .flag-btn.active-pend {
         background: #000 !important;
         color: #fff !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
+      }
+
+      body.print-mode-capa .container > *:not(.print-capa) {
+        display: none !important;
+      }
+      body.print-mode-capa .print-capa {
+        display: block !important;
+      }
+
+      .print-capa {
+        font-family: Helvetica, Arial, sans-serif;
+        color: #000;
+      }
+      .print-capa-title {
+        text-align: center;
+        font-size: 24px;
+        font-weight: 700;
+        margin: 8px 0 4px;
+      }
+      .print-capa-regime {
+        text-align: center;
+        font-size: 13px;
+        margin-bottom: 14px;
+      }
+      .print-capa-box {
+        border: 1px solid #000;
+        margin-bottom: 10px;
+      }
+      .print-capa-row {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        border-bottom: 1px solid #000;
+      }
+      .print-capa-row:last-child {
+        border-bottom: none;
+      }
+      .print-capa-row .lbl {
+        padding: 7px 8px;
+        font-weight: 700;
+        border-right: 1px solid #000;
+        background: #f3f3f3;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .print-capa-row .val {
+        padding: 7px 8px;
+      }
+      .print-capa-grid3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+      .print-capa-grid3 > div {
+        border-right: 1px solid #000;
+        padding: 7px 8px;
+      }
+      .print-capa-grid3 > div:last-child {
+        border-right: none;
+      }
+      .print-capa-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 8px;
+      }
+      .print-capa-table th,
+      .print-capa-table td {
+        border: 1px solid #000;
+        padding: 5px 6px;
+        text-align: left;
+        font-size: 10px;
+      }
+      .print-capa-table th {
+        background: #f3f3f3;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .print-sign-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+        margin-top: 28px;
+      }
+      .print-sign-box {
+        border-top: 1px solid #000;
+        padding-top: 6px;
+        min-height: 54px;
+        font-size: 10px;
+      }
+      .print-obs {
+        margin-top: 16px;
+        border: 1px solid #000;
+        min-height: 70px;
+        padding: 8px;
       }
     }
 
@@ -777,7 +894,6 @@
     </div>
     <div class="header-actions">
       <button class="btn btn-white" onclick="saveCurrentClient()">Salvar Cliente</button>
-      <button class="btn btn-outline" onclick="window.print()">Imprimir Fechamento (A4)</button>
     </div>
   </header>
 
@@ -867,6 +983,8 @@
       <div class="counter-pill pill-na">N/A: <span id="countNa">0</span></div>
       <div class="counter-pill pill-pend">PENDENTE: <span id="countPend">0</span></div>
       <button type="button" class="btn-clear-flags" onclick="resetCurrentRegime()">Limpar etapa</button>
+      <button type="button" class="btn-print-mini" id="btnPrintEtapa" onclick="printCurrentEtapa()">Imprimir esta etapa</button>
+      <button type="button" class="btn-print-mini" onclick="printFechamentoCapa()">Imprimir capa fechamento</button>
     </div>
   </section>
 
@@ -874,7 +992,7 @@
 
   <footer class="Signoff-card">
     <div>
-      <strong>Status p/ App Fechamento:</strong>
+      <strong>Status para revisão:</strong>
       <p style="font-size: 0.8rem; color: var(--muted); margin-top: 4px;">
         Só envie para revisão técnica após todos os itens estarem marcados com <strong>OK</strong> ou <strong>N/A</strong> (ou com a dúvida descrita na coluna Observação se marcado <strong>PEND</strong>).
       </p>
@@ -882,6 +1000,8 @@
     <div class="sign-box">Assinatura / Visto - Operador Fiscal</div>
     <div class="sign-box">Aprovação - Revisão Técnica</div>
   </footer>
+
+  <section class="print-capa" id="printCapaFechamento" aria-hidden="true"></section>
 </div>
 
 <script>
@@ -1441,10 +1561,132 @@
     document.getElementById("regimeProgressLabel").innerText = "Progresso: " + typeTitle + " · " + regimeTitle;
     const hintEl = document.getElementById("typeHintText");
     if (hintEl) hintEl.innerText = CHECKLIST_TYPES[typeKey].hint;
+    const btnEtapa = document.getElementById("btnPrintEtapa");
+    if (btnEtapa) btnEtapa.innerText = "Imprimir " + typeTitle;
 
     renderChecklistTable();
     updateCounters();
     persistWorkingDraft();
+  }
+
+  function ieStLabel(value) {
+    if (value === "por_operacao") return "Sem IE-ST → Por Operação";
+    if (value === "por_apuracao") return "Com IE-ST → Por Apuração";
+    return "Não se aplica";
+  }
+
+  function summarizeType(typeKey) {
+    const items = getRegimeItems().filter(item => getItemType(item.id) === typeKey);
+    const flags = getWorkingFlags();
+    const counts = countFlagsForItems(items, flags);
+    const done = counts.okCount + counts.naCount;
+    return {
+      title: CHECKLIST_TYPES[typeKey].title,
+      done,
+      total: counts.total,
+      pend: counts.pendCount,
+      pct: counts.total ? Math.round((done / counts.total) * 100) : 0
+    };
+  }
+
+  function buildFechamentoCapaHtml() {
+    const year = getSelectedYear();
+    const month = getSelectedMonth();
+    const name = document.getElementById("clientName").value || "-";
+    const cnpj = document.getElementById("clientCnpj").value || "-";
+    const operator = document.getElementById("clientOperator").value || "-";
+    const reviewer = document.getElementById("clientReviewer").value || "-";
+    const ieSt = ieStLabel(document.getElementById("clientIeSt").value);
+    const regimeTitle = regimesData[currentRegime].title;
+    const flags = getWorkingFlags();
+    const fechamentoItems = getRegimeItems().filter(item => getItemType(item.id) === "fechamento");
+    const etapaRows = Object.keys(CHECKLIST_TYPES).map(key => {
+      const s = summarizeType(key);
+      return `<tr><td>${escapeHtml(s.title)}</td><td>${s.done}/${s.total}</td><td>${s.pend}</td><td>${s.pct}%</td></tr>`;
+    }).join("");
+
+    const docRows = (fechamentoItems.length ? fechamentoItems : getCurrentItems()).map((item, idx) => {
+      const flag = (flags[item.id] || "").toUpperCase() || "-";
+      const obs = (getObsLog(item.id).current || "").trim();
+      return `<tr>
+        <td>${String(idx + 1).padStart(2, "0")}</td>
+        <td>${escapeHtml(item.title)}</td>
+        <td>${escapeHtml(flag)}</td>
+        <td>${escapeHtml(obs || "-")}</td>
+      </tr>`;
+    }).join("");
+
+    return `
+      <div class="print-capa-title">Fechamento</div>
+      <div class="print-capa-regime">${escapeHtml(regimeTitle)}</div>
+      <div class="print-capa-box">
+        <div class="print-capa-row"><div class="lbl">Razão Social:</div><div class="val">${escapeHtml(name)}</div></div>
+        <div class="print-capa-row"><div class="lbl">CNPJ:</div><div class="val">${escapeHtml(cnpj)}</div></div>
+        <div class="print-capa-row">
+          <div class="lbl">Mês/Ano apuração:</div>
+          <div class="val">
+            <div class="print-capa-grid3">
+              <div>${escapeHtml(MONTH_NAMES[month] || month)}</div>
+              <div>${escapeHtml(year)}</div>
+              <div>IE-ST: ${escapeHtml(ieSt)}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <strong>Resumo das etapas</strong>
+      <table class="print-capa-table">
+        <thead><tr><th>Etapa</th><th>OK/N/A</th><th>PEND</th><th>%</th></tr></thead>
+        <tbody>${etapaRows}</tbody>
+      </table>
+
+      <strong style="display:block;margin-top:12px;">Dossiê / itens de Fechamento</strong>
+      <table class="print-capa-table">
+        <thead><tr><th>#</th><th>Documento / Item</th><th>Flag</th><th>Observação</th></tr></thead>
+        <tbody>${docRows || `<tr><td colspan="4">Sem itens de fechamento cadastrados nesta visão.</td></tr>`}</tbody>
+      </table>
+
+      <div class="print-sign-grid">
+        <div class="print-sign-box">
+          Produzido por: ${escapeHtml(operator)}<br>
+          Data: ____/____/________<br><br>
+          Assinatura:
+        </div>
+        <div class="print-sign-box">
+          Revisado por: ${escapeHtml(reviewer)}<br>
+          Data: ____/____/________<br><br>
+          Assinatura:
+        </div>
+      </div>
+      <div class="print-obs"><strong>Observação:</strong></div>
+    `;
+  }
+
+  function afterPrintCleanup() {
+    document.body.classList.remove("print-mode-etapa", "print-mode-capa");
+  }
+
+  function printCurrentEtapa() {
+    if (!clientKeyFromName(document.getElementById("clientName").value)) {
+      alert("Informe o cliente antes de imprimir.");
+      return;
+    }
+    document.body.classList.remove("print-mode-capa");
+    document.body.classList.add("print-mode-etapa");
+    window.addEventListener("afterprint", afterPrintCleanup, { once: true });
+    window.print();
+  }
+
+  function printFechamentoCapa() {
+    if (!clientKeyFromName(document.getElementById("clientName").value)) {
+      alert("Informe o cliente antes de imprimir a capa.");
+      return;
+    }
+    document.getElementById("printCapaFechamento").innerHTML = buildFechamentoCapaHtml();
+    document.body.classList.remove("print-mode-etapa");
+    document.body.classList.add("print-mode-capa");
+    window.addEventListener("afterprint", afterPrintCleanup, { once: true });
+    window.print();
   }
 
   function renderAttachCell(itemId) {
