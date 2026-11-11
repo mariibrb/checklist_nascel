@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Central de Checklists Fiscais - Fechamento Mensal</title>
+  <style>
+    :root {
+      --primary: #881337;
+      --primary-light: #be185d;
+      --primary-soft: #fdf2f8;
+      --accent: #db2777;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --ok-bg: #dcfce7;
+      --ok-text: #15803d;
+      --ok-border: #86efac;
+      --na-bg: #f1f5f9;
+      --na-text: #475569;
+      --na-border: #cbd5e1;
+      --pend-bg: #ffe4e6;
+      --pend-text: #be123c;
+      --pend-border: #fda4af;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 24px;
+      line-height: 1.45;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .header-card {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: #fff;
+      padding: 24px 28px;
+      border-radius: 14px;
+      box-shadow: 0 10px 25px -5px rgba(136, 19, 55, 0.25);
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .header-title h1 {
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .header-title p {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-white {
+      background: #ffffff;
+      color: var(--primary);
+    }
+
+    .btn-white:hover {
+      background: var(--primary-soft);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .client-bar {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 22px;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 0.9fr 1.1fr 1.1fr;
+      gap: 14px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .field-group label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--primary);
+      letter-spacing: 0.04em;
+    }
+
+    .field-group input,
+    .field-group select {
+      padding: 8px 11px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: 0.9rem;
+      color: var(--text);
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    .field-group input:focus,
+    .field-group select:focus {
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(190, 24, 93, 0.12);
+    }
+
+    .tabs-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .tab-btn:hover {
+      border-color: var(--primary-light);
+      background: var(--primary-soft);
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 6px 16px rgba(136, 19, 55, 0.22);
+    }
+
+    .tab-btn .tab-title {
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tab-btn .tab-sub {
+      font-size: 0.78rem;
+      opacity: 0.82;
+    }
+
+    .tab-badge {
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    .tab-btn.active .tab-badge {
+      background: rgba(255, 255, 255, 0.22);
+      color: #fff;
+    }
+
+    .status-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 22px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .progress-wrap {
+      flex: 1;
+      min-width: 260px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 10px;
+      background: #e2e8f0;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .counters {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .counter-pill {
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pill-ok { background: var(--ok-bg); color: var(--ok-text); border: 1px solid var(--ok-border); }
+    .pill-na { background: var(--na-bg); color: var(--na-text); border: 1px solid var(--na-border); }
+    .pill-pend { background: var(--pend-bg); color: var(--pend-text); border: 1px solid var(--pend-border); }
+
+    .paths-box {
+      background: var(--primary-soft);
+      border: 1px dashed var(--primary-light);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+    }
+
+    .paths-box h3 {
+      font-size: 0.85rem;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .paths-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .path-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .path-item span {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .path-item input {
+      padding: 7px 10px;
+      border: 1px solid #f9a8d4;
+      border-radius: 6px;
+      font-family: 'Consolas', monospace;
+      font-size: 0.82rem;
+      background: #fff;
+      color: #334155;
+    }
+
+    .checklist-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+
+    .category-header {
+      background: #f1f5f9;
+      padding: 11px 18px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .checklist-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .checklist-table th {
+      background: #f8fafc;
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .checklist-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+      font-size: 0.9rem;
+    }
+
+    .checklist-row {
+      transition: background 0.15s;
+    }
+
+    .checklist-row:hover {
+      background-color: #fcfcfd;
+    }
+
+    .checklist-row.status-ok {
+      background-color: #f0fdf4;
+    }
+
+    .checklist-row.status-ok .task-title {
+      text-decoration: line-through;
+      color: #15803d;
+    }
+
+    .checklist-row.status-na {
+      background-color: #f8fafc;
+      opacity: 0.72;
+    }
+
+    .checklist-row.status-na .task-title {
+      text-decoration: line-through;
+      color: #64748b;
+    }
+
+    .checklist-row.status-pend {
+      background-color: #fff1f2;
+    }
+
+    .col-num {
+      width: 48px;
+      font-weight: 700;
+      color: var(--primary);
+      text-align: center;
+    }
+
+    .col-check {
+      width: 42px;
+      text-align: center;
+    }
+
+    .main-checkbox {
+      width: 19px;
+      height: 19px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .task-title {
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+
+    .task-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .dominio-badge {
+      display: inline-block;
+      margin-top: 5px;
+      padding: 2px 8px;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      font-family: 'Consolas', monospace;
+      font-size: 0.75rem;
+      color: #334155;
+    }
+
+    .col-flags {
+      width: 215px;
+      white-space: nowrap;
+    }
+
+    .flag-group {
+      display: inline-flex;
+      gap: 5px;
+    }
+
+    .flag-btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--muted);
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .flag-btn:hover {
+      border-color: #94a3b8;
+    }
+
+    .flag-btn.active-ok {
+      background: var(--ok-text);
+      color: #fff;
+      border-color: var(--ok-text);
+    }
+
+    .flag-btn.active-na {
+      background: var(--na-text);
+      color: #fff;
+      border-color: var(--na-text);
+    }
+
+    .flag-btn.active-pend {
+      background: var(--pend-text);
+      color: #fff;
+      border-color: var(--pend-text);
+    }
+
+    .col-obs {
+      width: 250px;
+    }
+
+    .obs-input {
+      width: 100%;
+      padding: 6px 9px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.82rem;
+      background: rgba(255, 255, 255, 0.85);
+    }
+
+    .obs-input:focus {
+      outline: none;
+      border-color: var(--primary-light);
+    }
+
+    .Signoff-card {
+      margin-top: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 22px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+
+    .sign-box {
+      border-top: 1px solid #94a3b8;
+      padding-top: 8px;
+      margin-top: 28px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+        font-size: 11px;
+      }
+      .header-actions,
+      .tabs-bar {
+        display: none !important;
+      }
+      .header-card {
+        background: none !important;
+        color: #000 !important;
+        border: 2px solid #000;
+        padding: 12px;
+        box-shadow: none;
+        margin-bottom: 12px;
+      }
+      .client-bar,
+      .status-panel,
+      .paths-box,
+      .checklist-card,
+      .Signoff-card {
+        box-shadow: none !important;
+        border: 1px solid #000 !important;
+        margin-bottom: 10px;
+        break-inside: avoid;
+      }
+      .checklist-table th,
+      .checklist-table td {
+        padding: 6px 8px;
+        border-bottom: 1px solid #999;
+      }
+      .flag-btn {
+        border: 1px solid #000 !important;
+        color: #000 !important;
+        padding: 2px 6px;
+        font-size: 9px;
+      }
+      .flag-btn.active-ok,
+      .flag-btn.active-na,
+      .flag-btn.active-pend {
+        background: #000 !important;
+        color: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+
+    @media (max-width: 960px) {
+      .client-bar,
+      .tabs-bar,
+      .paths-grid,
+      .Signoff-card {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header class="header-card">
+    <div class="header-title">
+      <h1 id="pageMainTitle">Checklist Operacional de Apuração Fiscal</h1>
+      <p>Fluxo Padrão: SIEG • Portal Nacional • App Coletor • Domínio Sistemas • App Fechamento • Nibo</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-white" onclick="window.print()">Imprimir Checklist (A4)</button>
+      <button class="btn btn-outline" onclick="markAllOk()">Marcar Tudo OK</button>
+      <button class="btn btn-outline" onclick="resetCurrentRegime()">Limpar Aba Atual</button>
+    </div>
+  </header>
+
+  <section class="client-bar">
+    <div class="field-group">
+      <label>Empresa / Cliente (Código Domínio + Razão Social)</label>
+      <input type="text" id="clientName" placeholder="Ex: 0145 - Empresa Exemplo LTDA" oninput="saveHeaderData()">
+    </div>
+    <div class="field-group">
+      <label>CNPJ / UF</label>
+      <input type="text" id="clientCnpj" placeholder="00.000.000/0001-00 (SP/MG)" oninput="saveHeaderData()">
+    </div>
+    <div class="field-group">
+      <label>Competência</label>
+      <input type="month" id="clientComp" value="2026-11" onchange="saveHeaderData()">
+    </div>
+    <div class="field-group">
+      <label>Responsável Apuração</label>
+      <input type="text" id="clientOperator" placeholder="Nome do Operador" oninput="saveHeaderData()">
+    </div>
+    <div class="field-group">
+      <label>Revisor Técnico</label>
+      <select id="clientReviewer" onchange="saveHeaderData()">
+        <option value="Mariana / Clayton">Mariana / Clayton</option>
+        <option value="Mariana">Mariana</option>
+        <option value="Clayton">Clayton</option>
+      </select>
+    </div>
+  </section>
+
+  <nav class="tabs-bar">
+    <button class="tab-btn active" id="tab-simples" onclick="switchRegime('simples')">
+      <div class="tab-title">
+        <span>Simples Nacional</span>
+        <span class="tab-badge" id="badge-simples">24 itens</span>
+      </div>
+      <div class="tab-sub">Anexos I a V • PGDAS-D • Fator R • ST/Monofásico</div>
+    </button>
+
+    <button class="tab-btn" id="tab-presumido" onclick="switchRegime('presumido')">
+      <div class="tab-title">
+        <span>Lucro Presumido</span>
+        <span class="tab-badge" id="badge-presumido">18 itens</span>
+      </div>
+      <div class="tab-sub">PIS/COFINS Cumulativo • ICMS RPA • IRPJ/CSLL</div>
+    </button>
+
+    <button class="tab-btn" id="tab-real" onclick="switchRegime('real')">
+      <div class="tab-title">
+        <span>Lucro Real</span>
+        <span class="tab-badge" id="badge-real">19 itens</span>
+      </div>
+      <div class="tab-sub">Não-Cumulativo (Créditos 9,25%) • LALUR • SPEDs</div>
+    </button>
+
+    <button class="tab-btn" id="tab-mei" onclick="switchRegime('mei')">
+      <div class="tab-title">
+        <span>MEI</span>
+        <span class="tab-badge" id="badge-mei">9 itens</span>
+      </div>
+      <div class="tab-sub">Teto 81k • Regra 80% Compras • PGMEI</div>
+    </button>
+  </nav>
+
+  <section class="status-panel">
+    <div class="progress-wrap">
+      <div class="progress-header">
+        <span id="regimeProgressLabel">Progresso do Fechamento (Simples Nacional)</span>
+        <span id="regimeProgressPct">0% concluído</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBarFill"></div>
+      </div>
+    </div>
+    <div class="counters">
+      <div class="counter-pill pill-ok">OK: <span id="countOk">0</span></div>
+      <div class="counter-pill pill-na">N/A: <span id="countNa">0</span></div>
+      <div class="counter-pill pill-pend">PENDENTE: <span id="countPend">0</span></div>
+    </div>
+  </section>
+
+  <section class="paths-box">
+    <h3>Diretórios Padrão de Salvamento na Rede (Preenchimento Mari / Clayton)</h3>
+    <div class="paths-grid">
+      <div class="path-item">
+        <span>1. Pasta para Salvar XMLs Brutos (SIEG / Prefeitura) + Relatório App Coletor:</span>
+        <input type="text" id="pathXmlInput" placeholder="Ex: Z:\Clientes\[EMPRESA]\2026\Fiscal\[MM-AAAA]\01_XMLs_e_Coletor" oninput="savePathsData()">
+      </div>
+      <div class="path-item">
+        <span>2. Pasta para Salvar Relatórios Domínio, Livros Fiscais, SPEDs e Guias (App Fechamento):</span>
+        <input type="text" id="pathCloseInput" placeholder="Ex: Z:\Clientes\[EMPRESA]\2026\Fiscal\[MM-AAAA]\02_Fechamento_e_Livros" oninput="savePathsData()">
+      </div>
+    </div>
+  </section>
+
+  <main class="checklist-card" id="checklistContainer"></main>
+
+  <footer class="Signoff-card">
+    <div>
+      <strong>Status p/ App Fechamento:</strong>
+      <p style="font-size: 0.8rem; color: var(--muted); margin-top: 4px;">
+        Só envie para revisão da Mariana ou do Clayton após todos os itens estarem marcados com <strong>OK</strong> ou <strong>N/A</strong> (ou com a dúvida descrita na coluna Observação se marcado <strong>PEND</strong>).
+      </p>
+    </div>
+    <div class="sign-box">Assinatura / Visto - Operador Fiscal</div>
+    <div class="sign-box">Aprovação Revisão Técnica (Mariana / Clayton)</div>
+  </footer>
+</div>
+
+<script>
+  const regimesData = {
+    simples: {
+      title: "Simples Nacional",
+      items: [
+        { id: "sn_01", cat: "1. Parâmetros e Coleta (Domínio / SIEG / App Coletor)", title: "Selecionar empresa e competência correta no Domínio (F8) e checar Regime", desc: "Verificar se é Competência ou Caixa.", path: "Domínio: Controle > Parâmetros > Aba Simples Nacional" },
+        { id: "sn_02", cat: "1. Parâmetros e Coleta (Domínio / SIEG / App Coletor)", title: "Baixar parcelas recebidas (Exclusivo se for Regime de Caixa)", desc: "Solicitar extrato/financeiro via WhatsApp/Nibo e baixar recebimentos antes de apurar.", path: "Domínio: Movimentos > Baixa de Parcelas" },
+        { id: "sn_03", cat: "1. Parâmetros e Coleta (Domínio / SIEG / App Coletor)", title: "Baixar e importar XMLs de Mercadorias e Fretes (Ativas e Canceladas)", desc: "NF-e (55), NFC-e (65), SAT (59) e CT-e (57) capturados no SIEG Cofre XML.", path: "Domínio: Utilitários > Importação > Importador de XML" },
+        { id: "sn_04", cat: "1. Parâmetros e Coleta (Domínio / SIEG / App Coletor)", title: "Baixar NFS-e (Prefeitura/Portal Nacional), importar na Domínio e rodar App Coletor", desc: "Passar notas do Emissor Nacional no App Coletor (App da Mari) para gerar o relatório de conferência dos Serviços Tomados.", path: "App Coletor + Domínio: Utilitários > Importação > Importação de NFS-e" },
+        { id: "sn_05", cat: "2. Auditoria de Sequência e Entradas (SP / MG / Retenções)", title: "Auditar quebra de sequência numérica e tratar Canceladas / Inutilizadas", desc: "Garantir que não há pulo de nota e que canceladas estão R$ 0,00.", path: "Domínio: Relatórios > Acompanhamento > Verificar Numeração | Movimentos > NF-e Inutilizadas" },
+        { id: "sn_06", cat: "2. Auditoria de Sequência e Entradas (SP / MG / Retenções)", title: "Analisar compras interestaduais (CFOP 2.556/2.551/2.406/2.407) p/ DIFAL Uso/Consumo e Ativo", desc: "Se alíquota interestadual (4% ou 12%) for menor que a interna, calcular DIFAL e emitir DARE-SP ou DAE-MG.", path: "Domínio: Movimentos > Entradas | Relatórios > Acompanhamento > Demonstrativo de CFOPs" },
+        { id: "sn_07", cat: "2. Auditoria de Sequência e Entradas (SP / MG / Retenções)", title: "Analisar compras interestaduais de revenda (CFOP 2.101/2.102/2.403) - Regra SP vs. MG", desc: "Em SP: checar NCM p/ Antecipação ST (Art. 426-A). Em MG: calcular Antecipação de Alíquota MG. Em 2.403: checar GNRE paga.", path: "Domínio: Movimentos > Entradas" },
+        { id: "sn_08", cat: "2. Auditoria de Sequência e Entradas (SP / MG / Retenções)", title: "Cruzar Relatório do App Coletor com Entradas: ISS Retido em Serviços Tomados", desc: "Conferir notas com ISS Retido = SIM no relatório do Coletor e emitir guia de ISS Tomador na Prefeitura.", path: "App Coletor + Portal Prefeitura + Domínio: Movimentos > Entradas" },
+        { id: "sn_09", cat: "2. Auditoria de Sequência e Entradas (SP / MG / Retenções)", title: "Cruzar Relatório do App Coletor: Retenções Federais (INSS, IRRF e CSRF 4,65%)", desc: "Lançar retenções de INSS (11%/3,5%), IRRF (1,5%/1%) e CSRF (4,65%) na nota para envio da EFD-Reinf / DCTFWeb.", path: "App Coletor + Domínio: Movimentos > Entradas" },
+        { id: "sn_10", cat: "3. Segregação de Saídas (Comércio, Indústria e Serviços)", title: "Retirar CFOPs de Não-Faturamento da Receita Bruta do Simples", desc: "Remessas, consertos, brindes, bonificações, devolução de compra (5.910, 5.915, 5.949, 5.202) e cupom referenciado (5.929).", path: "Domínio: Utilitários > Alterar Notas > Saídas" },
+        { id: "sn_11", cat: "3. Segregação de Saídas (Comércio, Indústria e Serviços)", title: "Conferir Devoluções de Venda (CFOP 1.201, 1.202, 1.411, 2.202)", desc: "Devem estar em acumulador que DEDUZ da Receita Bruta no mesmo Anexo e regra da venda original.", path: "Domínio: Movimentos > Entradas" },
+        { id: "sn_12", cat: "3. Segregação de Saídas (Comércio, Indústria e Serviços)", title: "Segregar Vendas com Substituição Tributária de ICMS (CFOP 5.405 / 6.404)", desc: "Alocar no acumulador COM Substituição Tributária de ICMS para zerar o percentual de ICMS no DAS.", path: "Domínio: Relatórios > Impostos > Simples Nacional" },
+        { id: "sn_13", cat: "3. Segregação de Saídas (Comércio, Indústria e Serviços)", title: "Segregar Vendas de Produtos Monofásicos de PIS e COFINS por NCM", desc: "Bebidas frias, medicamentos, perfumaria/cosméticos, autopeças/pneus e combustíveis/GLP.", path: "Domínio: Relatórios > Impostos > Simples Nacional > Produtos" },
+        { id: "sn_14", cat: "3. Segregação de Saídas (Comércio, Indústria e Serviços)", title: "Sincronizar Folha de Salários (12 meses) e validar Fator R (Anexo III vs. Anexo V)", desc: "Se Fator R >= 28% apura no Anexo III (6%); se < 28% apura no Anexo V (15,5%).", path: "Domínio: Movimentos > Outros Dados > Simples Nacional > Dados da Folha" },
+        { id: "sn_15", cat: "3. Segregação de Saídas (Comércio, Indústria e Serviços)", title: "Segregar Notas de Serviços Prestados COM Retenção de ISS", desc: "Notas emitidas com ISS Retido = SIM devem descontar o ISS dentro do DAS.", path: "Domínio: Movimentos > Saídas" },
+        { id: "sn_16", cat: "3. Segregação de Saídas (Comércio, Indústria e Serviços)", title: "Comunicar DP sobre faturamento no Anexo IV (INSS Patronal / CPP de 20% fora do DAS)", desc: "Avisar Folha de Pagamento caso a empresa tenha receita no Anexo IV.", path: "Comunicação Interna DP / DCTFWeb" },
+        { id: "sn_17", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Processar Apuração (F6) e fazer Prova Real Matemática da Receita Bruta", desc: "Confirmar na calculadora: (Vendas + Serviços Ativos) - (Devoluções de Venda) = Receita Bruta RPA.", path: "Domínio: Movimentos > Apuração | Relatórios > Impostos > Simples Nacional" },
+        { id: "sn_18", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Validar se o RBT12 do Domínio está idêntico ao RBT12 do Portal PGDAS-D", desc: "Se houver diferença nos 12 meses anteriores, ajustar em Receitas Anteriores.", path: "Domínio: Movimentos > Outros Dados > Simples Nacional > Receitas Anteriores" },
+        { id: "sn_19", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Bater centavos (Valor do DAS no PGDAS-D == Valor do Domínio) e gerar Guia/Recibo/Extrato", desc: "Só transmitir o PGDAS-D após o valor bater 100% com o demonstrativo do Domínio.", path: "Portal Simples Nacional / e-CAC" },
+        { id: "sn_20", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Emitir Livros Fiscais (Entradas, Saídas, ISS) e Demonstrativos em PDF na Domínio", desc: "Salvar todos os relatórios e livros na pasta de rede do cliente.", path: "Domínio: Relatórios > Livros > Entradas / Saídas / ISS" },
+        { id: "sn_21", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Montar pacote completo no App Fechamento e enviar p/ Revisão (Mariana / Clayton)", desc: "Subir no App Fechamento: DAS, Extrato/Recibo PGDAS, Relatório Domínio, Relatório App Coletor, Livros e Guias extras.", path: "App Fechamento" },
+        { id: "sn_22", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Transmitir DeSTDA (SEDIF-SN) e encerrar escrituração no site da Prefeitura", desc: "Gerar DeSTDA para contribuintes com IE e fechar competência municipal de ISS.", path: "Domínio: Relatórios > Informativos > Estaduais > DeSTDA" },
+        { id: "sn_23", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "(Pós-Revisão) Postar guias validadas para o cliente via Nibo / WhatsApp", desc: "Liberar para o cliente somente após o OK do revisor no App Fechamento.", path: "Nibo / WhatsApp" },
+        { id: "sn_24", cat: "4. Apuração, PGDAS-D, Livros, App Fechamento e Revisão", title: "Fechar / Travar o Período Fiscal no Domínio Sistemas", desc: "Bloquear o mês apurado para impedir alterações acidentais.", path: "Domínio: Utilitários > Fechamento de Período" }
+      ]
+    },
+    presumido: {
+      title: "Lucro Presumido",
+      items: [
+        { id: "lp_01", cat: "1. Coleta, Parâmetros, SIEG e App Coletor", title: "Selecionar empresa e competência no Domínio (F8) e checar regime (Caixa ou Competência)", desc: "Conferir parametrização federal/estadual e solicitar extratos de aplicação financeira no trimestre.", path: "Domínio: Controle > Parâmetros" },
+        { id: "lp_02", cat: "1. Coleta, Parâmetros, SIEG e App Coletor", title: "Baixar no SIEG e importar no Domínio XMLs de NF-e, NFC-e, SAT e CT-e (Ativas e Canceladas)", desc: "Importar lotes de entradas, saídas e conhecimentos de transporte.", path: "Domínio: Utilitários > Importação > Importador de XML" },
+        { id: "lp_03", cat: "1. Coleta, Parâmetros, SIEG e App Coletor", title: "Baixar NFS-e (Prefeitura/Portal Nacional), importar na Domínio e rodar o App Coletor", desc: "Gerar no App Coletor (App da Mari) o relatório de auditoria das retenções de Serviços Tomados.", path: "App Coletor + Domínio: Utilitários > Importação > NFS-e" },
+        { id: "lp_04", cat: "1. Coleta, Parâmetros, SIEG e App Coletor", title: "Auditar sequência numérica de Saídas e tratar Canceladas / Inutilizadas", desc: "Confirmar que não há pulo de numeração em NF-e, NFC-e e NFS-e.", path: "Domínio: Relatórios > Acompanhamento > Verificar Numeração" },
+        { id: "lp_05", cat: "2. Auditoria de Entradas (Crédito ICMS/IPI, Fronteira e App Coletor)", title: "Conferir crédito de ICMS/IPI nas entradas de revenda/insumos e bloqueio em ST/Uso e Consumo", desc: "CFOPs 1.101/1.102/2.102 tributados geram crédito de ICMS; 1.403 (ST) e 1.556 (Uso/Consumo) não geram crédito.", path: "Domínio: Movimentos > Entradas" },
+        { id: "lp_06", cat: "2. Auditoria de Entradas (Crédito ICMS/IPI, Fronteira e App Coletor)", title: "Auditar compras interestaduais (CFOP 2.xxx) p/ DIFAL e Antecipações (SP e MG)", desc: "Verificar DIFAL Uso/Ativo em conta gráfica (SP) ou DAE (MG), Art. 426-A (SP) e Antecipação de Entrada (MG).", path: "Domínio: Movimentos > Entradas" },
+        { id: "lp_07", cat: "2. Auditoria de Entradas (Crédito ICMS/IPI, Fronteira e App Coletor)", title: "Cruzar Relatório do App Coletor com Entradas: Guia de ISS Tomador", desc: "Emitir guia municipal para todas as notas apontadas com ISS Retido no relatório do Coletor.", path: "App Coletor + Portal da Prefeitura" },
+        { id: "lp_08", cat: "2. Auditoria de Entradas (Crédito ICMS/IPI, Fronteira e App Coletor)", title: "Cruzar Relatório do App Coletor: Lançar INSS, IRRF e CSRF (4,65%) na Domínio", desc: "Garantir que as retenções de serviços tomados subam para a EFD-Reinf e gerem DARF na DCTFWeb.", path: "App Coletor + Domínio: Movimentos > Entradas" },
+        { id: "lp_09", cat: "3. Auditoria de Saídas (ICMS, ISS, PIS/COFINS Cumulativo, IRPJ e CSLL)", title: "Excluir CFOPs de remessa, conserto, bonificação e devolução de compra da base de faturamento", desc: "CFOPs 5.910, 5.915, 5.949, 5.202 não podem compor base de PIS, COFINS, IRPJ e CSLL.", path: "Domínio: Relatórios > Acompanhamento > Demonstrativo de CFOPs" },
+        { id: "lp_10", cat: "3. Auditoria de Saídas (ICMS, ISS, PIS/COFINS Cumulativo, IRPJ e CSLL)", title: "Conferir exclusão do ICMS destacado nas saídas da base do PIS (0,65%) e COFINS (3,00%)", desc: "Validar se o acumulador está abatendo o ICMS próprio da base de PIS/COFINS (Tema 69 STF).", path: "Domínio: Relatórios > Impostos > PIS Cumulativo / COFINS Cumulativo" },
+        { id: "lp_11", cat: "3. Auditoria de Saídas (ICMS, ISS, PIS/COFINS Cumulativo, IRPJ e CSLL)", title: "Segregar produtos Monofásicos (CST 04) e abater Devoluções de Venda (1.202/1.411)", desc: "Itens monofásicos têm alíquota zero na revenda; devoluções deduzem a base do mês.", path: "Domínio: Movimentos > Saídas / Entradas" },
+        { id: "lp_12", cat: "3. Auditoria de Saídas (ICMS, ISS, PIS/COFINS Cumulativo, IRPJ e CSLL)", title: "Abater retenções sofridas nas notas de saída (IRRF e CSRF 4,65% retidos pelos clientes)", desc: "Deduzir das guias de PIS, COFINS, IRPJ e CSLL os valores que os clientes descontaram da nossa empresa.", path: "Domínio: Movimentos > Saídas / Baixa de Parcelas" },
+        { id: "lp_13", cat: "3. Auditoria de Saídas (ICMS, ISS, PIS/COFINS Cumulativo, IRPJ e CSLL)", title: "(Trimestral: Mar/Jun/Set/Dez) Lançar Rendimentos de Aplicação e apurar IRPJ e CSLL Presumido", desc: "Conferir presunção (8%/12% Comércio ou 32% Serviços), somar receitas financeiras e checar adicional de 10% IRPJ.", path: "Domínio: Movimentos > Outros Dados > IRPJ/CSLL" },
+        { id: "lp_14", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Processar Apuração (F6) e emitir Relatórios de Impostos em PDF na Domínio", desc: "Emitir demonstrativos de PIS, COFINS, ICMS, IPI, ISS, Retenções, IRPJ e CSLL.", path: "Domínio: Movimentos > Apuração | Relatórios > Impostos" },
+        { id: "lp_15", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Emitir todos os Livros Fiscais em PDF na Domínio Sistemas", desc: "Livros de Entradas, Saídas, Apuração de ICMS, Apuração de IPI (se indústria) e ISS.", path: "Domínio: Relatórios > Livros > Entradas / Saídas / Apuração ICMS / ISS" },
+        { id: "lp_16", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Gerar e validar SPED Fiscal, EFD-Contribuições, EFD-Reinf, DCTFWeb/MIT e GIA/DAPI", desc: "Validar arquivos nos PVAs, transmitir obrigações e gerar todos os DARFs, DARE/DAE e guias de ISS.", path: "Domínio: Relatórios > Informativos > Federais e Estaduais" },
+        { id: "lp_17", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Salvar na rede, montar pacote completo no App Fechamento e enviar p/ Revisão (Mariana/Clayton)", desc: "Subir no App Fechamento: Relatórios de Impostos, Relatório App Coletor, Livros Fiscais, Recibos SPED e Guias.", path: "App Fechamento" },
+        { id: "lp_18", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "(Pós-Revisão) Enviar guias via Nibo/WhatsApp e travar período no Domínio", desc: "Liberar ao cliente após revisão e bloquear mês fiscal.", path: "Domínio: Utilitários > Fechamento de Período" }
+      ]
+    },
+    real: {
+      title: "Lucro Real",
+      items: [
+        { id: "lr_01", cat: "1. Coleta Rigorosa, SIEG, App Coletor e Despesas Creditáveis", title: "Selecionar empresa e competência no Domínio (F8)", desc: "Verificar se apuração de IRPJ/CSLL é Trimestral ou Estimativa Mensal (Balanço de Suspensão/Redução).", path: "Domínio: Controle > Parâmetros" },
+        { id: "lr_02", cat: "1. Coleta Rigorosa, SIEG, App Coletor e Despesas Creditáveis", title: "Baixar no SIEG e importar XMLs de NF-e, NFC-e, SAT, CT-e e NF3-e Energia", desc: "Importar 100% dos documentos fiscais estaduais de entradas e saídas.", path: "Domínio: Utilitários > Importação > Importador de XML" },
+        { id: "lr_03", cat: "1. Coleta Rigorosa, SIEG, App Coletor e Despesas Creditáveis", title: "Baixar NFS-e (Prefeitura/Portal Nacional), importar na Domínio e rodar o App Coletor", desc: "Emitir o relatório do App Coletor (App da Mari) para auditar retenções e serviços tomados.", path: "App Coletor + Domínio: Utilitários > Importação > NFS-e" },
+        { id: "lr_04", cat: "1. Coleta Rigorosa, SIEG, App Coletor e Despesas Creditáveis", title: "Coletar e lançar faturas de Energia, Aluguéis PJ, Leasing, Fretes e Depreciação", desc: "Lançar despesas que geram crédito de 1,65% PIS e 7,6% COFINS.", path: "Domínio: Movimentos > Outros Dados > PIS/COFINS > Créditos / Ativo" },
+        { id: "lr_05", cat: "1. Coleta Rigorosa, SIEG, App Coletor e Despesas Creditáveis", title: "Conferir sequência numérica de Saídas e tratar Canceladas / Inutilizadas", desc: "Garantir integridade total da numeração antes de apurar os créditos/débitos.", path: "Domínio: Relatórios > Acompanhamento > Verificar Numeração" },
+        { id: "lr_06", cat: "2. Auditoria de Créditos Não-Cumulativos e Retenções nas Entradas", title: "Auditar créditos de ICMS, IPI, PIS (1,65%) e COFINS (7,6%) nas compras de revenda, insumos e fretes", desc: "Conferir CST 50 nas entradas tributadas e regras da Lei 14.592/2023.", path: "Domínio: Movimentos > Entradas" },
+        { id: "lr_07", cat: "2. Auditoria de Créditos Não-Cumulativos e Retenções nas Entradas", title: "Bloquear crédito de PIS/COFINS em compras de Monofásicos (CST 70), Alíquota Zero (CST 73) e Uso/Consumo", desc: "Mercadorias monofásicas ou alíquota zero para revenda não dão direito a crédito na entrada.", path: "Domínio: Movimentos > Entradas" },
+        { id: "lr_08", cat: "2. Auditoria de Créditos Não-Cumulativos e Retenções nas Entradas", title: "Analisar compras interestaduais (CFOP 2.xxx) p/ DIFAL e Antecipações (SP e MG)", desc: "Verificar DIFAL de Uso/Consumo e Ativo Imobilizado e antecipações estaduais.", path: "Domínio: Movimentos > Entradas" },
+        { id: "lr_09", cat: "2. Auditoria de Créditos Não-Cumulativos e Retenções nas Entradas", title: "Cruzar Relatório do App Coletor com Entradas: ISS Tomador + Retenções Federais (INSS, IRRF, CSRF)", desc: "Emitir guia municipal de ISS Retido e lançar INSS/IRRF/CSRF na Domínio para EFD-Reinf e DCTFWeb.", path: "App Coletor + Domínio: Movimentos > Entradas" },
+        { id: "lr_10", cat: "3. Auditoria de Saídas, Receitas Financeiras e Integração Contábil (LALUR)", title: "Conferir exclusão do ICMS próprio destacado nas saídas da base de débito do PIS (1,65%) e COFINS (7,6%)", desc: "Validar se o ICMS da operação própria foi abatido da base de cálculo.", path: "Domínio: Relatórios > Impostos > PIS / COFINS Não-Cumulativo" },
+        { id: "lr_11", cat: "3. Auditoria de Saídas, Receitas Financeiras e Integração Contábil (LALUR)", title: "Segregar saídas de produtos Monofásicos (CST 04) e limpar CFOPs de remessa/não-faturamento", desc: "Garantir que remessas não gerem débito de PIS/COFINS e itens monofásicos fiquem com alíquota zero.", path: "Domínio: Relatórios > Acompanhamento > Demonstrativo de CFOPs" },
+        { id: "lr_12", cat: "3. Auditoria de Saídas, Receitas Financeiras e Integração Contábil (LALUR)", title: "Lançar Receitas Financeiras do mês p/ tributação de 0,65% PIS e 4,00% COFINS (Decreto 8.426/2015)", desc: "Tributar rendimentos de aplicação, juros ativos e descontos obtidos.", path: "Domínio: Movimentos > Outros Dados > PIS/COFINS > Demais Receitas" },
+        { id: "lr_13", cat: "3. Auditoria de Saídas, Receitas Financeiras e Integração Contábil (LALUR)", title: "Abater retenções sofridas nas notas de saída (PIS, COFINS, CSLL e IRRF retidos por clientes)", desc: "Aproveitar os créditos de impostos retidos na fonte pelos clientes.", path: "Domínio: Movimentos > Saídas / Baixa de Parcelas" },
+        { id: "lr_14", cat: "3. Auditoria de Saídas, Receitas Financeiras e Integração Contábil (LALUR)", title: "Validar conciliação Fiscal x Contábil (Balancete / LALUR / LACS) p/ apuração de IRPJ e CSLL", desc: "Alinhar com o Setor Contábil o lucro contábil, adições, exclusões e compensação de prejuízo fiscal.", path: "Domínio Contábil / LALUR" },
+        { id: "lr_15", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Processar Apuração (F6) e emitir Relatórios de Impostos (com Memória de Créditos PIS/COFINS)", desc: "Salvar PDFs de PIS/COFINS Não-Cumulativo, ICMS, IPI, ISS, Retenções, IRPJ e CSLL.", path: "Domínio: Movimentos > Apuração | Relatórios > Impostos" },
+        { id: "lr_16", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Emitir todos os Livros Fiscais em PDF (Entradas, Saídas, Apuração ICMS, IPI, ISS e Inventário)", desc: "Gerar livros oficiais do período para compor o fechamento.", path: "Domínio: Relatórios > Livros > Entradas / Saídas / ICMS / IPI / ISS / Inventário" },
+        { id: "lr_17", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Gerar e validar SPED Fiscal, EFD-Contribuições (Blocos F e M), EFD-Reinf, DCTFWeb/MIT e GIA/DAPI", desc: "Validar no PVA, conferir créditos no Bloco M e gerar todas as guias de pagamento.", path: "Domínio: Relatórios > Informativos > Federais e Estaduais" },
+        { id: "lr_18", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "Salvar na rede, montar dossiê completo no App Fechamento e enviar p/ Revisão (Mariana/Clayton)", desc: "Anexar Memória de Créditos, Relatórios Domínio, Relatório App Coletor, Livros, SPEDs e Guias.", path: "App Fechamento" },
+        { id: "lr_19", cat: "4. Apuração, Livros, SPEDs, App Fechamento e Revisão", title: "(Pós-Revisão) Liberar guias no Nibo/WhatsApp e travar período fiscal no Domínio", desc: "Enviar ao cliente após validação técnica e bloquear mês na Domínio.", path: "Domínio: Utilitários > Fechamento de Período" }
+      ]
+    },
+    mei: {
+      title: "MEI (Microempreendedor Individual)",
+      items: [
+        { id: "mei_01", cat: "1. Coleta de Dados (SIEG, Portal Nacional, App Coletor e Cliente)", title: "Baixar XMLs de compras (Entradas) e vendas (Saídas) do MEI no SIEG Cofre XML", desc: "Capturar todas as NF-e emitidas contra o CNPJ do MEI e emitidas por ele.", path: "SIEG Cofre XML" },
+        { id: "mei_02", cat: "1. Coleta de Dados (SIEG, Portal Nacional, App Coletor e Cliente)", title: "Baixar NFS-e do Portal Nacional (Emissor Nacional) e rodar no App Coletor", desc: "Verificar pelo relatório do App Coletor se o MEI tomou serviços com retenção de ISS/INSS.", path: "Portal Nacional (gov.br/nfse) + App Coletor" },
+        { id: "mei_03", cat: "1. Coleta de Dados (SIEG, Portal Nacional, App Coletor e Cliente)", title: "Receber do cliente (via WhatsApp / Nibo) o faturamento sem nota do mês", desc: "Coletar controles de vendas em dinheiro, PIX e maquininha de cartão.", path: "WhatsApp / Nibo" },
+        { id: "mei_04", cat: "2. Auditoria de Limites do MEI (Regras SE / SENÃO)", title: "Conferir Faturamento Acumulado no Ano vs. Limite de R$ 81.000,00 (ou proporcional)", desc: "Se passou de R$ 81k até R$ 97,2k (20%) ou acima de R$ 97,2k: PARAR e avisar Mariana/Clayton imediatamente!", path: "Planilha / Controle de Faturamento MEI" },
+        { id: "mei_05", cat: "2. Auditoria de Limites do MEI (Regras SE / SENÃO)", title: "Conferir Volume de Compras no SIEG vs. Limite de 80% das Receitas", desc: "Alertar Mariana/Clayton se as compras do ano estiverem próximas ou acima de 80% do que o MEI vendeu.", path: "Relatório de Entradas SIEG" },
+        { id: "mei_06", cat: "2. Auditoria de Limites do MEI (Regras SE / SENÃO)", title: "Verificar se houve Compra Interestadual (CFOP 2.xxx) sujeita a DIFAL/ST ou ISS Tomador", desc: "Checar se alguma compra de fora do estado exige recolhimento estadual ou guia municipal de ISS retido.", path: "XMLs de Entrada + Relatório App Coletor" },
+        { id: "mei_07", cat: "3. Guia DAS-MEI, App Fechamento, Revisão e Entrega", title: "Emitir a guia DAS-MEI no portal PGMEI e preencher o Relatório Mensal de Receitas Brutas", desc: "Gerar documento de arrecadação do mês (vencimento dia 20).", path: "Portal Simples Nacional > Simei > PGMEI" },
+        { id: "mei_08", cat: "3. Guia DAS-MEI, App Fechamento, Revisão e Entrega", title: "Salvar arquivos na pasta da rede e subir no App Fechamento p/ Revisão (Mariana/Clayton)", desc: "Anexar Guia DAS-MEI, Controle de Receitas/Compras e Relatório do App Coletor.", path: "App Fechamento" },
+        { id: "mei_09", cat: "3. Guia DAS-MEI, App Fechamento, Revisão e Entrega", title: "(Pós-Revisão) Enviar guia DAS-MEI ao cliente via Nibo / WhatsApp", desc: "Disponibilizar guia validada para pagamento do cliente.", path: "Nibo / WhatsApp" }
+      ]
+    }
+  };
+
+  let currentRegime = "simples";
+  let savedState = JSON.parse(localStorage.getItem("mari_fiscal_checklists_v1")) || {
+    header: { name: "", cnpj: "", comp: "2026-11", operator: "", reviewer: "Mariana / Clayton" },
+    paths: {
+      simples: { xml: "", close: "" },
+      presumido: { xml: "", close: "" },
+      real: { xml: "", close: "" },
+      mei: { xml: "", close: "" }
+    },
+    flags: {},
+    obs: {}
+  };
+
+  function escapeAttr(text) {
+    return String(text || "")
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function initApp() {
+    document.getElementById("clientName").value = savedState.header.name || "";
+    document.getElementById("clientCnpj").value = savedState.header.cnpj || "";
+    document.getElementById("clientComp").value = savedState.header.comp || "2026-11";
+    document.getElementById("clientOperator").value = savedState.header.operator || "";
+    document.getElementById("clientReviewer").value = savedState.header.reviewer || "Mariana / Clayton";
+    switchRegime("simples");
+  }
+
+  function saveToStorage() {
+    localStorage.setItem("mari_fiscal_checklists_v1", JSON.stringify(savedState));
+  }
+
+  function saveHeaderData() {
+    savedState.header = {
+      name: document.getElementById("clientName").value,
+      cnpj: document.getElementById("clientCnpj").value,
+      comp: document.getElementById("clientComp").value,
+      operator: document.getElementById("clientOperator").value,
+      reviewer: document.getElementById("clientReviewer").value
+    };
+    saveToStorage();
+  }
+
+  function savePathsData() {
+    savedState.paths[currentRegime] = {
+      xml: document.getElementById("pathXmlInput").value,
+      close: document.getElementById("pathCloseInput").value
+    };
+    saveToStorage();
+  }
+
+  function switchRegime(regimeKey) {
+    currentRegime = regimeKey;
+
+    document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+    document.getElementById("tab-" + regimeKey).classList.add("active");
+
+    const rPaths = (savedState.paths && savedState.paths[regimeKey]) || { xml: "", close: "" };
+    document.getElementById("pathXmlInput").value = rPaths.xml || "";
+    document.getElementById("pathCloseInput").value = rPaths.close || "";
+
+    document.getElementById("pageMainTitle").innerText = "Checklist Operacional - " + regimesData[regimeKey].title;
+    document.getElementById("regimeProgressLabel").innerText = "Progresso do Fechamento (" + regimesData[regimeKey].title + ")";
+
+    renderChecklistTable();
+    updateCounters();
+  }
+
+  function renderChecklistTable() {
+    const container = document.getElementById("checklistContainer");
+    const items = regimesData[currentRegime].items;
+
+    let html = "";
+    let lastCategory = "";
+
+    items.forEach((item, index) => {
+      if (item.cat !== lastCategory) {
+        if (lastCategory !== "") {
+          html += `</tbody></table>`;
+        }
+        lastCategory = item.cat;
+        html += `
+          <div class="category-header">${item.cat}</div>
+          <table class="checklist-table">
+            <thead>
+              <tr>
+                <th class="col-num">#</th>
+                <th class="col-check">✓</th>
+                <th>O que fazer / Onde clicar na Domínio e Sistemas</th>
+                <th class="col-flags">Flag Mensal</th>
+                <th class="col-obs">Observação / Pendência</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+      }
+
+      const currentFlag = savedState.flags[item.id] || "";
+      const currentObs = savedState.obs[item.id] || "";
+      const rowStatusClass = currentFlag ? `status-${currentFlag}` : "";
+      const isChecked = (currentFlag === "ok" || currentFlag === "na") ? "checked" : "";
+
+      html += `
+        <tr class="checklist-row ${rowStatusClass}" id="row-${item.id}">
+          <td class="col-num">${String(index + 1).padStart(2, "0")}</td>
+          <td class="col-check">
+            <input type="checkbox" class="main-checkbox" ${isChecked} onchange="toggleMainCheck('${item.id}', this.checked)">
+          </td>
+          <td>
+            <div class="task-title">${item.title}</div>
+            <div class="task-desc">${item.desc}</div>
+            <span class="dominio-badge">${item.path}</span>
+          </td>
+          <td class="col-flags">
+            <div class="flag-group">
+              <button type="button" class="flag-btn ${currentFlag === 'ok' ? 'active-ok' : ''}" onclick="setFlag('${item.id}', 'ok')">[ OK ]</button>
+              <button type="button" class="flag-btn ${currentFlag === 'na' ? 'active-na' : ''}" onclick="setFlag('${item.id}', 'na')">[ N/A ]</button>
+              <button type="button" class="flag-btn ${currentFlag === 'pend' ? 'active-pend' : ''}" onclick="setFlag('${item.id}', 'pend')">[ PEND ]</button>
+            </div>
+          </td>
+          <td class="col-obs">
+            <input type="text" class="obs-input" placeholder="Anotar dúvida / motivo..." value="${escapeAttr(currentObs)}" oninput="saveObs('${item.id}', this.value)">
+          </td>
+        </tr>
+      `;
+    });
+
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+  }
+
+  function setFlag(itemId, flagValue) {
+    if (savedState.flags[itemId] === flagValue) {
+      delete savedState.flags[itemId];
+    } else {
+      savedState.flags[itemId] = flagValue;
+    }
+    saveToStorage();
+    renderChecklistTable();
+    updateCounters();
+  }
+
+  function toggleMainCheck(itemId, checked) {
+    if (checked) {
+      savedState.flags[itemId] = "ok";
+    } else {
+      delete savedState.flags[itemId];
+    }
+    saveToStorage();
+    renderChecklistTable();
+    updateCounters();
+  }
+
+  function saveObs(itemId, text) {
+    savedState.obs[itemId] = text;
+    saveToStorage();
+  }
+
+  function updateCounters() {
+    const items = regimesData[currentRegime].items;
+    let okCount = 0;
+    let naCount = 0;
+    let pendCount = 0;
+
+    items.forEach(item => {
+      const f = savedState.flags[item.id];
+      if (f === "ok") okCount++;
+      if (f === "na") naCount++;
+      if (f === "pend") pendCount++;
+    });
+
+    const total = items.length;
+    const done = okCount + naCount;
+    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+    document.getElementById("countOk").innerText = okCount;
+    document.getElementById("countNa").innerText = naCount;
+    document.getElementById("countPend").innerText = pendCount;
+    document.getElementById("regimeProgressPct").innerText = `${pct}% concluído (${done}/${total})`;
+    document.getElementById("progressBarFill").style.width = `${pct}%`;
+  }
+
+  function markAllOk() {
+    const items = regimesData[currentRegime].items;
+    items.forEach(item => {
+      if (!savedState.flags[item.id]) {
+        savedState.flags[item.id] = "ok";
+      }
+    });
+    saveToStorage();
+    renderChecklistTable();
+    updateCounters();
+  }
+
+  function resetCurrentRegime() {
+    if (!confirm("Deseja limpar todas as marcações e observações desta aba para começar outra empresa?")) return;
+    const items = regimesData[currentRegime].items;
+    items.forEach(item => {
+      delete savedState.flags[item.id];
+      delete savedState.obs[item.id];
+    });
+    saveToStorage();
+    renderChecklistTable();
+    updateCounters();
+  }
+
+  window.onload = initApp;
+</script>
+
+</body>
+</html>
