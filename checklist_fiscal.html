@@ -1425,7 +1425,7 @@
 
     const regimeTitle = regimesData[currentRegime].title;
     const typeTitle = CHECKLIST_TYPES[typeKey].title;
-    document.getElementById("pageMainTitle").innerText = "Fechamento - " + typeTitle + " (" + regimeTitle + ")";
+    document.getElementById("pageMainTitle").innerText = "Fechamento - (" + regimeTitle + ")";
     document.getElementById("regimeProgressLabel").innerText = "Progresso: " + typeTitle + " · " + regimeTitle;
     const hintEl = document.getElementById("typeHintText");
     if (hintEl) hintEl.innerText = CHECKLIST_TYPES[typeKey].hint;
