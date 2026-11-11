@@ -298,6 +298,22 @@
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn-clear-flags {
+      border: 1px solid var(--pend-border);
+      background: var(--pend-bg);
+      color: var(--pend-text);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-clear-flags:hover {
+      filter: brightness(0.97);
     }
 
     .counter-pill {
@@ -761,12 +777,7 @@
     </div>
     <div class="header-actions">
       <button class="btn btn-white" onclick="saveCurrentClient()">Salvar Cliente</button>
-      <button class="btn btn-outline" onclick="exportBackupJson()">Backup JSON</button>
-      <button class="btn btn-outline" onclick="document.getElementById('importBackupInput').click()">Importar JSON</button>
-      <input type="file" id="importBackupInput" accept="application/json,.json" style="display:none" onchange="importBackupJson(event)">
       <button class="btn btn-outline" onclick="window.print()">Imprimir Fechamento (A4)</button>
-      <button class="btn btn-outline" onclick="markAllOk()">Marcar Tudo OK</button>
-      <button class="btn btn-outline" onclick="resetCurrentRegime()">Limpar Etapa Atual</button>
     </div>
   </header>
 
@@ -822,7 +833,7 @@
       <label>Revisor Técnico</label>
       <input type="text" id="clientReviewer" placeholder="Nome do revisor" oninput="persistWorkingDraft()">
     </div>
-    <p class="db-hint">Os fechamentos ficam organizados por <strong>Ano → Mês → Cliente</strong>. Escolha Ano/Mês e um cliente já salvo para carregar; ou digite um novo e clique em <strong>Salvar Cliente</strong>. Use Backup JSON para compartilhar com a equipe. Anexos ficam vinculados ao item e, no futuro, irão para a pasta de rede do fechamento.</p>
+    <p class="db-hint">Os fechamentos ficam organizados por <strong>Ano → Mês → Cliente</strong>. Escolha Ano/Mês e um cliente já salvo para carregar; ou digite um novo e clique em <strong>Salvar Cliente</strong>. Anexos ficam vinculados ao item e, no futuro, irão para a pasta de rede do fechamento.</p>
   </section>
 
   <nav class="tabs-bar">
@@ -835,10 +846,10 @@
   <div class="type-bar">
     <span class="type-bar-label">Etapa:</span>
     <button type="button" class="type-pill active" id="tab-importacao" onclick="switchChecklistType('importacao')">Importação</button>
-    <button type="button" class="type-pill" id="tab-analise" onclick="switchChecklistType('analise')">Análise</button>
+    <button type="button" class="type-pill" id="tab-analise" onclick="switchChecklistType('analise')">Conferência</button>
     <button type="button" class="type-pill" id="tab-obrigacoes" onclick="switchChecklistType('obrigacoes')">Obrigações Acessórias</button>
     <button type="button" class="type-pill" id="tab-fechamento" onclick="switchChecklistType('fechamento')">Fechamento</button>
-    <p class="type-hint" id="typeHintText">Importação: o que a pessoa deve escriturar no período.</p>
+    <p class="type-hint" id="typeHintText">Importação: o que a pessoa deve escriturar no período (parâmetros, XMLs, NFS-e, coletor, sequência).</p>
   </div>
 
   <section class="status-panel">
@@ -855,6 +866,7 @@
       <div class="counter-pill pill-ok">OK: <span id="countOk">0</span></div>
       <div class="counter-pill pill-na">N/A: <span id="countNa">0</span></div>
       <div class="counter-pill pill-pend">PENDENTE: <span id="countPend">0</span></div>
+      <button type="button" class="btn-clear-flags" onclick="resetCurrentRegime()">Limpar etapa</button>
     </div>
   </section>
 
@@ -989,8 +1001,8 @@
       hint: "Importação: o que a pessoa deve escriturar no período (parâmetros, XMLs, NFS-e, coletor, sequência)."
     },
     analise: {
-      title: "Análise",
-      hint: "Análise: o que o revisor deve conferir (entradas, saídas, retenções, ST/DIFAL/FECP, segregações, prova real)."
+      title: "Conferência",
+      hint: "Conferência: o executor confere na Domínio o que escriturou (entradas, saídas, retenções, ST/DIFAL/FECP, segregações, prova real)."
     },
     obrigacoes: {
       title: "Obrigações Acessórias",
@@ -998,11 +1010,11 @@
     },
     fechamento: {
       title: "Fechamento",
-      hint: "Fechamento: compilado de livros, relatórios e guias + pacote para revisão/entrega e travamento do período."
+      hint: "Fechamento: dossiê para o revisor analisar livros, demonstrativos, relatórios e guias do período."
     }
   };
 
-  // Papéis: Importação=escriturar | Análise=revisor | Obrigações=entregar | Fechamento=livros/relatórios/guias
+  // Papéis: Importação=escriturar | Conferência=executor confere | Obrigações=entregar | Fechamento=revisor/dossiê
   const ITEM_TYPE_MAP = {
     sn_01: "importacao", sn_02: "importacao", sn_03: "importacao", sn_04: "importacao", sn_05: "importacao",
     sn_06: "analise", sn_07: "analise", sn_08: "analise", sn_09: "analise",
