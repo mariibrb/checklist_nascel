@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checklist Fiscal — Nascel</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background-color: #fdf2f8;
+      color: #1e293b;
+      padding: 24px;
+      margin: 0;
+    }
+
+    .market-sheet {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 1px solid #f9a8d4;
+      border-radius: 12px;
+      padding: 28px 32px;
+      box-shadow: 0 8px 20px rgba(136, 19, 55, 0.08);
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #881337;
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .top-bar h1 {
+      font-size: 1.35rem;
+      color: #881337;
+      margin: 0;
+    }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .actions a,
+    .actions button {
+      background: #881337;
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .actions a.secondary,
+    .actions button.secondary {
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+    }
+
+    .hint {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin: 0 0 16px;
+    }
+
+    .regime-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .regime-tabs button {
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #475569;
+      cursor: pointer;
+    }
+
+    .regime-tabs button.active {
+      background: #881337;
+      color: #ffffff;
+      border-color: #881337;
+    }
+
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #be185d;
+      margin: 18px 0 8px 0;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #fce7f3;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 7px 6px;
+      border-bottom: 1px dashed #e2e8f0;
+      cursor: pointer;
+      font-size: 0.93rem;
+      transition: background 0.1s;
+    }
+
+    .check-item:hover { background: #fdf2f8; }
+
+    .check-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      accent-color: #881337;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .check-item.checked span {
+      text-decoration: line-through;
+      color: #94a3b8;
+    }
+
+    @media (max-width: 700px) {
+      .regime-tabs { grid-template-columns: 1fr 1fr; }
+      .market-sheet { padding: 18px; }
+    }
+
+    @media print {
+      body { background: #fff; padding: 0; }
+      .market-sheet { border: none; box-shadow: none; padding: 0; max-width: 100%; }
+      .actions { display: none; }
+      .hint { display: none; }
+      .regime-tabs button:not(.active) { display: none; }
+      .regime-tabs { grid-template-columns: 1fr; margin-bottom: 10px; }
+      .regime-tabs button.active {
+        background: none;
+        color: #000;
+        border: 1px solid #000;
+        text-align: left;
+        padding: 6px;
+      }
+      .section-title {
+        color: #000;
+        border-bottom: 1px solid #000;
+        margin: 10px 0 4px 0;
+        font-size: 9.5pt;
+      }
+      .check-item {
+        padding: 4px 2px;
+        font-size: 9.5pt;
+        border-bottom: 1px dotted #ccc;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="market-sheet">
+  <div class="top-bar">
+    <h1>Checklist de Fechamento</h1>
+    <div class="actions">
+      <a class="secondary" href="index.html">Início</a>
+      <button class="secondary" type="button" onclick="clearCurrentChecks()">Limpar Lista</button>
+      <button type="button" onclick="window.print()">Imprimir</button>
+    </div>
+  </div>
+
+  <p class="hint">Lista geral, independente de cliente — marque os passos como uma lista de mercado.</p>
+
+  <div class="regime-tabs">
+    <button type="button" id="btn-simples" class="active" onclick="setRegime('simples')">Simples Nacional</button>
+    <button type="button" id="btn-presumido" onclick="setRegime('presumido')">Lucro Presumido</button>
+    <button type="button" id="btn-real" onclick="setRegime('real')">Lucro Real</button>
+    <button type="button" id="btn-mei" onclick="setRegime('mei')">MEI</button>
+  </div>
+
+  <div id="listContainer"></div>
+</div>
+
+<script>
+  const commonSteps = {
+    captura: [
+      "Baixar XMLs e relatório resumo na SIEG (NF-e, NFC-e, SAT, CT-e e Canceladas)",
+      "Baixar NFS-e do Portal Nacional e processar no App Coletor (conferência de tomados)",
+      "Baixar XMLs e Livro Fiscal nos sites das Prefeituras (Prestados e Tomados)",
+      "Baixar XMLs e relatórios de vendas de Plataformas de E-commerce e site do cliente",
+      "Baixar documentos e relatórios enviados no Nibo, E-mail, WhatsApp e Drives"
+    ],
+    escrituracao: [
+      "Selecionar empresa e competência na Domínio (F8) e validar Competência ou Caixa",
+      "Importar lotes de XMLs de Entradas, Saídas, Fretes e Serviços na Domínio",
+      "Lançar documentos manuais sem XML e baixas financeiras (se Regime de Caixa)"
+    ],
+    comprovacao: [
+      "Bater total escriturado na Domínio com o Relatório Resumo da SIEG",
+      "Bater total de serviços e retenções com o Livro da Prefeitura e Relatório do App Coletor",
+      "Bater total de vendas na Domínio com os relatórios do Cliente e E-commerce",
+      "Verificar Quebra de Sequência Numérica na Domínio e tratar Canceladas e Inutilizadas"
+    ]
+  };
+
+  const listsByRegime = {
+    simples: {
+      "1. Baixar os Arquivos": commonSteps.captura,
+      "2. Escriturar os Arquivos": commonSteps.escrituracao,
+      "3. Comprovar a Escrituração": commonSteps.comprovacao,
+      "4. Avaliar Notas e Localizar Erros": [
+        "Tirar CFOPs de Não-Faturamento da receita bruta (remessas, brindes, conserto, 5.929)",
+        "Conferir se as Devoluções de Venda (1.202/1.411/2.202) estão abatendo no anexo correto",
+        "Segregar vendas com ICMS-ST (CFOP 5.405 / 6.404) e produtos Monofásicos (PIS/COFINS)",
+        "Sincronizar Folha de Salários (12m) para Fator R e segregar notas COM Retenção de ISS",
+        "Auditar Entradas Interestaduais (2.xxx): DIFAL, Antecipação SP (426-A) / MG, ICMS-ST e FECP (Por Operação vs. Por Apuração)",
+        "Conferir Inscrições de Substituto Tributário (IE-ST) ativas em outras UFs",
+        "Conferir no App Coletor e lançar retenções de Serviços Tomados (ISS, INSS, IRRF e CSRF 4,65%)"
+      ],
+      "5. Apurar Impostos e Obrigações Acessórias": [
+        "Processar Apuração (F6) e fazer Prova Real: (Vendas + Serviços) - Devoluções = Base RPA",
+        "Transmitir PGDAS-D (após bater centavos com a Domínio) e emitir Guia DAS, Recibo e Extrato",
+        "Emitir guias estaduais/municipais (DARE-SP, DAE-MG, GNRE por apuração e ISS Tomador)",
+        "Transmitir DeSTDA (SEDIF-SN), GIA-ST / Sintegra (se tiver IE-ST), EFD-Reinf, DCTFWeb e encerrar Prefeitura",
+        "Verificar obrigações específicas/anuais (DEFIS, DAMEF-MG, DIMOB, DMED, DME)"
+      ],
+      "6. Extrair Relatórios e Livros da Domínio": [
+        "Salvar em PDF: Resumo de CFOPs/Acumuladores e Demonstrativo do Simples Nacional",
+        "Salvar em PDF: Livros de Entradas, Saídas e Serviços (ISS)"
+      ],
+      "7. Gerar Fechamento, Revisão e Entrega": [
+        "Montar o dossiê no Fechamento Nascel (Guias + Recibos + Relatórios + Livros) e enviar p/ Revisão",
+        "Enviar guias ao cliente (Nibo / WhatsApp) após aprovação e travar período na Domínio"
+      ]
+    },
+    presumido: {
+      "1. Baixar os Arquivos": commonSteps.captura,
+      "2. Escriturar os Arquivos": commonSteps.escrituracao,
+      "3. Comprovar a Escrituração": commonSteps.comprovacao,
+      "4. Avaliar Notas e Localizar Erros": [
+        "Conferir crédito de ICMS/IPI nas entradas de revenda/insumos e bloquear em ST e Uso/Consumo",
+        "Auditar DIFAL, Antecipação, ICMS-ST, FECP/FEM e IE-ST em outras UFs (Por Operação vs. Por Apuração)",
+        "Conferir no App Coletor e lançar retenções de Serviços Tomados (ISS, INSS, IRRF e CSRF 4,65%)",
+        "Tirar CFOPs de remessa/conserto/bonificação da base de PIS, COFINS, IRPJ e CSLL",
+        "Conferir exclusão do ICMS próprio nas saídas da base de PIS (0,65%) e COFINS (3,00%)",
+        "Segregar produtos Monofásicos (CST 04), Devoluções de Venda e abater retenções sofridas nas saídas",
+        "(No Trimestre) Lançar Rendimentos de Aplicação Financeira para base de IRPJ e CSLL"
+      ],
+      "5. Apurar Impostos e Obrigações Acessórias": [
+        "Processar Apuração (F6) e emitir guias de PIS, COFINS, ICMS, IPI, ST, DIFAL, FECP, ISS, IRPJ e CSLL",
+        "Gerar e transmitir SPED Fiscal (EFD ICMS/IPI c/ Reg. 1601, Bloco G/H/K), GIA-SP, DAPI-MG, GIA-ST e Sintegra",
+        "Gerar e transmitir EFD-Contribuições (Cumulativo), EFD-Reinf, MIT + DCTFWeb (DARF Unificado), DIRBI e PER/DCOMP",
+        "Encerrar competência de ISS na Prefeitura e verificar obrigações anuais/setoriais (ECD, ECF, DAMEF-MG, DIMOB, DMED)"
+      ],
+      "6. Extrair Relatórios e Livros da Domínio": [
+        "Salvar em PDF: Demonstrativos de PIS, COFINS, ICMS, ST/DIFAL/FECP, IPI, ISS, Retenções, IRPJ e CSLL",
+        "Salvar em PDF: Livros de Entradas, Saídas, Apuração de ICMS, Apuração de IPI e ISS"
+      ],
+      "7. Gerar Fechamento, Revisão e Entrega": [
+        "Montar o dossiê no Fechamento Nascel (Guias + Recibos SPED + Relatórios + Livros) e enviar p/ Revisão",
+        "Enviar guias ao cliente (Nibo / WhatsApp) após aprovação e travar período na Domínio"
+      ]
+    },
+    real: {
+      "1. Baixar os Arquivos": commonSteps.captura.concat([
+        "Coletar faturas de Energia, Aluguéis PJ, Leasing, Fretes e Depreciação (créditos de 9,25%)"
+      ]),
+      "2. Escriturar os Arquivos": commonSteps.escrituracao,
+      "3. Comprovar a Escrituração": commonSteps.comprovacao,
+      "4. Avaliar Notas e Localizar Erros": [
+        "Auditar créditos de ICMS, IPI, PIS (1,65%) e COFINS (7,6%) em insumos, revenda, fretes, energia e aluguéis (CST 50)",
+        "Bloquear crédito de PIS/COFINS em Monofásicos (CST 70), Alíquota Zero (CST 73) e Uso/Consumo",
+        "Auditar DIFAL, Antecipação, ICMS-ST, FECP/FEM e IE-ST em outras UFs (Por Operação vs. Por Apuração)",
+        "Conferir no App Coletor e lançar retenções de Serviços Tomados (ISS, INSS, IRRF e CSRF 4,65%)",
+        "Conferir exclusão do ICMS próprio das saídas na base de PIS/COFINS e segregar Monofásicos (CST 04)",
+        "Tributar Receitas Financeiras (0,65% PIS e 4% COFINS) e abater retenções sofridas nas saídas",
+        "Conciliar Balancete Contábil e LALUR / LACS (adições, exclusões e compensação de prejuízo)"
+      ],
+      "5. Apurar Impostos e Obrigações Acessórias": [
+        "Processar Apuração (F6) e emitir guias de PIS/COFINS Não-Cumulativo, ICMS, IPI, ST, DIFAL, FECP, ISS, IRPJ e CSLL",
+        "Gerar e transmitir SPED Fiscal completo (Blocos G, H, K e Reg. 1601), GIA-SP, DAPI-MG, GIA-ST, Sintegra e Portaria CAT 42 / E-CredAc",
+        "Gerar e transmitir EFD-Contribuições (Blocos A, C, D, F, M e P), EFD-Reinf, MIT + DCTFWeb, DIRBI e PER/DCOMP Web",
+        "Encerrar ISS na Prefeitura e validar obrigações anuais/setoriais (ECD, ECF, LALUR, DAMEF-MG, DIMOB, DMED)"
+      ],
+      "6. Extrair Relatórios e Livros da Domínio": [
+        "Salvar em PDF: Memória de Créditos PIS/COFINS e Demonstrativos de ICMS, ST/DIFAL/FECP, IPI, ISS, Retenções, IRPJ e CSLL",
+        "Salvar em PDF: Livros de Entradas, Saídas, Apuração de ICMS, Apuração de IPI, ISS e Inventário"
+      ],
+      "7. Gerar Fechamento, Revisão e Entrega": [
+        "Montar o dossiê no Fechamento Nascel (Guias + Memória de Créditos + SPEDs + Livros) e enviar p/ Revisão",
+        "Enviar guias ao cliente (Nibo / WhatsApp) após aprovação e travar período na Domínio"
+      ]
+    },
+    mei: {
+      "1. Baixar os Arquivos": [
+        "Baixar XMLs de compras (Entradas) e vendas (Saídas) do MEI na SIEG",
+        "Baixar NFS-e do Portal Nacional e rodar no App Coletor (conferir serviços tomados)",
+        "Coletar com o cliente (WhatsApp/Nibo) o faturamento sem nota do mês"
+      ],
+      "2. Conferir Limites e Obrigações": [
+        "Conferir acumulado de receitas no ano contra o limite de R$ 81.000,00 (ou proporcional)",
+        "Conferir total de compras na SIEG contra o limite de 80% do faturamento",
+        "Verificar se houve compra interestadual (CFOP 2.xxx) sujeita a DIFAL/ST ou serviço tomado com ISS/INSS retido"
+      ],
+      "3. Emitir Guia, Fechamento e Entrega": [
+        "Emitir guia DAS-MEI no PGMEI e preencher Relatório Mensal de Receitas Brutas",
+        "Transmitir EFD-Reinf / eSocial / DCTFWeb (se tiver funcionário ou retenção) e DASN-SIMEI (em Maio)",
+        "Montar o dossiê no Fechamento Nascel para Revisão e enviar DAS-MEI ao cliente via Nibo / WhatsApp"
+      ]
+    }
+  };
+
+  let currentRegime = "simples";
+  let db = JSON.parse(localStorage.getItem("nascel_market_checklist_db")) || {};
+
+  function getStorageKey() {
+    return "regime_" + currentRegime;
+  }
+
+  function setRegime(r) {
+    currentRegime = r;
+    document.querySelectorAll(".regime-tabs button").forEach(b => b.classList.remove("active"));
+    document.getElementById("btn-" + r).classList.add("active");
+    renderList();
+  }
+
+  function toggleItem(itemKey, checked) {
+    const key = getStorageKey();
+    if (!db[key]) db[key] = {};
+    db[key][itemKey] = checked;
+    localStorage.setItem("nascel_market_checklist_db", JSON.stringify(db));
+    renderList();
+  }
+
+  function clearCurrentChecks() {
+    const key = getStorageKey();
+    delete db[key];
+    localStorage.setItem("nascel_market_checklist_db", JSON.stringify(db));
+    renderList();
+  }
+
+  function renderList() {
+    const container = document.getElementById("listContainer");
+    const sections = listsByRegime[currentRegime];
+    const key = getStorageKey();
+    const checkedMap = db[key] || {};
+
+    let html = "";
+    let idx = 1;
+
+    for (const [sectionTitle, items] of Object.entries(sections)) {
+      html += `<div class="section-title">${sectionTitle}</div>`;
+      items.forEach(text => {
+        const itemKey = "item_" + idx;
+        const isChecked = !!checkedMap[itemKey];
+        html += `
+          <label class="check-item ${isChecked ? "checked" : ""}">
+            <input type="checkbox" ${isChecked ? "checked" : ""} onchange="toggleItem('${itemKey}', this.checked)">
+            <span>${text}</span>
+          </label>
+        `;
+        idx++;
+      });
+    }
+
+    container.innerHTML = html;
+  }
+
+  window.onload = renderList;
+</script>
+
+</body>
+</html>

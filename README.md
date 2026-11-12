@@ -1,8 +1,10 @@
-# Central de Checklists Fiscais — Nascel
+# Central Fiscal — Nascel
 
-Checklist operacional de fechamento mensal (Simples Nacional, Lucro Presumido, Lucro Real e MEI).
+Site estático com duas áreas:
 
-Site estático: abra `index.html` no navegador ou publique no Render / GitHub Pages.
+- `index.html` — página inicial de acesso
+- `checklist.html` — checklist geral (lista de mercado, independente de cliente)
+- `fechamento.html` — dossiê de fechamento por cliente (código, revisão, anexos, impressão)
 
 As marcações ficam salvas no `localStorage` do navegador de cada usuário.
 
