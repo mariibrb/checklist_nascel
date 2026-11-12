@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>Checklist Fiscal — Nascel</title>
   <style>
     body {
@@ -62,12 +63,6 @@
       background: #f1f5f9;
       color: #334155;
       border: 1px solid #cbd5e1;
-    }
-
-    .hint {
-      font-size: 0.85rem;
-      color: #64748b;
-      margin: 0 0 16px;
     }
 
     .regime-tabs {
@@ -140,7 +135,6 @@
       body { background: #fff; padding: 0; }
       .market-sheet { border: none; box-shadow: none; padding: 0; max-width: 100%; }
       .actions { display: none; }
-      .hint { display: none; }
       .regime-tabs button:not(.active) { display: none; }
       .regime-tabs { grid-template-columns: 1fr; margin-bottom: 10px; }
       .regime-tabs button.active {
@@ -176,8 +170,6 @@
     </div>
   </div>
 
-  <p class="hint">Lista geral, independente de cliente — marque os passos como uma lista de mercado.</p>
-
   <div class="regime-tabs">
     <button type="button" id="btn-simples" class="active" onclick="setRegime('simples')">Simples Nacional</button>
     <button type="button" id="btn-presumido" onclick="setRegime('presumido')">Lucro Presumido</button>
@@ -190,9 +182,10 @@
 
 <script>
   const commonSteps = {
+    // Igual em TODOS os regimes: uma linha para mercadoria/frete e uma para serviço
     captura: [
-      "Baixar XMLs de DANFE e CT-e (NF-e, NFC-e, SAT, CT-e e canceladas) + todos os relatórios disponíveis em: SIEG, Nibo, E-mail, Drive, WhatsApp, plataformas de e-commerce e portal do cliente",
-      "Baixar NFS-e (prestados e tomados) + todos os relatórios disponíveis em: Portal Nacional, SIEG, Nibo, E-mail, Drive, WhatsApp, plataformas de e-commerce, portal do cliente e Prefeitura — e passar no App Coletor quando houver serviços tomados"
+      "Baixar todos os XMLs de DANFE e CT-e (NF-e, NFC-e, SAT, CT-e e canceladas) e todos os relatórios que existirem — olhando em TODOS estes lugares: SIEG, Nibo, E-mail, Drive, WhatsApp, e-commerce e portal do cliente",
+      "Baixar todas as NFS-e (prestados e tomados) e todos os relatórios que existirem — olhando em TODOS estes lugares: Portal Nacional, SIEG, Nibo, E-mail, Drive, WhatsApp, e-commerce, portal do cliente e Prefeitura; se tiver serviço tomado, passar no App Coletor"
     ],
     escrituracao: [
       "Selecionar empresa e competência na Domínio (F8) e validar Competência ou Caixa",
@@ -244,7 +237,7 @@
   const listsByRegime = {
     simples: {
       "1. Baixar os Arquivos": commonSteps.captura,
-      "1b. Documentos extras deste regime": extrasPorRegime.simples,
+      "Documentos extras deste regime": extrasPorRegime.simples,
       "2. Escriturar os Arquivos": commonSteps.escrituracao,
       "3. Comprovar a Escrituração": commonSteps.comprovacao,
       "4. Avaliar Notas e Localizar Erros": [
@@ -274,7 +267,7 @@
     },
     presumido: {
       "1. Baixar os Arquivos": commonSteps.captura,
-      "1b. Documentos extras deste regime": extrasPorRegime.presumido,
+      "Documentos extras deste regime": extrasPorRegime.presumido,
       "2. Escriturar os Arquivos": commonSteps.escrituracao,
       "3. Comprovar a Escrituração": commonSteps.comprovacao,
       "4. Avaliar Notas e Localizar Erros": [
@@ -303,7 +296,7 @@
     },
     real: {
       "1. Baixar os Arquivos": commonSteps.captura,
-      "1b. Documentos extras deste regime": extrasPorRegime.real,
+      "Documentos extras deste regime": extrasPorRegime.real,
       "2. Escriturar os Arquivos": commonSteps.escrituracao,
       "3. Comprovar a Escrituração": commonSteps.comprovacao,
       "4. Avaliar Notas e Localizar Erros": [
@@ -332,7 +325,7 @@
     },
     mei: {
       "1. Baixar os Arquivos": commonSteps.captura,
-      "1b. Documentos extras deste regime": extrasPorRegime.mei,
+      "Documentos extras deste regime": extrasPorRegime.mei,
       "2. Conferir Limites e Obrigações": [
         "Conferir acumulado de receitas no ano contra o limite de R$ 81.000,00 (ou proporcional)",
         "Conferir total de compras na SIEG contra o limite de 80% do faturamento",
@@ -347,7 +340,7 @@
   };
 
   let currentRegime = "simples";
-  let db = JSON.parse(localStorage.getItem("nascel_market_checklist_db")) || {};
+  let db = JSON.parse(localStorage.getItem("nascel_market_checklist_db_v2")) || {};
 
   function getStorageKey() {
     return "regime_" + currentRegime;
@@ -364,14 +357,14 @@
     const key = getStorageKey();
     if (!db[key]) db[key] = {};
     db[key][itemKey] = checked;
-    localStorage.setItem("nascel_market_checklist_db", JSON.stringify(db));
+    localStorage.setItem("nascel_market_checklist_db_v2", JSON.stringify(db));
     renderList();
   }
 
   function clearCurrentChecks() {
     const key = getStorageKey();
     delete db[key];
-    localStorage.setItem("nascel_market_checklist_db", JSON.stringify(db));
+    localStorage.setItem("nascel_market_checklist_db_v2", JSON.stringify(db));
     renderList();
   }
 
