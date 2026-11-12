@@ -191,11 +191,8 @@
 <script>
   const commonSteps = {
     captura: [
-      "Baixar XMLs e relatório resumo na SIEG (NF-e, NFC-e, SAT, CT-e e Canceladas)",
-      "Baixar NFS-e do Portal Nacional e processar no App Coletor (conferência de tomados)",
-      "Baixar XMLs e Livro Fiscal nos sites das Prefeituras (Prestados e Tomados)",
-      "Baixar XMLs e relatórios de vendas de Plataformas de E-commerce e site do cliente",
-      "Baixar documentos e relatórios enviados no Nibo, E-mail, WhatsApp e Drives"
+      "Baixar XMLs de DANFE e CT-e (NF-e, NFC-e, SAT, CT-e e canceladas) + todos os relatórios disponíveis em: SIEG, Nibo, E-mail, Drive, WhatsApp, plataformas de e-commerce e portal do cliente",
+      "Baixar NFS-e (prestados e tomados) + todos os relatórios disponíveis em: Portal Nacional, SIEG, Nibo, E-mail, Drive, WhatsApp, plataformas de e-commerce, portal do cliente e Prefeitura — e passar no App Coletor quando houver serviços tomados"
     ],
     escrituracao: [
       "Selecionar empresa e competência na Domínio (F8) e validar Competência ou Caixa",
@@ -269,10 +266,10 @@
       ]
     },
     real: {
-      "1. Baixar os Arquivos": commonSteps.captura.concat([
-        "Coletar faturas de Energia, Aluguéis PJ, Leasing, Fretes e Depreciação (créditos de 9,25%)"
+      "1. Baixar os Arquivos": commonSteps.captura,
+      "2. Escriturar os Arquivos": commonSteps.escrituracao.concat([
+        "Separar também faturas de Energia, Aluguéis PJ, Leasing, Fretes e Depreciação (créditos de 9,25%)"
       ]),
-      "2. Escriturar os Arquivos": commonSteps.escrituracao,
       "3. Comprovar a Escrituração": commonSteps.comprovacao,
       "4. Avaliar Notas e Localizar Erros": [
         "Auditar créditos de ICMS, IPI, PIS (1,65%) e COFINS (7,6%) em insumos, revenda, fretes, energia e aluguéis (CST 50)",
@@ -299,12 +296,9 @@
       ]
     },
     mei: {
-      "1. Baixar os Arquivos": [
-        "Baixar XMLs de compras (Entradas) e vendas (Saídas) do MEI na SIEG",
-        "Baixar NFS-e do Portal Nacional e rodar no App Coletor (conferir serviços tomados)",
-        "Coletar com o cliente (WhatsApp/Nibo) o faturamento sem nota do mês"
-      ],
+      "1. Baixar os Arquivos": commonSteps.captura,
       "2. Conferir Limites e Obrigações": [
+        "Anotar com o cliente (WhatsApp/Nibo) o faturamento sem nota do mês",
         "Conferir acumulado de receitas no ano contra o limite de R$ 81.000,00 (ou proporcional)",
         "Conferir total de compras na SIEG contra o limite de 80% do faturamento",
         "Verificar se houve compra interestadual (CFOP 2.xxx) sujeita a DIFAL/ST ou serviço tomado com ISS/INSS retido"
